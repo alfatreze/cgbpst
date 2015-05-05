@@ -213,7 +213,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
             $scope.graficosLoaded = true;
         }
 
-        return this.conteudosGraficos;
+        return $scope.conteudosGraficos;
     }
 
     $scope.gerarGrafico = function (graficoId) {
@@ -239,22 +239,26 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
         $scope.showLinks = conteudo_getShowLinks($scope.textosVisible, $scope.graficosVisible);
     }
 
-    $scope.saveConteudoTexto = function (conteudoTexto) {
-        if (conteudoTexto.id != 0) {
+    $scope.saveConteudoTexto = function (conteudoTexto) { 
+        if (conteudoTexto.id == 0) {
             Texto.saveNew({
                 "id": conteudoTexto.id, "titulo": conteudoTexto.titulo,
                 "subtitulo": conteudoTexto.subtitulo,
                 "conteudo": conteudoTexto.conteudo,
                 "posicao": conteudoTexto.posicao
             }, function (data) {
-                alert(data);
                 console.log("put ");
+				
+				$scope.conteudoTextoEditOn = false;
+
+				$scope.textosLoaded = false;
+				$scope.getTextos();				
                 //$scope.textos = data;
                 //$scope.textos = JSON.stringify(data));
                 //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
                 //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
-                alert(JSON.stringify(error));
+                alert('Erro: ' + JSON.stringify(error));
                 $scope.textos = {};
             });
         } else {
@@ -264,38 +268,37 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
                 "conteudo": conteudoTexto.conteudo,
                 "posicao": conteudoTexto.posicao
             }, function (data) {
-                alert(data);
                 console.log("post ");
+				
+				$scope.conteudoTextoEditOn = false;
+
+				$scope.textosLoaded = false;
+				$scope.getTextos();				
                 //$scope.textos = data;
                 //$scope.textos = JSON.stringify(data));
                 //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
                 //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
-                alert(JSON.stringify(error));
+                alert('Erro ' + JSON.stringify(error));
                 $scope.textos = {};
             });
         }
-
-        $scope.conteudoTextoEditOn = false;
-
-        $scope.textosLoaded = false;
-        $scope.getTextos();
     }
 
-    this.deleteConteudoTexto = function (conteudoTexto) {
+    $scope.deleteConteudoTexto = function (conteudoTexto) {
         Texto.delete({ "id": conteudoTexto.id }, function (data) {
             console.log("deleted ");
+			
+            $scope.textosLoaded = false;
+            $scope.getTextos();			
             //$scope.textos = data;
             //$scope.textos = JSON.stringify(data));
             //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
                 //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
-                alert(JSON.stringify(error));
+                alert('Erro ' + JSON.stringify(error));
                 $scope.textos = {};
             });
-
-            $scope.textosLoaded = false;
-            $scope.getTextos();
     }
 
     $scope.ordenarConteudoTexto = function (conteudoTexto,ordem) {
@@ -309,14 +312,18 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
     }
 
     $scope.saveConteudoGrafico = function (conteudoGrafico) {
-        var conteudoToSave = this.conteudosGraficos[conteudoGrafico.index];
+        var conteudoToSave = $scope.conteudosGraficos[conteudoGrafico.index];
 
         conteudoToSave.title = conteudoGrafico.title;
 
-        this.conteudosGraficos[conteudoGraficos.index] = conteudoToSave;
+        $scope.conteudosGraficos[conteudoGraficos.index] = conteudoToSave;
 
         localStorage.setItem("BDP_ConteudoGraficosTeste", JSON.stringify(conteudoGraficos));
     }
+	
+    $scope.conteudoTextoInitEditor = function (textareaId) {
+        //CKEDITOR.replace(textareaId);
+    }	
 
     function getDataPublicacao() {
         var d = data,
@@ -500,8 +507,8 @@ function HeaderController($scope) {
         }
     }
 
-    $scope.activeLinks = bdpMenu_FilterMenuLinksBySection(mainLinks, this.activeSection);
-    $scope.activeSubLinks = bdpMenu_FilterMenuLinksBySection(subLinks, this.activeSection);
+    $scope.activeLinks = bdpMenu_FilterMenuLinksBySection(mainLinks, $scope.activeSection);
+    $scope.activeSubLinks = bdpMenu_FilterMenuLinksBySection(subLinks, $scope.activeSection);
 
 }
 
