@@ -17,7 +17,7 @@ controller: DomainsController
      <label>Membros:<input id="membros" ng-model="dominiosModel.sel.membros"></label>
       <label>Dimensões:</label>
       <select ng-model="choice.dimensao" ng-change="showMembros()">
-          <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.nome}}">{{obj.nome}}</option>
+          <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.id}}">{{obj.nome}}</option>
       </select>
       Membros seleccionados: {{dominiosModel.sel.membros}}
       <label ng-repeat="obj in choice.membros.membros">
@@ -34,7 +34,7 @@ controller: DomainsController
     <div id="panelHide" ng-hide="true" >panelHide</div>
     <div id="output" style="margin: 1px;">
     </div>
-  </div>  
+  </div>
 </div>
 
 
