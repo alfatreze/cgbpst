@@ -42,9 +42,9 @@ var paths = {
     'bower_components/angular-resource/angular-resource.min.js',
     'bower_components/foundation-apps/js/angular/**/*.js',
     // 3rd party
-    'bower_components/c3/c3.js',
-    'node_modules/d3/d3.js',
-    '!bower_components/foundation-apps/js/angular/app.js'
+    //'bower_components/c3/c3.js',
+    //'node_modules/d3/d3.js',
+    //'!bower_components/foundation-apps/js/angular/app.js'
   ],
   // These files are for your app's JavaScript
   appJS: [
@@ -52,7 +52,7 @@ var paths = {
     'client/assets/js/app.js',
     'client/assets/js/services.js',
     'client/assets/js/controllers.js',
-    'client/assets/js/angular-resources.js'
+    //'client/assets/js/angular-resources.js'
     //'node_modules/d3/d3.js',
     //'bower_components/c3/c3.js',
   ]
