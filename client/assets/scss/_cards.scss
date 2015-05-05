@@ -1,0 +1,101 @@
+// FO CARDS
+
+// This is a card container
+.card-fo {
+    @include card-container( 
+        $background: #fff, // Background color
+        $color: #000, // Text color
+        $border: 1px solid $primary-color, // Border
+        $radius: 0, // Border radius
+        $shadow: 0 4px 5px rgba(0,0,0,0.3), // Box shadow
+        $padding: 1rem, 
+        $margin: 1rem // Margin bottom
+    );
+    
+    &:hover .card-fo-actions {
+        opacity: 1
+    }
+    
+    
+    .grid-content .grid-block { margin: 0; }
+    
+    .grid-block { margin: 0; }
+}
+
+// This is a card divider
+.card-fo-title {
+    @include card-section( $padding: 1rem );
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #000;
+    text-transform: uppercase;
+    //background: $primary-color;
+}
+
+// This is a card title
+.card-fo-subtitle {
+    @include card-section( $padding: 1rem );
+    font-size: 1.2rem;
+    font-weight: 100;
+    color: $primary-color;
+    padding-top: 0;
+    border-bottom: 1px solid lighten($primary-color,50%);
+    
+    
+}
+
+// This is a card subtitle
+.card-fo-divider {
+    @include card-divider( 
+        $background: #ccc, 
+        $padding: 1rem
+    );
+}
+
+// This is a card section
+.card-fo-section {
+    @include card-section( $padding: 1rem );
+    position: relative;
+    color: #666;
+}
+
+
+// Card actions - activate on overlay
+.card-fo-actions {
+    @include card-divider( 
+        $background: $primary-color, 
+        $padding: 0
+    );
+    font-size: 1rem;
+    color: #fff;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    transition: 0.3s ease-in-out;
+    
+    
+    
+    span {
+        padding: 1rem;
+        
+        &:hover {
+            background: #000;
+            color: #fff;
+        }
+    
+    }
+    
+
+}
+
+// This is a card footer
+.card-fo-footer {
+    @include card-divider( 
+        $background: #eee, 
+        $padding: 1rem
+    );
+    font-size: 0.8rem;
+    color: #888;
+}
