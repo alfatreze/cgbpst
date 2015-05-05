@@ -124,7 +124,7 @@ gulp.task('sass', function () {
 });
 
 // Compiles and copies the Foundation for Apps JavaScript, as well as your app's custom JS
-gulp.task('uglify', ['uglify:foundation', 'uglify:app', 'uglify:services', 'uglify:controllers', 'uglify:angular-resource'])
+gulp.task('uglify', ['uglify:foundation', 'uglify:app'])
 
 gulp.task('uglify:foundation', function(cb) {
   var uglify = $.if(isProduction, $.uglify()
@@ -152,44 +152,6 @@ gulp.task('uglify:app', function() {
   ;
 });
 
-gulp.task('uglify:services', function() {
-  var uglify = $.if(isProduction, $.uglify()
-    .on('error', function (e) {
-      console.log(e);
-    }));
-
-  return gulp.src(paths.appJS)
-    .pipe(uglify)
-    .pipe($.concat('services.js'))
-    .pipe(gulp.dest('./build/assets/js/'))
-  ;
-});
-
-gulp.task('uglify:controllers', function() {
-  var uglify = $.if(isProduction, $.uglify()
-    .on('error', function (e) {
-      console.log(e);
-    }));
-
-  return gulp.src(paths.appJS)
-    .pipe(uglify)
-    .pipe($.concat('controllers.js'))
-    .pipe(gulp.dest('./build/assets/js/'))
-  ;
-});
-
-gulp.task('uglify:angular-resource', function() {
-  var uglify = $.if(isProduction, $.uglify()
-    .on('error', function (e) {
-      console.log(e);
-    }));
-
-  return gulp.src(paths.appJS)
-    .pipe(uglify)
-    .pipe($.concat('angular-resource.js'))
-    .pipe(gulp.dest('./build/assets/js/'))
-  ;
-});
 
 // Starts a test server, which you can view at http://localhost:8080
 gulp.task('server', ['build'], function() {
