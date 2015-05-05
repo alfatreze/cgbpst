@@ -1,0 +1,52 @@
+
+---
+name: Dominios
+url: /Dominios
+animationIn: slideInLeft
+animationOut: slideOutLeft
+controller: DomainsController
+---
+
+
+<div class="grid-block">
+  <div class="small-2 block">
+   <div class="nav-bar right">
+    <ul class="button-group">
+      <li><a href="#" ng-click="selectLink(1,'Table')">Indicador 1</a></li>
+      <li><a href="#" ng-click="selectLink(2,'Graph')">Indicador 2</a></li>
+     </ul>
+   </div>
+   <div ng-show="selection.link">
+      <label>Dominios:</label>
+      <select ng-model="choice.dominio" ng-change="showMembros()">
+          <option ng-repeat="obj in _key" value="{{obj}}">{{obj}}</option>
+      </select>
+      <label>Membros:<input id="membros" ng-model="selection.membros"></label>
+      Membros seleccionados: {{selection.membros}}
+      <label ng-repeat="(key,value) in choice.membros">
+        <input type="checkbox" checkbox-group cb-id="value.id" cb-model="selection.membros">{{value.value}}</input>
+      </label>
+
+
+      <label><button ng-click="getTable()">>>> Tabela >>></button></label>
+      <label><button ng-click="getGraph()">>>> Gráfico >>></button></label>
+
+      <label><button ng-click="getTable2()">>>> Gráfico >>></button></label>
+    </div>
+  </div>
+  <div class="small-10 block">
+    <div id="panelHide" ng-hide="true" >panelHide</div>
+    <div id="output" style="margin: 1px;">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<!--
+<button ng-click="showPivotTable()">Click me</button>
+
+-->

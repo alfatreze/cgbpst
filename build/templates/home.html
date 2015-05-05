@@ -1,5 +1,5 @@
 
-<div ng-controller="ConteudoController as conteudo" 
+<div ng-controller="ConteudoController" 
      class="grid-content">
 
     <!--<h1>PORTAL DAS ESTATÍSTICAS</h1>-->
@@ -10,8 +10,8 @@
          animation-in="zoomIn" 
          animation-out="zoomOut">
 
-        <span ng-repeat="link in conteudo.showLinks | orderBy:'order'"
-              ng-click="conteudo.showConteudos(link.conteudosToShow);"
+        <span ng-repeat="link in showLinks | orderBy:'order'"
+              ng-click="showConteudos(link.conteudosToShow);"
               class="label <!--{{link.className}}-->"
               style="margin-right: 10px">
             {{link.name}}
@@ -20,12 +20,12 @@
     </div>
     
     
-    <div class="grid-block small-up-1 medium-up-4">
+    <div class="grid-block small-up-1 medium-up-4" ng-init="getTextos()">
 
-        <div ng-repeat="conteudoTexto in conteudo.textos | orderBy:'order'" 
-             ng-show="conteudo.textosVisible"
-             class="grid-content" 
-             animation-in="zoomIn" 
+        <div ng-repeat="conteudoTexto in textos.texto | orderBy:'order'"
+             ng-show="textosVisible"
+             class="grid-content"
+             animation-in="zoomIn"
              animation-out="zoomOut">
             <div class="card-fo">
                 <div class="card-fo-title">
@@ -52,10 +52,10 @@
             </div>
         </div>
 
-        <div ng-repeat="conteudoGrafico in conteudo.graficos | orderBy:'order'" 
-             ng-show="conteudo.graficosVisible"
-             class="grid-content" 
-             animation-in="zoomIn" 
+        <div ng-repeat="conteudoGrafico in getGraficos() | orderBy:'order'"
+             ng-show="graficosVisible"
+             class="grid-content"
+             animation-in="zoomIn"
              animation-out="zoomOut">
             <div class="card-fo">
                 <div class="card-fo-title">
@@ -75,7 +75,7 @@
                     </span>
                     <span>{{conteudoGrafico.textDate}}</span>
                 </div>
-                {{conteudo.gerarGrafico(conteudoGrafico.graficoId)}}
+                {{gerarGrafico(conteudoGrafico.graficoId)}}
             </div>
         </div>
     </div>

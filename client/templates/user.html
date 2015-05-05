@@ -1,6 +1,6 @@
 ---
 name: user
-url: /home.user
+url: /user
 animationIn: fadeIn
 animationOut: fadeOut
 ---
@@ -31,7 +31,7 @@ animationOut: fadeOut
                         <img zf-iconic="person" icon="thumb" size="small">
                         {{conteudoTexto.person}}
                     </span>
-                    <span>{{conteudoTexto.textDate}}</span>
+                    <span>{{conteudoTexto.getDataPublicacao()}}</span>
                 </div>
                 {{conteudo.gerarGrafico(conteudoGrafico.graficoId)}}
             </div>

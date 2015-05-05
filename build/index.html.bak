@@ -1,0 +1,121 @@
+<!doctype html>
+
+<html lang="en" ng-app="application">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banco de Portugal | Portal das Estatísticas | Back Office</title>
+
+    
+    <!-- CSS -->
+    <link href="/assets/css/app.css" rel="stylesheet" type="text/css">
+    <link href="/assets/css/to/c3.css" rel="stylesheet" type="text/css">
+    <!--<link href="/assets/css/c3.min.css" rel="stylesheet" type="text/css">-->
+    <link href="/assets/css/pivot.css" rel="stylesheet" type="text/css">
+
+
+    <!-- CORE JS -->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script src="/assets/js/foundation.js"></script>
+    <script src="/assets/js/templates.js"></script>
+    <script src="/assets/js/routes.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/angular-resource.js"></script>
+
+    <!-- pivot table and graphs -->
+    <script type="text/javascript" src="/assets/lib/jquery.min.js"></script>
+    <script type="text/javascript" src="/assets/lib/jquery-ui.min.js"></script>
+<!--<script type="text/javascript" src="/assets/lib/d3.v3.min.js"></script>
+    <script type="text/javascript" src="/assets/lib/c3.min.js"></script>-->
+    <script type="text/javascript" src="/assets/lib/pivot.js"></script>
+<!--    <script type="text/javascript" src="/assets/lib/c3_renderers.js"></script>-->
+    <script type="text/javascript" src="/assets/lib/gchart_renderers.js"></script>
+
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart", "charteditor"]});
+    </script>
+    <!-- EXT JS -->
+    
+</head>
+
+<body>
+    
+    <div class="grid-frame vertical">
+        
+        <!-- HEADER -->
+        <div ng-controller="HeaderController as header" 
+             class="grid-content shrink header" 
+             style="padding: 0;">
+
+            <div class="menu-group">
+                
+                <div class="menu-group-left">
+                    
+                    <ul class="dark condense menu-bar header-top">
+                        <li class="brand" 
+							ng-repeat="menuSection in header.menuSections | orderBy:'order'"
+                            ng-show="header.isMenuSectionSelected(menuSection.section)">
+                            <a ui-sref="{{menuSection.uiSref}}">
+                                <img src="assets\img\Logo_BdP.svg">
+                            </a>
+                        </li>
+                        <li ng-repeat="menuSection in header.menuSections | orderBy:'order'"
+                            ui-sref-active="active"  
+							ng-show="header.isMenuSectionSelected(menuSection.section)===false">
+                            <a ng-click="header.selectMenuSection(menuSection.section);" 
+                               ui-sref="{{menuSection.uiSref}}">
+                                {{menuSection.name}}
+                            </a>
+                        </li>
+                        <li ng-repeat="link in header.activeLinks">
+                            <a ui-sref="{{link.uiSref}}">
+                                {{link.name}}
+                            </a>
+                        </li>
+                    </ul>
+                    
+                </div>
+                
+                <div class="menu-group-right">
+                    <ul class="menu-bar header-name">
+                        <li class="designation">
+                            <a ui-sref="home" class="text-left">
+                                <div>PORTAL DAS</div>
+                                <div>ESTATÍSTICAS</div>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                
+            </div>
+
+            <ul class="primary condense menu-bar header-nav">
+                <li ng-repeat="link in header.activeSubLinks | orderBy:'order'"
+                    ui-sref-active="active"
+                    class="{{link.enabled}}">
+                    <a ui-sref="{{link.uiSref}}">
+                        {{link.name}}
+                    </a>
+                </li>
+
+            </ul>
+            
+        </div>
+        
+        <!-- AUTOMATIC BREADCRUMBS -->
+        <ui-breadcrumbs
+                template-url="uiBreadcrumbs.tpl.html">
+        </ui-breadcrumbs>
+        
+        <!-- CONTENT -->
+        <div ui-view class="grid-block">
+            
+        </div>
+
+    </div>
+
+</body>
+
+</html>

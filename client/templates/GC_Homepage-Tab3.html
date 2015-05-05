@@ -4,11 +4,11 @@ url: /GestaoPaginaInicial-tab3
 parent: GestaoPaginaInicial
 ---
 
-<div class="grid-content">
+<div class="grid-content" ng-controller="ConteudoController as conteudo">
 
     <div class="grid-block"
          style="margin: 1.5rem 0"
-         animation-in="zoomIn" 
+         animation-in="zoomIn"
          animation-out="zoomOut">
 
         <span class="label"
@@ -22,49 +22,36 @@ parent: GestaoPaginaInicial
 
     </div>
 
-    <div class="card">
-        <div class="card-section grid-block">
-            <div class="grid-content">
+    <div class="card" ng-repeat="conteudoGrafico in conteudo.getGraficos() | orderBy:'order'"
+         ng-show="conteudo.graficosVisible">
+        <form ng-submit="conteudo.saveConteudoGrafico(conteudoGrafico)">
+            <div class="card-section grid-block">
+                <div class="grid-content">
 
-                    <h4>Nome do Gráfico</h4>
+                    <h4>{{conteudoGrafico.title}}</h4>
 
-                <div style="color: #aaa">
-                    <span><strong>Data de Publicação</strong></span>
-                    <span>12/08/2012</span>
+                    <input type="text" placeholder="Título" ng-model="conteudoGrafico.title" />
+
+                    <div id="{{conteudoGrafico.graficoId}}"></div>
+
+                    <div style="color: #aaa">
+                        <span><strong>Data de Publicação</strong></span>
+                        <span>{{conteudoGrafico.textDate}}</span>
+                    </div>
                 </div>
-            </div>
-            <div class="grid-content shrink">
+                <div class="grid-content shrink">
                     <span><strong>ORDEM</strong></span>
                     <span>1</span>
-            </div>
-            <div class="grid-content shrink">
-                    <div><a class="tiny expand button">EDITAR</a></div>
-                    <div><a class="alert tiny expand button">APAGAR</a></div>
-            </div>
-        </div>
-    </div>
-    
-    
-    <div class="card">
-        <div class="card-section grid-block">
-            <div class="grid-content">
-
-                    <h4>Nome do Gráfico</h4>
-
-                <div style="color: #aaa">
-                    <span><strong>Data de Publicação</strong></span>
-                    <span>13/09/2012</span>
                 </div>
-            </div>
-            <div class="grid-content shrink">
-                    <span><strong>ORDEM</strong></span>
-                    <span>2</span>
-            </div>
-            <div class="grid-content shrink">
-                    <div><a class="tiny expand button">EDITAR</a></div>
+                <div class="grid-content shrink">
+                    <div><input type="submit" value="Gravar" class="tiny expand button" /></div>
                     <div><a class="alert tiny expand button">APAGAR</a></div>
+                </div>
+                {{conteudo.gerarGrafico(conteudoGrafico.graficoId)}}
             </div>
-        </div>
+        </form>
     </div>
+
+
 
 </div>
