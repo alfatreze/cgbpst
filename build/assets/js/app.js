@@ -1,0 +1,397 @@
+(function () {
+    'use strict';
+
+    angular.module('application', [
+    // Angular libraries
+    'ui.router',
+    'ngAnimate',
+        
+    // App Modules
+    'controllers',
+    // Foundation UI components
+    'foundation',
+    // Routing with front matter
+    'foundation.dynamicRouting',
+    // Transitioning between views
+    'foundation.dynamicRouting.animations'
+    ])
+        .config(config)
+        .run(run);
+
+    config.$inject = ['$urlRouterProvider', '$locationProvider'];
+
+    function config($urlProvider, $locationProvider) {
+
+        // Default to the index view if the URL loaded is not found
+        $urlProvider.otherwise('/home');
+
+        // Use this to enable HTML5 mode
+        $locationProvider.html5Mode({
+            enabled: false,
+            requireBase: false
+        });
+
+        // Use this to set the prefix for hash-bangs
+        // Example: example.com/#!/page
+        $locationProvider.hashPrefix('!');
+    }
+
+    function run() {
+        // Enable FastClick to remove the 300ms click delay on touch devices
+        FastClick.attach(document.body);
+    }
+    
+    
+ 
+
+
+})();
+
+
+(function () {
+    
+    // CONTROLLER MODULE
+    
+    var app = angular.module('controllers', []);
+    
+    // CONTROLLERS
+    // --------------------------------------------------
+    
+    // HEADER
+    app.controller('HeaderController', function(){
+
+        this.menuSections = menuSections;
+        this.activeLinks = mainLinks;
+        this.activeSubLinks = subLinks;
+        this.activeSection = 'FO';
+
+        this.selectMenuSection = function (menuSectionKey) {
+            this.activeSection = menuSectionKey;
+
+            this.activeLinks = bdpMenu_FilterMenuLinksBySection(mainLinks, menuSectionKey);
+            this.activeSubLinks = bdpMenu_FilterMenuLinksBySection(subLinks, menuSectionKey);
+        }
+
+        this.isMenuSectionSelected = function (menuSectionKey) {
+            if (this.activeSection == menuSectionKey) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        this.activeLinks = bdpMenu_FilterMenuLinksBySection(mainLinks, this.activeSection);
+        this.activeSubLinks = bdpMenu_FilterMenuLinksBySection(subLinks, this.activeSection);
+
+    });
+    
+    function bdpMenu_FilterMenuLinksBySection(menuLinks, menuSectionKey)
+    {
+        var newMenuLinks = new Array();       
+
+        var menuLink;
+           
+        for (var i = 0; i < menuLinks.length; i++)
+        {
+            menuLink = menuLinks[i];
+    
+            if (menuLink['section'] == menuSectionKey) {
+                newMenuLinks[newMenuLinks.length] = menuLink;
+            }
+        }
+
+        return newMenuLinks;
+    }
+
+    function bdpMenu_GetSection(menuSectionKey)
+    {
+        var menuSection;
+        var menuSectionToReturn;
+           
+        for (var i = 0; i < menuSections.length; i++)
+        {
+            menuSection = menuSections[i];
+    
+            if (menuSection['section'] == menuSectionKey) {
+                menuSectionToReturn = menuSection;
+                break;
+            }
+        }
+
+        return menuSectionToReturn;
+    }
+
+    
+    var menuSections = [
+        {
+        name: 'Backoffice',
+        order: 1,
+        section: 'BO',
+        uiSref: 'backoffice',
+        },
+        {
+        name: 'Frontoffice',
+        order: 2,
+        section: 'FO',
+        uiSref: 'home',
+        }
+    ];
+
+    var mainLinks = [
+        /*{
+        name: 'Front Office',
+        order: 1,
+        section: 'FO',
+        uiSref: 'home',
+        },*/
+        {
+        name: 'Ajuda',
+        order: 2,
+        section: 'FO',
+        uiSref: 'Ajuda',
+        },
+        {
+        name: 'Area Pessoal',
+        order: 2,
+        section: 'FO',
+        uiSref: 'user',
+        },
+        {
+        name: 'Ajuda',
+        order: 2,
+        section: 'BO',
+        uiSref: 'Ajuda_BO',
+        },
+        {
+        name: '-',
+        order: 3,
+        section: 'FO',
+        uiSref: 'Menu',
+        },
+    ];
+
+    var subLinks = [
+        {
+        name: 'Gestão de Conteúdos',
+        order: 1,
+        section: 'BO',
+        uiSref: 'GestaoConteudos',
+        enabled: true,
+        },
+        {
+        name: 'Gestão de Publicações',
+        order: 2,
+        section: 'BO',
+        uiSref: 'GestaoPublicacoes',
+        enabled: 'disabled',
+        },
+        {
+        name: 'Gestão da Pesquisa',
+        order: 3,
+        section: 'BO',
+        uiSref: 'GestaoPesquisa',
+        enabled: 'disabled',
+        },
+        {
+        name: 'Gestão de Utilizadores',
+        order: 4,
+        section: 'BO',
+        uiSref: 'GestaoUtilizadores',
+        enabled: 'disabled',
+        },
+        {
+        name: 'Gestão de Contactos',
+        order: 5,
+        section: 'BO',
+        uiSref: 'GestaoContactos',
+        enabled: 'disabled',
+        },
+        {
+        name: 'Monitorização',
+        order: 6,
+        section: 'BO',
+        uiSref: 'Monitorizacao',
+        enabled: 'disabled',
+        },
+        {
+        name: 'Estatística',
+        order: 1,
+        section: 'FO',
+        uiSref: 'DomainEstatistica',
+        enabled: '',
+        },
+        {
+        name: 'Domínio 2',
+        order: 2,
+        section: 'FO',
+        uiSref: '',
+        enabled: 'disabled',
+        },
+    ];
+    
+    // SIDEBAR
+
+    app.controller('ConteudoController', function(){
+        this.textos = conteudoTextos;
+        this.graficos = conteudoGraficos;
+        this.textosVisible = true;
+        this.graficosVisible = true;
+
+        this.gerarGrafico = function (graficoId) {
+            conteudo_gerarGrafico(graficoId);
+        }
+
+        this.showLinks = conteudo_getShowLinks(this.textosVisible, this.graficosVisible);
+
+        this.showConteudos = function (conteudosToShow) {
+            if (conteudosToShow == 'textos' || conteudosToShow == 'all') {
+                this.textosVisible = true;
+            }
+            else {
+                this.textosVisible = false;
+            }
+
+            if (conteudosToShow == 'graficos' || conteudosToShow == 'all') {
+                this.graficosVisible = true;
+            } else {
+                this.graficosVisible = false;
+            }
+            
+            this.showLinks = conteudo_getShowLinks(this.textosVisible, this.graficosVisible);
+        }
+    });
+
+    function conteudo_gerarGrafico(graficoId)
+    {
+        var chart1 = c3.generate({
+            bindto: '#' + graficoId,
+            data: {
+                columns: [
+                ['data1', 30, 20, 50, 40, 60, 50],
+                ['data2', 200, 130, 90, 240, 130, 220],
+                ['data3', 300, 200, 160, 400, 250, 250]
+                ]
+            }
+        });
+    }
+
+    function conteudo_getShowLinks(textosVisible, graficosVisible) {
+        var returnArray = new Array();
+        var allVisible = textosVisible && graficosVisible;
+
+        returnArray[returnArray.length] = conteudoShowTextos;
+        returnArray[returnArray.length] = conteudoShowGraficos;
+        returnArray[returnArray.length] = conteudoShowAll;
+
+        if (textosVisible) {
+            returnArray[0].className = conteudoTextosClassLinkActive;
+        }
+        else {
+            returnArray[0].className = conteudoTextosClassLinkInactive;
+        }
+
+        if (graficosVisible) {
+            returnArray[1].className = conteudoTextosClassLinkActive;
+        }
+        else {
+            returnArray[1].className = conteudoTextosClassLinkInactive;
+        }
+
+        if (allVisible) {
+            returnArray[2].className = conteudoTextosClassLinkActive;
+        }
+        else {
+            returnArray[2].className = conteudoTextosClassLinkInactive;
+        }
+
+        return returnArray;
+    }
+
+    var conteudoTextosClassLinkActive = 'LinkConteudoActive';
+    var conteudoTextosClassLinkInactive = 'LinkConteudoInactive';
+
+    var conteudoShowTextos = {
+        name: 'Apenas textos',
+        conteudosToShow: 'textos',
+        }
+
+    var conteudoShowGraficos = {
+        name: 'Apenas gráficos',
+        conteudosToShow: 'graficos',
+    }
+
+    var conteudoShowAll = {
+        name: 'Ver todos',
+        conteudosToShow: 'all',
+    }
+
+    var conteudoTextos = [
+        {
+        title: 'This is a title 1',
+        order: 1,
+        subTitle: 'This is a subtitle wich has a bit more content and allows for a simple explanation of the displayed item',
+        mainText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        person: 'António Oliveira',
+        textDate: '23 AGO 2015',
+        },
+        {
+        title: 'This is a title 2',
+        order: 1,
+        subTitle: 'This is a subtitle wich has a bit more content and allows for a simple explanation of the displayed item',
+        mainText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        person: 'António Oliveira',
+        textDate: '23 AGO 2015',
+        },
+        {
+        title: 'This is a title 3',
+        order: 1,
+        subTitle: 'This is a subtitle wich has a bit more content and allows for a simple explanation of the displayed item',
+        mainText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        person: 'António Oliveira',
+        textDate: '23 AGO 2015',
+        },
+        {
+        title: 'This is a title 4',
+        order: 1,
+        subTitle: 'This is a subtitle wich has a bit more content and allows for a simple explanation of the displayed item',
+        mainText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        person: 'António Oliveira',
+        textDate: '23 AGO 2015',
+        },
+        {
+        title: 'This is a title 5',
+        order: 1,
+        subTitle: 'This is a subtitle wich has a bit more content and allows for a simple explanation of the displayed item',
+        mainText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        person: 'António Oliveira',
+        textDate: '23 AGO 2015',
+        }
+    ];
+
+    var conteudoGraficos = [
+        {
+        title: 'This is a title 1',
+        order: 1,
+        graficoId: 'Graf1',
+        person: 'Margarida Rebelo',
+        textDate: '20 JUL 2015',
+        },
+        {
+        title: 'This is a title 2',
+        order: 1,
+        graficoId: 'Graf2',
+        person: 'Margarida Rebelo',
+        textDate: '20 JUL 2015',
+        },
+        {
+        title: 'This is a title 3',
+        order: 1,
+        graficoId: 'Graf3',
+        person: 'Margarida Rebelo',
+        textDate: '20 JUL 2015',
+        },
+
+    ];
+})();
+

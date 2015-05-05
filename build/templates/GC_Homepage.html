@@ -1,0 +1,29 @@
+
+<h1>Gestão da Página Inicial</h1>
+
+<div class="grid-content">
+
+    <div zf-tabs="" id="displaced-tabs" displaced="true">
+        <div 
+		zf-tab="1"
+		ui-sref="GestaoPaginaInicial-tab1"
+		title="TODOS"></div>
+        <div
+		zf-tab="2"
+        ui-sref="GestaoPaginaInicial-tab2"
+		title="NOTÍCIAS"></div>
+        <div zf-tab="3"
+        ui-sref="GestaoPaginaInicial-tab3"
+		title="GRÁFICOS"></div>
+    </div>
+
+    <div zf-tab-content="" target="displaced-tabs">
+
+    </div>
+
+    <div ui-view  class="grid-content">
+
+
+	</div>
+
+</div>
