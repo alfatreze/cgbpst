@@ -1,0 +1,89 @@
+---
+name: home
+url: /home
+animationIn: fadeIn
+animationOut: fadeOut
+---
+
+<div ng-controller="ConteudoController as conteudo" 
+     class="grid-content">
+
+    <!--<h1>PORTAL DAS ESTATÍSTICAS</h1>-->
+    
+
+    <div class="grid-block"
+         style="margin: 1.5rem 0"
+         animation-in="zoomIn" 
+         animation-out="zoomOut">
+
+        <span ng-repeat="link in conteudo.showLinks | orderBy:'order'"
+              ng-click="conteudo.showConteudos(link.conteudosToShow);"
+              class="label <!--{{link.className}}-->"
+              style="margin-right: 10px">
+            {{link.name}}
+        </span>
+
+    </div>
+    
+    
+    <div class="grid-block small-up-1 medium-up-4">
+
+        <div ng-repeat="conteudoTexto in conteudo.textos | orderBy:'order'" 
+             ng-show="conteudo.textosVisible"
+             class="grid-content" 
+             animation-in="zoomIn" 
+             animation-out="zoomOut">
+            <div class="card-fo">
+                <div class="card-fo-title">
+                    {{conteudoTexto.title}}
+                </div>
+                <div class="card-fo-subtitle">
+                    {{conteudoTexto.subTitle}}
+                </div>
+                <div class="card-fo-section">
+                    {{conteudoTexto.mainText}}
+                    <div class="card-fo-actions grid-block">
+                        <span class="grid-block"><img zf-iconic="" icon="magnifying-glass" size="small" class="iconic-color-secondary">&nbsp;LER MAIS</span>
+                        <span class="grid-block"><img zf-iconic="" icon="share-boxed" size="small" class="iconic-color-secondary">&nbsp;PARTILHAR</span>
+                    </div>
+                </div>
+                <div class="card-fo-footer">
+                    <span>
+                        <img zf-iconic="" icon="Person" size="small">
+                        &nbsp;{{conteudoTexto.person}}
+                    </span>
+                    <span> | </span>
+                    <span>{{conteudoTexto.textDate}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div ng-repeat="conteudoGrafico in conteudo.graficos | orderBy:'order'" 
+             ng-show="conteudo.graficosVisible"
+             class="grid-content" 
+             animation-in="zoomIn" 
+             animation-out="zoomOut">
+            <div class="card-fo">
+                <div class="card-fo-title">
+                    {{conteudoGrafico.title}}
+                </div>
+                <div class="card-fo-section">
+                    <div id="{{conteudoGrafico.graficoId}}"></div>
+                    <div class="card-fo-actions grid-block">
+                        <span class="grid-block"><img zf-iconic="" icon="magnifying-glass" size="small" class="iconic-color-secondary">&nbsp;LER MAIS</span>
+                        <span class="grid-block"><img zf-iconic="" icon="share-boxed" size="small" class="iconic-color-secondary">&nbsp;PARTILHAR</span>
+                    </div>
+                </div>
+                <div class="card-fo-footer">
+                    <span>
+                        <img zf-iconic="" icon="person" size="small">
+                        &nbsp;{{conteudoGrafico.person}}
+                    </span>
+                    <span>{{conteudoGrafico.textDate}}</span>
+                </div>
+                {{conteudo.gerarGrafico(conteudoGrafico.graficoId)}}
+            </div>
+        </div>
+    </div>
+
+</div>

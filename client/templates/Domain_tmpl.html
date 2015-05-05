@@ -1,0 +1,48 @@
+---
+name: Estatística
+url: /GestaoConteudos
+animationIn: slideInLeft
+animationOut: slideOutLeft
+---
+
+
+<!-- Left Menu | Hides on < tablet -->   
+    <zf-panel id="sidebar" position="left" class="medium-grid-block medium-3">
+
+        <a href="#" zf-close="" class="close-button">×</a>
+
+            <ul class="vertical menu-bar condense">
+                <li ui-sref-active="active" >
+                    <a ui-sref="GestaoPaginaInicial">
+                        <img zf-iconic="" icon="thumb" size="small" class="iconic-color-primary">
+                        Gestão de Página Inicial
+                    </a>
+                </li>
+                <li ui-sref-active="active" >
+                    <a ui-sref="GestaoHierarquiaNavegacao">
+                        <img zf-iconic="" icon="thumb" size="small" class="iconic-color-primary">
+                        Gestão da Hierarquia de Navegação
+                    </a>
+                </li>
+                <li ui-sref-active="active" >
+                    <a ui-sref="GestaoDashboard">
+                        <img zf-iconic="" icon="thumb" size="small" class="iconic-color-primary">
+                        Gestão de Dashboard
+                    </a>
+                </li>
+            </ul>
+
+    </zf-panel>
+    
+
+    <!-- Content Pane -->
+    <div class="grid-block">
+        <div ui-view class="grid-content">
+
+            <a class="button" zf-toggle="sidebar">Toggle Sidebar</a>
+
+            <h1>Gestão de Conteúdos</h1>
+            <p class="lead">Content here.</p>
+
+        </div>
+    </div>

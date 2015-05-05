@@ -1,0 +1,61 @@
+---
+name: GestaoPaginaInicial-tab2
+url: /GestaoPaginaInicial-tab2
+parent: GestaoPaginaInicial
+---
+
+<div class="grid-content" ng-controller="ConteudoController as conteudo" ng-init="conteudo.getTextos()">
+    <br />
+    <a ng-click="conteudo.novoConteudoTexto()">Novo</a>
+    <br /><br />
+    <div class="grid-block"
+         style="margin: 1.5rem 0"
+         animation-in="zoomIn"
+         animation-out="zoomOut">
+
+        <span class="label"
+              style="margin-right: 10px">
+            ORDEM
+        </span>
+        <span class="label"
+              style="margin-right: 10px">
+            DATA DE PUBLICAÇÃO
+        </span>
+
+    </div>
+
+    <div class="card" ng-repeat="conteudoTexto in textos.texto | orderBy:'posicao'"
+         ng-show="conteudo.textosVisible">
+        <form ng-submit="conteudo.saveConteudoTexto(conteudoTexto)">
+            <div class="card-section grid-block">
+                <div class="grid-content">
+
+                    <h4>
+                        {{conteudoTexto.titulo}}
+                    </h4>
+                    <input type="text" placeholder="Título" ng-model="conteudoTexto.titulo" />
+                    
+                    {{conteudoTexto.subtitulo}}
+                    <input type="text" placeholder="Subtítulo" ng-model="conteudoTexto.subtitulo" />
+
+                    {{conteudoTexto.conteudo}}
+                    <textarea name="text" placeholder="Texto" ng-model="conteudoTexto.conteudo" rows="3"></textarea>
+
+                    <div style="color: #aaa">
+                        <span><strong>Data de Publicação</strong></span>
+                        <span>{{conteudoTexto.data}}</span>
+                    </div>
+                </div>
+                <div class="grid-content shrink">
+                    <span><strong>ORDEM</strong></span>
+                    <span>{{conteudoTexto.posicao}}</span>
+                </div>
+                <div class="grid-content shrink">
+                    <div><input type="submit" value="Gravar" /></div>
+                    <div><a class="alert tiny expand button" ng-click="conteudo.deleteConteudoTexto(conteudoTexto);">APAGAR</a></div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>

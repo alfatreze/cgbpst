@@ -1,0 +1,526 @@
+(function () {
+    'use strict';
+
+    angular.module('application', [
+    // Angular libraries
+    'ui.router',
+    'ngAnimate',
+
+    // App Modules
+    'controllers',
+    // Foundation UI components
+    'foundation',
+    // Routing with front matter
+    'foundation.dynamicRouting',
+    // Transitioning between views
+    'foundation.dynamicRouting.animations',
+    //services
+    'statServices',
+    //controllers
+    'statControllers'    
+    ])
+        .config(config)
+        .run(run);
+
+    config.$inject = ['$urlRouterProvider', '$locationProvider'];
+
+    function config($urlProvider, $locationProvider) {
+
+        // Default to the index view if the URL loaded is not found
+        $urlProvider.otherwise('/home');
+
+        // Use this to enable HTML5 mode
+        $locationProvider.html5Mode({
+            enabled: false,
+            requireBase: false
+        });
+
+        // Use this to set the prefix for hash-bangs
+        // Example: example.com/#!/page
+        $locationProvider.hashPrefix('!');
+    }
+
+    function run() {
+        // Enable FastClick to remove the 300ms click delay on touch devices
+        FastClick.attach(document.body);
+    }
+
+
+
+
+
+})();
+
+
+(function () {
+    
+    // CONTROLLER MODULE
+
+    var app = angular.module('controllers', ['statServices', 'ngResource']);
+
+    // CONTROLLERS
+    // --------------------------------------------------
+    
+    // HEADER
+    app.controller('HeaderController', function () {
+
+        //this is $scope??
+
+        this.menuSections = menuSections;
+        this.activeLinks = mainLinks;
+        this.activeSubLinks = subLinks;
+        this.activeSection = 'FO';
+
+        this.selectMenuSection = function (menuSectionKey) {
+            this.activeSection = menuSectionKey;
+
+            this.activeLinks = bdpMenu_FilterMenuLinksBySection(mainLinks, menuSectionKey);
+            this.activeSubLinks = bdpMenu_FilterMenuLinksBySection(subLinks, menuSectionKey);
+        }
+
+        this.isMenuSectionSelected = function (menuSectionKey) {
+            if (this.activeSection == menuSectionKey) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        this.activeLinks = bdpMenu_FilterMenuLinksBySection(mainLinks, this.activeSection);
+        this.activeSubLinks = bdpMenu_FilterMenuLinksBySection(subLinks, this.activeSection);
+
+    });
+    
+    function bdpMenu_FilterMenuLinksBySection(menuLinks, menuSectionKey)
+    {
+        var newMenuLinks = new Array();       
+
+        var menuLink;
+           
+        for (var i = 0; i < menuLinks.length; i++)
+        {
+            menuLink = menuLinks[i];
+    
+            if (menuLink['section'] == menuSectionKey) {
+                newMenuLinks[newMenuLinks.length] = menuLink;
+            }
+        }
+
+        return newMenuLinks;
+    }
+
+    function bdpMenu_GetSection(menuSectionKey)
+    {
+        var menuSection;
+        var menuSectionToReturn;
+           
+        for (var i = 0; i < menuSections.length; i++)
+        {
+            menuSection = menuSections[i];
+    
+            if (menuSection['section'] == menuSectionKey) {
+                menuSectionToReturn = menuSection;
+                break;
+            }
+        }
+
+        return menuSectionToReturn;
+    }
+
+    
+    var menuSections = [
+        {
+        name: 'Backoffice',
+        order: 1,
+        section: 'BO',
+        uiSref: 'backoffice',
+        },
+        {
+        name: 'Frontoffice',
+        order: 2,
+        section: 'FO',
+        uiSref: 'home',
+        }
+    ];
+
+    var mainLinks = [
+        /*{
+        name: 'Front Office',
+        order: 1,
+        section: 'FO',
+        uiSref: 'home',
+        },*/
+        {
+        name: 'Ajuda',
+        order: 2,
+        section: 'FO',
+        uiSref: 'Ajuda',
+        },
+        {
+        name: 'Area Pessoal',
+        order: 2,
+        section: 'FO',
+        uiSref: 'user',
+        },
+        {
+        name: 'Ajuda',
+        order: 2,
+        section: 'BO',
+        uiSref: 'Ajuda_BO',
+        },
+        {
+        name: '-',
+        order: 3,
+        section: 'FO',
+        uiSref: 'Menu',
+        },
+    ];
+
+    var subLinks = [
+        {
+        name: 'Gestão de Conteúdos',
+        order: 1,
+        section: 'BO',
+        uiSref: 'GestaoConteudos',
+        enabled: true,
+        },
+        {
+        name: 'Gestão de Publicações',
+        order: 2,
+        section: 'BO',
+        uiSref: 'GestaoPublicacoes',
+        enabled: 'disabled',
+        },
+        {
+        name: 'Gestão da Pesquisa',
+        order: 3,
+        section: 'BO',
+        uiSref: 'GestaoPesquisa',
+        enabled: 'disabled',
+        },
+        {
+        name: 'Gestão de Utilizadores',
+        order: 4,
+        section: 'BO',
+        uiSref: 'GestaoUtilizadores',
+        enabled: 'disabled',
+        },
+        {
+        name: 'Gestão de Contactos',
+        order: 5,
+        section: 'BO',
+        uiSref: 'GestaoContactos',
+        enabled: 'disabled',
+        },
+        {
+        name: 'Monitorização',
+        order: 6,
+        section: 'BO',
+        uiSref: 'Monitorizacao',
+        enabled: 'disabled',
+        },
+        {
+        name: 'Estatística',
+        order: 1,
+        section: 'FO',
+        uiSref: 'DomainEstatistica',
+        enabled: '',
+        },
+        {
+        name: 'Domínio 2',
+        order: 2,
+        section: 'FO',
+        uiSref: '',
+        enabled: 'disabled',
+        },
+    ];
+    
+    // SIDEBAR
+
+    app.controller('ConteudoController', function ($scope, $state, $window, Texto, Dominios) {
+
+        //this is $scope???
+        this.graficos = conteudoGraficos;
+
+        //tem que devolver uma estrutura do tipo {textos : [{"id":1,"titulo":"titulo1","subtitulo":"subtitulo1","conteudo":"content1","posicao":1,"data":"\/Date(1430131939000+0000)\/"},{"id":2,"titulo":"titulo2","subtitulo":"subtitulo2","conteudo":"content2"]}
+        //pedir para alterarem o serviço rest para devolver na estrutura correcta
+        /*$scope.texto = Texto.query(function(data){
+            $scope.textos = data;
+            //$scope.textos = JSON.stringify(data));
+            //console.log("Textos: " + JSON.stringify($scope.textos));
+        }, function(error){
+            //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+            alert(JSON.stringify(error));
+            $scope.textos={};
+        });*/
+
+        this.textosVisible = true;
+        this.graficosVisible = true;
+        this.textosLoaded = false;
+        this.graficosLoaded = false;
+        this.conteudosGraficos = new Array();
+
+        this.novoConteudoTexto = function () {
+            var conteudoToSave = { "id": 0, "titulo": "", "subtitulo": "", "conteudo": "", "posicao": 0, "data": "\/Date(1430131939000+0000)\/" };
+
+            conteudoToSave.id = 0;
+            conteudoToSave.titulo = '';
+            conteudoToSave.subtitulo = '';
+            conteudoToSave.conteudo = '';
+            conteudoToSave.posicao = 1;
+            conteudoToSave.data = '23 AGO 2015';
+
+            var novosConteudos = new Array();
+            novosConteudos[0] = conteudoToSave;
+
+            for (var i = 0; i < $scope.textos.texto.length; i++) {
+                novosConteudos[i + 1] = $scope.textos.texto[i];
+            }
+
+            $scope.textos.texto = novosConteudos;
+        }
+
+        this.getTextos = function () {
+            if (!this.textosLoaded) {
+                $scope.textoQueryResult = Texto.query(function (data) {
+                    $scope.textos = data;
+                    this.textosLoaded = true;
+               
+                }, function (error) {
+                    //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                    alert(JSON.stringify(error));
+                    $scope.textos = {};
+                });
+
+
+            }
+
+            return this.conteudosTexto;
+        }
+
+        this.getGraficos = function () {
+            if (!this.graficosLoaded) {
+                if (localStorage.getItem("BDP_ConteudoGraficosTeste")) {
+                    conteudoGraficos = JSON.parse(localStorage.getItem("BDP_ConteudoGraficosTeste"));
+                }
+
+                this.conteudosGraficos = new Array();
+
+                var conteudoGrafico;
+
+                for (var i = 0; i < conteudoGraficos.length; i++) {
+                    conteudoGrafico = conteudoGraficos[i];
+                    conteudoGrafico['index'] = i;
+                    this.conteudosGraficos[i] = conteudoGrafico;
+                }
+
+                this.graficosLoaded = true;
+            }
+
+            return this.conteudosGraficos;
+        }
+
+        this.gerarGrafico = function (graficoId) {
+            conteudo_gerarGrafico(graficoId);
+        }
+
+        this.showLinks = conteudo_getShowLinks(this.textosVisible, this.graficosVisible);
+
+        this.showConteudos = function (conteudosToShow) {
+            if (conteudosToShow == 'textos' || conteudosToShow == 'all') {
+                this.textosVisible = true;
+            }
+            else {
+                this.textosVisible = false;
+            }
+
+            if (conteudosToShow == 'graficos' || conteudosToShow == 'all') {
+                this.graficosVisible = true;
+            } else {
+                this.graficosVisible = false;
+            }
+            
+            this.showLinks = conteudo_getShowLinks(this.textosVisible, this.graficosVisible);
+        }
+
+        this.saveConteudoTexto = function (conteudoTexto) {
+            /*alert(conteudoTexto.id);
+            alert(conteudoTexto.titulo);
+            alert(conteudoTexto.subtitulo);
+            alert(conteudoTexto.conteudo);
+            alert(conteudoTexto.posicao);*/
+
+            if (conteudoTexto.id != 0) {
+                Texto.saveNew({
+                    "id": conteudoTexto.id, "titulo": conteudoTexto.titulo,
+                    "subtitulo": conteudoTexto.subtitulo,
+                    "conteudo": conteudoTexto.conteudo,
+                    "posicao": conteudoTexto.posicao
+                }, function (data) {
+                    alert(data);
+                    console.log("put ");
+                    //$scope.textos = data;
+                    //$scope.textos = JSON.stringify(data));
+                    //console.log("Textos: " + JSON.stringify($scope.textos));
+                }, function (error) {
+                    //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                    alert(JSON.stringify(error));
+                    $scope.textos = {};
+                });
+            } else {
+                Texto.save({
+                    "id": conteudoTexto.id, "titulo": conteudoTexto.titulo,
+                    "subtitulo": conteudoTexto.subtitulo,
+                    "conteudo": conteudoTexto.conteudo,
+                    "posicao": conteudoTexto.posicao
+                }, function (data) {
+                    alert(data);
+                    console.log("post ");
+                    //$scope.textos = data;
+                    //$scope.textos = JSON.stringify(data));
+                    //console.log("Textos: " + JSON.stringify($scope.textos));
+                }, function (error) {
+                    //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                    alert(JSON.stringify(error));
+                    $scope.textos = {};
+                });
+            }
+
+            this.getTextos();
+        }
+
+        this.deleteConteudoTexto = function (conteudoTexto) {
+            Texto.delete({ "id": conteudoTexto.id }, function (data) {
+                console.log("deleted ");
+                //$scope.textos = data;
+                //$scope.textos = JSON.stringify(data));
+                //console.log("Textos: " + JSON.stringify($scope.textos));
+                }, function (error) {
+                    //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                    alert(JSON.stringify(error));
+                    $scope.textos = {};
+                });
+
+            this.getTextos();
+        }
+
+        this.ordenarConteudoTexto = function (conteudoTexto,ordem) {
+            conteudoTexto.ordem = conteudoTexto.posicao + ordem;
+
+            if (conteudoTexto.posicao < 1) {
+                conteudoTexto.posicao = 1;
+            }
+
+            this.saveConteudoTexto(conteudoTexto);
+        }
+
+        this.saveConteudoGrafico = function (conteudoGrafico) {
+            var conteudoToSave = this.conteudosGraficos[conteudoGrafico.index];
+
+            conteudoToSave.title = conteudoGrafico.title;
+
+            this.conteudosGraficos[conteudoGraficos.index] = conteudoToSave;
+
+            localStorage.setItem("BDP_ConteudoGraficosTeste", JSON.stringify(conteudoGraficos));
+        }
+    });
+
+    function conteudo_gerarGrafico(graficoId)
+    {
+        var chart1 = c3.generate({
+            bindto: '#' + graficoId,
+            width: 450,
+            data: {
+                columns: [
+                ['data1', 30, 20, 50, 40, 60, 50],
+                ['data2', 200, 130, 90, 240, 130, 220],
+                ['data3', 300, 200, 160, 400, 250, 250]
+                ]
+            }
+        });
+    }
+
+    function conteudo_getShowLinks(textosVisible, graficosVisible) {
+        var returnArray = new Array();
+        var allVisible = textosVisible && graficosVisible;
+
+        returnArray[returnArray.length] = conteudoShowTextos;
+        returnArray[returnArray.length] = conteudoShowGraficos;
+        returnArray[returnArray.length] = conteudoShowAll;
+
+        if (textosVisible) {
+            returnArray[0].className = conteudoTextosClassLinkActive;
+        }
+        else {
+            returnArray[0].className = conteudoTextosClassLinkInactive;
+        }
+
+        if (graficosVisible) {
+            returnArray[1].className = conteudoTextosClassLinkActive;
+        }
+        else {
+            returnArray[1].className = conteudoTextosClassLinkInactive;
+        }
+
+        if (allVisible) {
+            returnArray[2].className = conteudoTextosClassLinkActive;
+        }
+        else {
+            returnArray[2].className = conteudoTextosClassLinkInactive;
+        }
+
+        return returnArray;
+    }
+
+    var conteudoTextosClassLinkActive = 'LinkConteudoActive';
+    var conteudoTextosClassLinkInactive = 'LinkConteudoInactive';
+
+    var conteudoShowTextos = {
+        name: 'Apenas textos',
+        conteudosToShow: 'textos',
+        }
+
+    var conteudoShowGraficos = {
+        name: 'Apenas gráficos',
+        conteudosToShow: 'graficos',
+    }
+
+    var conteudoShowAll = {
+        name: 'Ver todos',
+        conteudosToShow: 'all',
+    }
+
+    var conteudoTextos = [
+        { "id": 1, "titulo": "titulo1", "subtitulo": "subtitulo1", "conteudo": "content1", "posicao": 1, "data": "\/Date(1430131939000+0000)\/" },
+        { "id": 2, "titulo": "titulo2", "subtitulo": "subtitulo2", "conteudo": "content2", "posicao": 2, "data": "\/Date(1430131949000+0000)\/" },
+        { "id": 4, "titulo": "titulo4", "subtitulo": "subtitulo4", "conteudo": "content4", "posicao": 4, "data": "\/Date(1430146232000+0000)\/" },
+        { "id": 5, "titulo": "titulo5", "subtitulo": "subtitulo5", "conteudo": "content5", "posicao": 5, "data": "\/Date(1430146239000+0000)\/" }
+    ];
+
+    var conteudoGraficos = [
+        {
+        title: 'This is a title 1',
+        order: 1,
+        graficoId: 'Graf1',
+        person: 'Margarida Rebelo',
+        textDate: '20 JUL 2015',
+        },
+        {
+        title: 'This is a title 2',
+        order: 1,
+        graficoId: 'Graf2',
+        person: 'Margarida Rebelo',
+        textDate: '20 JUL 2015',
+        },
+        {
+        title: 'This is a title 3',
+        order: 1,
+        graficoId: 'Graf3',
+        person: 'Margarida Rebelo',
+        textDate: '20 JUL 2015',
+        },
+
+    ];
+})();
+
