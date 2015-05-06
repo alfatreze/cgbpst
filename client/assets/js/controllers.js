@@ -527,6 +527,7 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
    $scope.choice = {};
    $scope.choice.dimensao = {};
    $scope.choice.membros =[];
+   $scope.indicador = {};
  };
 
  function pivotTable (pivotData,pivotMembers){
@@ -579,24 +580,27 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         d.push(res);
     });
   
-    // todo: testar como POST quando existir ligação ao servico REST
-    $scope.indicador = Indicador.query({"indicador":$scope.dominiosModel.link,"membros":d},function(res) {
-    $scope.indicador = res.toJSON();
-    //amp Dimensoes
-    _key = jQuery.map($scope.indicador, function(v, k){ return k;});
-    //map Membros
-    _value = jQuery.map($scope.indicador, function(v, k){ return v;});
-    $scope.indicador._key = _key;
-    $scope.indicador._value = _value;
-    
-    /* hack table */
-    var sum = $.pivotUtilities.aggregatorTemplates.sum;
-    var numberFormat = $.pivotUtilities.numberFormat;
-    var intFormat = numberFormat({digitsAfterDecimal: 0});
-    var pivotMembers = {
-                      rows: ["TipoOperacao"],
-                      cols: ["Periodo"],
-                      aggregator: sum(intFormat)(["indicador"]),
+    if (jQuery.isEmptyObject($scope.indicador)) { 
+        // todo: testar como POST quando existir ligação ao servico REST
+        $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
+            $scope.indicador = res.toJSON();
+            console.log($scope.indicador.observacao);
+            //amp Dimensoes
+            _key = jQuery.map($scope.indicador.observacao, function(v, k){ return k;});
+        
+            //map Membros
+            _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
+            $scope.indicador._key = _key;
+            $scope.indicador._value = _value;
+            
+            /* hack table */
+            var sum = $.pivotUtilities.aggregatorTemplates.sum;
+            var numberFormat = $.pivotUtilities.numberFormat;
+            var intFormat = numberFormat({digitsAfterDecimal: 0});
+            var pivotMembers = {
+                      rows: ["tipo_operacao"],
+                      cols: ["periodo"],
+                      aggregator: sum(intFormat)(["valor"]),
                       filter : function(filter) {
                           /*var aaa = [];aaa.push(filter);
                           var bbb = $scope.dominiosModel.sel.membros;
@@ -609,41 +613,89 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                         //todo: definir filtro com _.where
                         return true;
                       }
-    };
+            };
    
-    /* hack */
-    pivotTable($scope.indicador._value,pivotMembers);
-});
-  }
+            /* hack */
+            pivotTable($scope.indicador._value,pivotMembers);
+        });
+    } else {
+            var sum = $.pivotUtilities.aggregatorTemplates.sum;
+            var numberFormat = $.pivotUtilities.numberFormat;
+            var intFormat = numberFormat({digitsAfterDecimal: 0});
+            var pivotMembers = {
+                      rows: ["tipo_operacao"],
+                      cols: ["periodo"],
+                      aggregator: sum(intFormat)(["valor"]),
+                      filter : function(filter) {
+                          /*var aaa = [];aaa.push(filter);
+                          var bbb = $scope.dominiosModel.sel.membros;
+                          _.each(bbb, function (val){
+                              delete val.dimensao;
+                              console.log(val);
+                              console.log(_.where(aaa,val));    
+                          });
+                          */
+                        //todo: definir filtro com _.where
+                        return true;
+                      }
+            };
+   
+            /* hack */
+            pivotTable($scope.indicador._value,pivotMembers);
+    }
+   }
 
   $scope.getGraph = function() {
+      
+    if (jQuery.isEmptyObject($scope.indicador)) {       
+        // todo: testar como POST quando existir ligação ao servico REST
+        $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
+            $scope.indicador = res.toJSON();
+            
+            console.log($scope.indicador.observacao);
+            
+            //amp Dimensoes
+            _key = jQuery.map($scope.indicador.observacao, function(v, k){ return k;});
+            //map Membros
+            _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
+            $scope.indicador._key = _key;
+            $scope.indicador._value = _value;
+    
+          /* hack */
+          var sum = $.pivotUtilities.aggregatorTemplates.sum;
+          var numberFormat = $.pivotUtilities.numberFormat;
+          var intFormat = numberFormat({digitsAfterDecimal: 0});
+          var pivotMembers = {
+                          rows: ["tipo_operacao"],
+                          cols: ["periodo"],
+                            aggregatorName : "Nome do indicador",
+                            aggregator: sum(intFormat)(["valor"]),
+                            //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
+                            rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
+                            renderer: $.pivotUtilities.renderers["Line Chart"]
+            };
 
-    $scope.indicador = Indicador.query({"id":$scope.dominiosModel.sel.membros},function(res) {
-      $scope.indicador = res.toJSON();
-      _key = jQuery.map($scope.indicador, function(v, k){ return k;});
-      _value = jQuery.map($scope.indicador, function(v, k){ return v;});
-      $scope.indicador._key = _key;
-      $scope.indicador._value = _value;
+          /* hack */
+          pivotTable($scope.indicador._value,pivotMembers);
+        });
+    } else {
+          /* hack */
+          var sum = $.pivotUtilities.aggregatorTemplates.sum;
+          var numberFormat = $.pivotUtilities.numberFormat;
+          var intFormat = numberFormat({digitsAfterDecimal: 0});
+          var pivotMembers = {
+                          rows: ["tipo_operacao"],
+                          cols: ["periodo"],
+                            aggregatorName : "Nome do indicador",
+                            aggregator: sum(intFormat)(["valor"]),
+                            //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
+                            rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
+                            renderer: $.pivotUtilities.renderers["Line Chart"]
+            };
 
-      /* hack */
-      var sum = $.pivotUtilities.aggregatorTemplates.sum;
-      var numberFormat = $.pivotUtilities.numberFormat;
-      var intFormat = numberFormat({digitsAfterDecimal: 0});
-      var pivotMembers = {
-                        rows: ["TipoOperacao"],
-                        cols: ["Periodo"],
-                        aggregatorName : "Nome do indicador",
-                        aggregator: sum(intFormat)(["indicador"]),
-                        //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
-                        rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
-                        renderer: $.pivotUtilities.renderers["Line Chart"]
-      };
-      if ($scope.dominiosModel.sel.membros == 2)
-        pivotMembers.rows.push("TipoValor");
-      /* hack */
-
-      pivotTable($scope.indicador._value,pivotMembers);
-    });
+          /* hack */
+          pivotTable($scope.indicador._value,pivotMembers);        
+    }
   }
 
   $scope.getTable2 = function() {
@@ -699,8 +751,44 @@ statControllers.factory('dominiosModel',function(){
   return dominiosModel;
 });
 /***** Directive *****/
+ 
+ statControllers.directive("checkboxGroup", function() {
+        return {
+            restrict: "A",
+            link: function(scope, elem, attrs) {
+
+                //check model
+                if (!scope.$eval(attrs.cbModel))
+                  scope.$eval(attrs.cbMode) = [];
+
+                // Determine initial checked boxes
+                if (scope.$eval(attrs.cbModel).indexOf(scope.$eval(attrs.cbId)) !== -1) {
+                    elem[0].checked = true;
+                }
+
+                // Update array on click
+                elem.bind('click', function() {
+                    var index = scope.$eval(attrs.cbModel).indexOf(scope.$eval(attrs.cbId));
+                    // Add if checked
+                    if (elem[0].checked) {
+                        if (index === -1) scope.$eval(attrs.cbModel).push(scope.$eval(attrs.cbId));
+                    }
+                    // Remove if unchecked
+                    else {
+                        if (index !== -1) scope.$eval(attrs.cbModel).splice(index, 1);
+                    }
+                    // Sort and update DOM display
+                    scope.$apply(scope.$eval(attrs.cbModel).sort(function(a, b) {
+                        return a - b
+                    }));
+                });
+            }
+        }
+    });
+ 
+ 
 /* hack... todo: pass key and id insted of dimensao:scope.choice dimensao */
-statControllers.directive("checkboxGroup", function() {
+statControllers.directive("checkboxGroup-hack", function() {
         return {
             restrict: "A",
             link: function(scope, elem, attrs) {
