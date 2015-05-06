@@ -615,6 +615,7 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                       }
             };
    
+   
             /* hack */
             pivotTable($scope.indicador._value,pivotMembers);
         });
