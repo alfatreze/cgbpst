@@ -41,3 +41,12 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+build/
+bower_components/
+node_modules/
+.editorconfig
+.idea/
+f.txt
+etc.zip
+npm-debug.log
