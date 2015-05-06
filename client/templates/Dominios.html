@@ -6,51 +6,35 @@ animationOut: slideOutLeft
 controller: DomainsController
 ---
 <div class="grid-block">
+  <div class="small-2 block">
+   <div class="nav-bar right">
+    <ul class="button-group">
+      <li><a href="#" ng-click="selectLink(1,'Table')">Indicador 1</a></li>
+      <li><a href="#" ng-click="selectLink(2,'Graph')">Indicador 2</a></li>
+     </ul>
+   </div>
+   <div ng-show="dominiosModel.link">
+     <label>Membros:<input id="membros" ng-model="dominiosModel.sel.membros"></label>
+      <label>Dimensões:</label>
+      <select ng-model="choice.dimensao" ng-change="showMembros()">
+          <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.id}}">{{obj.nome}}</option>
+      </select>
+      Membros seleccionados: {{dominiosModel.sel.membros}}
+      <label ng-repeat="obj in choice.membros.membros">
+        <input type="checkbox" checkbox-group cb-id="obj.id" cb-model="dominiosModel.sel.membros">{{obj.nome}}</input>
+      </label>
 
-    <div class="small-2 block">
-        
-        <div class="nav-bar right">
-            <ul class="button-group">
-                <li><a href="#" ng-click="selectLink(1,'Table')">Indicador 1</a>
-                </li>
-                <li><a href="#" ng-click="selectLink(2,'Graph')">Indicador 2</a>
-                </li>
-            </ul>
-        </div>
-        
-        <div ng-show="dominiosModel.link">
-            <label>Membros:
-                <input id="membros" ng-model="dominiosModel.sel.membros">
-            </label>
-            <label>Dimensões:</label>
-            <select ng-model="choice.dimensao" ng-change="showMembros()">
-                <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.id}}">{{obj.nome}}</option>
-            </select>
-            Membros seleccionados: {{dominiosModel.sel.membros}}
-            <label ng-repeat="obj in choice.membros.membros">
-                <input type="checkbox" checkbox-group cb-id="obj.id" cb-model="dominiosModel.sel.membros">{{obj.nome}}</input>
-            </label>
+      <label><button ng-click="getTable()">>>> Tabela >>></button></label>
+      <label><button ng-click="getGraph()">>>> Gráfico >>></button></label>
 
-            <label>
-                <button ng-click="getTable()">>>> Tabela >>></button>
-            </label>
-            <label>
-                <button ng-click="getGraph()">>>> Gráfico >>></button>
-            </label>
-
-            <label>
-                <button ng-click="getTable2()">>>> Gráfico >>></button>
-            </label>
-        </div>
-    
+      <label><button ng-click="getTable2()">>>> Gráfico >>></button></label>
     </div>
-
-    <div class="small-8 block">
-        <div id="panelHide" ng-hide="true">panelHide</div>
-        <div id="output" style="margin: 1px;">
-        </div>
+  </div>
+  <div class="small-8 block">
+    <div id="panelHide" ng-hide="true" >panelHide</div>
+    <div id="output" style="margin: 1px;">
     </div>
-
+  </div>
 </div>
 
 

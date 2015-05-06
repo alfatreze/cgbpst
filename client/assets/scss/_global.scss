@@ -61,8 +61,7 @@
         &-l1, &-l2, &-l3 { position: relative; }
         &-l1 { 
             .accordion-content { position: relative; }
-            font-weight: 600;
-            font-size: 0.98em;
+            font-weight: 800;
             
             // Push level 2 item
             > .accordion-content { 
