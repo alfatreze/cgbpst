@@ -29,11 +29,10 @@ Indicador.$inject = ['$resource'];
 Texto.$inject = ['$resource'];
 
 function Dominios($resource){
+
 	return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dominio',{},{
     //return $resource('http://localhost:5000/Portal.svc/dominio',{},{
-    query: {method:'GET', 
-            params:{},  
-          isArray:true}
+    query: {method:'GET', params:{}, isArray:false}
   });
 };
 
@@ -45,6 +44,7 @@ function Dimensoes($resource){
 };
 
 function Indicador($resource){
+  //return $resource('/api/indicador_1.json',{},{
   return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/indicador/:id',{id:'@id'}, {
     //return $resource('http://localhost:5000/Portal.svc/indicador/:id',{id:'@id'}, {
     query: {method:'GET',
