@@ -8,13 +8,12 @@ statControllers.controller('HeaderController', HeaderController);
 statControllers.controller('ConteudoController', ConteudoController);
 statControllers.controller('DragDropController', DragDropController);
 
-DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel','$filter'];
+DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel'];
 HeaderController.$inject = ['$scope'];
 ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios'];
 DragDropController.$inject = ['$scope'];
 
 function DragDropController($scope) {
-
 
      $scope.models = {
         selected: null,
@@ -31,8 +30,6 @@ function DragDropController($scope) {
    $scope.$watch('models', function(model) {
         $scope.modelAsJson = angular.toJson(model, true);
     }, true);
-
-
 
 }
 
@@ -512,7 +509,7 @@ function HeaderController($scope) {
 
 }
 
-function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,filterFilter,dominiosModel,$filter){
+function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,filterFilter,dominiosModel){
 
   $scope.dominios = Dominios.query();
   $scope.dominiosModel = dominiosModel;
@@ -558,6 +555,7 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
     console.log("init:: Read Dominios")
   }
 
+  
   $scope.selectLink = function(value,action,cols,rows){
     if ($scope.dominiosModel.link != value){
       reset();
@@ -574,37 +572,48 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
 
   $scope.getTable = function() {
 
-    console.log($filter('GroupBy')($scope.dominiosModel.sel.membros[0],"dominio"));
-console.log(jQuery.map($scope.dominiosModel.sel.membros[0], function(v, k){ return k;}));
-    // todo: testar como POST quando existir ligação ao servico REST
-      $scope.indicador = Indicador.get({"id":$scope.dominiosModel.link,"m":$scope.dominiosModel.sel.membros},function(res) {
-      $scope.indicador = res.toJSON();
-      //amp Dimensoes
-      _key = jQuery.map($scope.indicador, function(v, k){ return k;});
-      //map Membros
-      _value = jQuery.map($scope.indicador, function(v, k){ return v;});
-      $scope.indicador._key = _key;
-      $scope.indicador._value = _value;
-
-      /* hack table */
-      var sum = $.pivotUtilities.aggregatorTemplates.sum;
-      var numberFormat = $.pivotUtilities.numberFormat;
-      var intFormat = numberFormat({digitsAfterDecimal: 0});
-      var pivotMembers = {
-                        rows: ["TipoOperacao"],
-                        cols: ["Periodo"],
-                        aggregator: sum(intFormat)(["indicador"]),
-                        filter : function(d) {
-                          //todo: definir filtro com _.where
-                          return true;
-                        }
-      };
-      if ($scope.dominiosModel.link == 2)
-        pivotMembers.rows.push("TipoValor");
-      /* hack */
-
-      pivotTable($scope.indicador._value,pivotMembers);
+    var m =   _.groupBy($scope.dominiosModel.sel.membros, function(val){ return val.dimensao});
+    var d= [];
+    _.each(m,function(v,k,o) {
+        var res = {id:k,value:_.pluck(v,'membro')};
+        d.push(res);
     });
+  
+    // todo: testar como POST quando existir ligação ao servico REST
+    $scope.indicador = Indicador.query({"indicador":$scope.dominiosModel.link,"membros":d},function(res) {
+    $scope.indicador = res.toJSON();
+    //amp Dimensoes
+    _key = jQuery.map($scope.indicador, function(v, k){ return k;});
+    //map Membros
+    _value = jQuery.map($scope.indicador, function(v, k){ return v;});
+    $scope.indicador._key = _key;
+    $scope.indicador._value = _value;
+    
+    /* hack table */
+    var sum = $.pivotUtilities.aggregatorTemplates.sum;
+    var numberFormat = $.pivotUtilities.numberFormat;
+    var intFormat = numberFormat({digitsAfterDecimal: 0});
+    var pivotMembers = {
+                      rows: ["TipoOperacao"],
+                      cols: ["Periodo"],
+                      aggregator: sum(intFormat)(["indicador"]),
+                      filter : function(filter) {
+                          /*var aaa = [];aaa.push(filter);
+                          var bbb = $scope.dominiosModel.sel.membros;
+                          _.each(bbb, function (val){
+                              delete val.dimensao;
+                              console.log(val);
+                              console.log(_.where(aaa,val));    
+                          });
+                          */
+                        //todo: definir filtro com _.where
+                        return true;
+                      }
+    };
+   
+    /* hack */
+    pivotTable($scope.indicador._value,pivotMembers);
+});
   }
 
   $scope.getGraph = function() {
@@ -690,7 +699,7 @@ statControllers.factory('dominiosModel',function(){
   return dominiosModel;
 });
 /***** Directive *****/
-
+/* hack... todo: pass key and id insted of dimensao:scope.choice dimensao */
 statControllers.directive("checkboxGroup", function() {
         return {
             restrict: "A",
@@ -701,25 +710,31 @@ statControllers.directive("checkboxGroup", function() {
                   scope.$eval(attrs.cbMode) = [];
 
                 // Determine initial checked boxes
-                if (scope.$eval(attrs.cbModel).indexOf(scope.$eval(attrs.cbId)) !== -1) {
+                var a = {"dimensao":scope.choice.dimensao,"membro":scope.$eval(attrs.cbId)}
+                //if (scope.$eval(attrs.cbModel).indexOf(scope.$eval(attrs.cbId)) !== -1) {
+                if (_.findIndex(scope.$eval(attrs.cbModel), a) !== -1) {
                     elem[0].checked = true;
                 }
 
                 // Update array on click
                 elem.bind('click', function() {
-                    var index = scope.$eval(attrs.cbModel).indexOf(scope.$eval(attrs.cbId));
+                    var a = {"dimensao":scope.choice.dimensao,"membro":scope.$eval(attrs.cbId)}
+                   //var index = scope.$eval(attrs.cbModel).indexOf(scope.$eval(attrs.cbId));
+                   var index = _.findIndex(scope.$eval(attrs.cbModel), a);
                     // Add if checked
                     if (elem[0].checked) {
                         if (index === -1) {
                           var a = {"dimensao":scope.choice.dimensao,"membro":scope.$eval(attrs.cbId)}
-
                           //scope.$eval(attrs.cbModel).push(scope.$eval(attrs.cbId));
                           scope.$eval(attrs.cbModel).push(a);
                         }
                     }
                     // Remove if unchecked
                     else {
-                        if (index !== -1) scope.$eval(attrs.cbModel).splice(index, 1);
+                        if (index !== -1) {
+                          
+                            scope.$eval(attrs.cbModel).splice(index, 1);
+                        }
                     }
                     // Sort and update DOM display
                     scope.$apply(scope.$eval(attrs.cbModel).sort(function(a, b) {
