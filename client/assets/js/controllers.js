@@ -265,8 +265,6 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
                 "conteudo": conteudoTexto.conteudo,
                 "posicao": conteudoTexto.posicao
             }, function (data) {
-                console.log("post ");
-
 				$scope.conteudoTextoEditOn = false;
 
 				$scope.textosLoaded = false;
@@ -579,12 +577,11 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         var res = {id:k,value:_.pluck(v,'membro')};
         d.push(res);
     });
-  
+       
     if (jQuery.isEmptyObject($scope.indicador)) { 
         // todo: testar como POST quando existir ligação ao servico REST
         $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
             $scope.indicador = res.toJSON();
-            console.log($scope.indicador.observacao);
             //amp Dimensoes
             _key = jQuery.map($scope.indicador.observacao, function(v, k){ return k;});
         
@@ -652,9 +649,6 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         // todo: testar como POST quando existir ligação ao servico REST
         $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
             $scope.indicador = res.toJSON();
-            
-            console.log($scope.indicador.observacao);
-            
             //amp Dimensoes
             _key = jQuery.map($scope.indicador.observacao, function(v, k){ return k;});
             //map Membros
@@ -753,7 +747,7 @@ statControllers.factory('dominiosModel',function(){
 });
 /***** Directive *****/
  
- statControllers.directive("checkboxGroup", function() {
+statControllers.directive("checkboxGroup", function() {
         return {
             restrict: "A",
             link: function(scope, elem, attrs) {
