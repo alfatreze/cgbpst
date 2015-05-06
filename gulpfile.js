@@ -42,9 +42,9 @@ var paths = {
     'bower_components/angular-resource/angular-resource.min.js',
     'bower_components/foundation-apps/js/angular/**/*.js',
     // 3rd party
-    'bower_components/c3/c3.js',
-    'node_modules/d3/d3.js',
-    '!bower_components/foundation-apps/js/angular/app.js'
+    //'bower_components/c3/c3.js',
+    //'node_modules/d3/d3.js',
+    //'!bower_components/foundation-apps/js/angular/app.js'
   ],
   // These files are for your app's JavaScript
   appJS: [
@@ -52,7 +52,7 @@ var paths = {
     'client/assets/js/app.js',
     'client/assets/js/services.js',
     'client/assets/js/controllers.js',
-    'client/assets/js/angular-resources.js'
+    //'client/assets/js/angular-resources.js'
     //'node_modules/d3/d3.js',
     //'bower_components/c3/c3.js',
   ]
@@ -124,7 +124,7 @@ gulp.task('sass', function () {
 });
 
 // Compiles and copies the Foundation for Apps JavaScript, as well as your app's custom JS
-gulp.task('uglify', ['uglify:foundation', 'uglify:app', 'uglify:services', 'uglify:controllers', 'uglify:angular-resource'])
+gulp.task('uglify', ['uglify:foundation', 'uglify:app'])
 
 gulp.task('uglify:foundation', function(cb) {
   var uglify = $.if(isProduction, $.uglify()
@@ -152,44 +152,6 @@ gulp.task('uglify:app', function() {
   ;
 });
 
-gulp.task('uglify:services', function() {
-  var uglify = $.if(isProduction, $.uglify()
-    .on('error', function (e) {
-      console.log(e);
-    }));
-
-  return gulp.src(paths.appJS)
-    .pipe(uglify)
-    .pipe($.concat('services.js'))
-    .pipe(gulp.dest('./build/assets/js/'))
-  ;
-});
-
-gulp.task('uglify:controllers', function() {
-  var uglify = $.if(isProduction, $.uglify()
-    .on('error', function (e) {
-      console.log(e);
-    }));
-
-  return gulp.src(paths.appJS)
-    .pipe(uglify)
-    .pipe($.concat('controllers.js'))
-    .pipe(gulp.dest('./build/assets/js/'))
-  ;
-});
-
-gulp.task('uglify:angular-resource', function() {
-  var uglify = $.if(isProduction, $.uglify()
-    .on('error', function (e) {
-      console.log(e);
-    }));
-
-  return gulp.src(paths.appJS)
-    .pipe(uglify)
-    .pipe($.concat('angular-resource.js'))
-    .pipe(gulp.dest('./build/assets/js/'))
-  ;
-});
 
 // Starts a test server, which you can view at http://localhost:8080
 gulp.task('server', ['build'], function() {

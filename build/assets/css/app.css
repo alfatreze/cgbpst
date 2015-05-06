@@ -6342,7 +6342,8 @@ blockquote, blockquote p {
 .domain-l1, .domain-l2, .domain-l3 {
   position: relative; }
 .domain-l1 {
-  font-weight: 800; }
+  font-weight: 600;
+  font-size: 0.98em; }
   .domain-l1 .accordion-content {
     position: relative; }
   .domain-l1 > .accordion-content {

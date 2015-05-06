@@ -1,7 +1,7 @@
 
-<div class="grid-content" ng-controller="ConteudoController as conteudo" ng-init="conteudo.getTextos()">
+<div class="grid-content" ng-controller="ConteudoController as conteudo" ng-init="getTextos()">
     <br />
-    <a ng-click="conteudo.novoConteudoTexto()">Novo</a>
+    <a ng-click="novoConteudoTexto()">Novo</a>
     <br /><br />
     <div class="grid-block"
          style="margin: 1.5rem 0"
@@ -18,19 +18,15 @@
         </span>
 
     </div>
-
     <div class="card" ng-show="conteudoTextoEditOn">
-        <form ng-submit="conteudo.saveConteudoTexto(conteudoTexto)">
+        <form ng-submit="saveConteudoTexto(conteudoTextoToEdit)">
             <div class="card-section grid-block">
                 <div class="grid-content">
                     <input type="text" placeholder="Título" ng-model="conteudoTextoToEdit.titulo" />
                     <br />
                     <input type="text" placeholder="Subtítulo" ng-model="conteudoTextoToEdit.subtitulo" />
                     <br />
-                    <textarea name="conteudoTextoTexto" id="conteudoTextoTexto" placeholder="Texto" ng-model="conteudoTextoToEdit.conteudo" rows="3"></textarea>
-                    <script type="text/javascript" language="javascript">
-                        CKEDITOR.replace('conteudoTextoTexto');
-                    </script>
+                    <textarea name="conteudoTextoTexto" id="conteudoTextoTexto" placeholder="Texto" ng-model="conteudoTextoToEdit.conteudo" ng-init="conteudoTextoInitEditor('conteudoTextoTexto')" rows="3"></textarea>
                     <br />
                     <div style="color: #aaa">
                         <span><strong>Data de Publicação</strong></span>
@@ -44,7 +40,7 @@
                 <div class="grid-content shrink">
                     <div><input type="submit" value="GRAVAR" class="tiny expand button" /></div>
                     <br />
-                    <div><a class="tiny expand button" ng-click="conteudo.cancelarConteudoTexto();">CANCELAR</a></div>
+                    <div><a class="tiny expand button" ng-click="cancelarConteudoTexto();">CANCELAR</a></div>
                 </div>
             </div>
         </form>
@@ -72,13 +68,13 @@
                     <span>{{conteudoTexto.posicao}}</span>
                 </div>
                 <div class="grid-content shrink">
-                <div><a class="tiny expand button" ng-click="conteudo.editarConteudoTexto(conteudoTexto);">EDITAR</a></div>
+                <div><a class="tiny expand button" ng-click="editarConteudoTexto(conteudoTexto);">EDITAR</a></div>
                 <br />
-                <div><a class="tiny expand button" ng-click="conteudo.ordenarConteudoTexto(conteudoTexto,-1);">/\</a></div>
+                <div><a class="tiny expand button" ng-click="ordenarConteudoTexto(conteudoTexto,-1);">/\</a></div>
                 <br />
-                <div><a class="tiny expand button" ng-click="conteudo.ordenarConteudoTexto(conteudoTexto, +1);">\/</a></div>
+                <div><a class="tiny expand button" ng-click="ordenarConteudoTexto(conteudoTexto, +1);">\/</a></div>
                 <br />
-                    <div><a class="alert tiny expand button" ng-click="conteudo.deleteConteudoTexto(conteudoTexto);">APAGAR</a></div>
+                    <div><a class="alert tiny expand button" ng-click="deleteConteudoTexto(conteudoTexto);">APAGAR</a></div>
                 </div>
             </div>
 

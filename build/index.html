@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Banco de Portugal | Portal das Estatísticas | Back Office</title>
 
-    
+
     <!-- CSS -->
     <link href="/assets/css/app.css" rel="stylesheet" type="text/css">
     <link href="/assets/css/to/c3.css" rel="stylesheet" type="text/css">
@@ -21,15 +21,14 @@
     <script src="/assets/js/templates.js"></script>
     <script src="/assets/js/routes.js"></script>
     <script src="/assets/js/app.js"></script>
-    <script src="/assets/js/angular-resource.js"></script>
 
     <!-- pivot table and graphs -->
     <script type="text/javascript" src="/assets/lib/jquery.min.js"></script>
     <script type="text/javascript" src="/assets/lib/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/assets/lib/d3.v3.min.js"></script>
+    <script type="text/javascript" src="/assets/lib/c3.min.js"></script>
     <script type="text/javascript" src="/assets/lib/angular-drag-and-drop-lists.min.js"></script>
-    <!-- <script type="text/javascript" src="/assets/lib/d3.v3.min.js"></script>
-    <script type="text/javascript" src="/assets/lib/c3.min.js"></script>-->
-    <script type="text/javascript" src="/assets/lib/pivot.js"></script>
+    <script type="text/javascript" src="/assets/lib/pivot.min.js"></script>
 <!--    <script type="text/javascript" src="/assets/lib/c3_renderers.js"></script>-->
     <script type="text/javascript" src="/assets/lib/gchart_renderers.js"></script>
 
@@ -37,22 +36,22 @@
       google.load("visualization", "1", {packages:["corechart", "charteditor"]});
     </script>
     <!-- EXT JS -->
-    
+
     <script src="/assets/lib/CkEditor/ckeditor.js"></script>
 </head>
 
 <body>
-    
+
     <div class="grid-frame vertical">
-        
+
         <!-- HEADER -->
         <div ng-controller="HeaderController"
-             class="grid-content shrink header" 
+             class="grid-content shrink header"
              style="padding: 0;">
 
             <div class="menu-group">
                 <div class="menu-group-left">
-                    
+
                     <ul class="dark condense menu-bar header-top">
                       <li class="brand" ng-repeat="ms in menuSections | orderBy:'order'"
                             ng-show="isMenuSectionSelected(ms.section)">
@@ -61,7 +60,7 @@
                             </a>
                         </li>
                       <li ng-repeat="ms in menuSections | orderBy:'order'"
-                            ui-sref-active="active"  
+                            ui-sref-active="active"
 							              ng-show="isMenuSectionSelected(ms.section)===false">
                             <a ng-click="selectMenuSection(ms.section)" ui-sref="{{ms.uiSref}}">
                                 {{ms.name}}
@@ -73,9 +72,9 @@
                             </a>
                         </li>
                     </ul>
-                    
+
                 </div>
-                
+
                 <div class="menu-group-right">
                     <ul class="menu-bar header-name">
                         <li class="designation">
@@ -87,7 +86,7 @@
 
                     </ul>
                 </div>
-                
+
             </div>
 
             <ul class="primary condense menu-bar header-nav">
@@ -100,17 +99,17 @@
                 </li>
 
             </ul>
-            
+
         </div>
-        
+
         <!-- AUTOMATIC BREADCRUMBS -->
         <ui-breadcrumbs
                 template-url="uiBreadcrumbs.tpl.html">
         </ui-breadcrumbs>
-        
+
         <!-- CONTENT -->
         <div ui-view class="grid-block">
-            
+
         </div>
 
     </div>

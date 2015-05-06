@@ -234,8 +234,8 @@ Indicador.$inject = ['$resource'];
 Texto.$inject = ['$resource'];
 
 function Dominios($resource){
-  //return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dominio',{},{
-    return $resource('http://localhost:5000/Portal.svc/dominio',{},{
+	return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dominio',{},{
+    //return $resource('http://localhost:5000/Portal.svc/dominio',{},{
     query: {method:'GET', 
             params:{},  
           isArray:true}
@@ -243,23 +243,23 @@ function Dominios($resource){
 };
 
 function Dimensoes($resource){
-  //return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dimensao/info', {}, {
-  return $resource('http://localhost:5000/Portal.svc/dimensao/info', {}, {
+  return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dimensao/info', {}, {
+  //return $resource('http://localhost:5000/Portal.svc/dimensao/info', {}, {
     query: {method:'GET', isArray:false}
   });
 };
 
 function Indicador($resource){
-  //return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/indicador/:id',{id:'@id'}, {
-    return $resource('http://localhost:5000/Portal.svc/indicador/:id',{id:'@id'}, {
+  return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/indicador/:id',{id:'@id'}, {
+    //return $resource('http://localhost:5000/Portal.svc/indicador/:id',{id:'@id'}, {
     query: {method:'GET',
     isArray:false}
   });
 };
 
 function Texto($resource){
-    //return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/texto/:id', { id: '@id' }, {
-      return $resource('http://localhost:5000/Portal.svc/texto/:id', { id: '@id' }, {
+    return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/texto/:id', { id: '@id' }, {
+    //  return $resource('http://localhost:5000/Portal.svc/texto/:id', { id: '@id' }, {
     query: {method:'GET',
         isArray: false
     },
@@ -283,7 +283,7 @@ statControllers.controller('HeaderController', HeaderController);
 statControllers.controller('ConteudoController', ConteudoController);
 statControllers.controller('DragDropController', DragDropController);
 
-DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel'];
+DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel','$filter'];
 HeaderController.$inject = ['$scope'];
 ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios'];
 DragDropController.$inject = ['$scope'];
@@ -488,7 +488,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
             $scope.graficosLoaded = true;
         }
 
-        return this.conteudosGraficos;
+        return $scope.conteudosGraficos;
     }
 
     $scope.gerarGrafico = function (graficoId) {
@@ -515,21 +515,25 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
     }
 
     $scope.saveConteudoTexto = function (conteudoTexto) {
-        if (conteudoTexto.id != 0) {
+        if (conteudoTexto.id == 0) {
             Texto.saveNew({
                 "id": conteudoTexto.id, "titulo": conteudoTexto.titulo,
                 "subtitulo": conteudoTexto.subtitulo,
                 "conteudo": conteudoTexto.conteudo,
                 "posicao": conteudoTexto.posicao
             }, function (data) {
-                alert(data);
                 console.log("put ");
+
+				$scope.conteudoTextoEditOn = false;
+
+				$scope.textosLoaded = false;
+				$scope.getTextos();
                 //$scope.textos = data;
                 //$scope.textos = JSON.stringify(data));
                 //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
                 //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
-                alert(JSON.stringify(error));
+                alert('Erro: ' + JSON.stringify(error));
                 $scope.textos = {};
             });
         } else {
@@ -539,38 +543,37 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
                 "conteudo": conteudoTexto.conteudo,
                 "posicao": conteudoTexto.posicao
             }, function (data) {
-                alert(data);
                 console.log("post ");
+
+				$scope.conteudoTextoEditOn = false;
+
+				$scope.textosLoaded = false;
+				$scope.getTextos();
                 //$scope.textos = data;
                 //$scope.textos = JSON.stringify(data));
                 //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
                 //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
-                alert(JSON.stringify(error));
+                alert('Erro ' + JSON.stringify(error));
                 $scope.textos = {};
             });
         }
-
-        $scope.conteudoTextoEditOn = false;
-
-        $scope.textosLoaded = false;
-        $scope.getTextos();
     }
 
-    this.deleteConteudoTexto = function (conteudoTexto) {
+    $scope.deleteConteudoTexto = function (conteudoTexto) {
         Texto.delete({ "id": conteudoTexto.id }, function (data) {
             console.log("deleted ");
+
+            $scope.textosLoaded = false;
+            $scope.getTextos();
             //$scope.textos = data;
             //$scope.textos = JSON.stringify(data));
             //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
                 //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
-                alert(JSON.stringify(error));
+                alert('Erro ' + JSON.stringify(error));
                 $scope.textos = {};
             });
-
-            $scope.textosLoaded = false;
-            $scope.getTextos();
     }
 
     $scope.ordenarConteudoTexto = function (conteudoTexto,ordem) {
@@ -584,13 +587,17 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
     }
 
     $scope.saveConteudoGrafico = function (conteudoGrafico) {
-        var conteudoToSave = this.conteudosGraficos[conteudoGrafico.index];
+        var conteudoToSave = $scope.conteudosGraficos[conteudoGrafico.index];
 
         conteudoToSave.title = conteudoGrafico.title;
 
-        this.conteudosGraficos[conteudoGraficos.index] = conteudoToSave;
+        $scope.conteudosGraficos[conteudoGraficos.index] = conteudoToSave;
 
         localStorage.setItem("BDP_ConteudoGraficosTeste", JSON.stringify(conteudoGraficos));
+    }
+
+    $scope.conteudoTextoInitEditor = function (textareaId) {
+        //CKEDITOR.replace(textareaId);
     }
 
     function getDataPublicacao() {
@@ -775,12 +782,12 @@ function HeaderController($scope) {
         }
     }
 
-    $scope.activeLinks = bdpMenu_FilterMenuLinksBySection(mainLinks, this.activeSection);
-    $scope.activeSubLinks = bdpMenu_FilterMenuLinksBySection(subLinks, this.activeSection);
+    $scope.activeLinks = bdpMenu_FilterMenuLinksBySection(mainLinks, $scope.activeSection);
+    $scope.activeSubLinks = bdpMenu_FilterMenuLinksBySection(subLinks, $scope.activeSection);
 
 }
 
-function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,filterFilter,dominiosModel){
+function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,filterFilter,dominiosModel,$filter){
 
   $scope.dominios = Dominios.query();
   $scope.dominiosModel = dominiosModel;
@@ -814,7 +821,7 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
   $scope.showMembros = function (){
     if (!$scope.choice.dimensao)
         return;
-    var a = filterFilter($scope.dimensoes.dimensao,{nome:$scope.choice.dimensao});
+    var a = filterFilter($scope.dimensoes.dimensao,{id:$scope.choice.dimensao});
     $scope.choice.membros = a[0];
   }
 
@@ -842,6 +849,8 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
 
   $scope.getTable = function() {
 
+    console.log($filter('GroupBy')($scope.dominiosModel.sel.membros[0],"dominio"));
+console.log(jQuery.map($scope.dominiosModel.sel.membros[0], function(v, k){ return k;}));
     // todo: testar como POST quando existir ligação ao servico REST
       $scope.indicador = Indicador.get({"id":$scope.dominiosModel.link,"m":$scope.dominiosModel.sel.membros},function(res) {
       $scope.indicador = res.toJSON();
@@ -976,7 +985,12 @@ statControllers.directive("checkboxGroup", function() {
                     var index = scope.$eval(attrs.cbModel).indexOf(scope.$eval(attrs.cbId));
                     // Add if checked
                     if (elem[0].checked) {
-                        if (index === -1) scope.$eval(attrs.cbModel).push(scope.$eval(attrs.cbId));
+                        if (index === -1) {
+                          var a = {"dimensao":scope.choice.dimensao,"membro":scope.$eval(attrs.cbId)}
+
+                          //scope.$eval(attrs.cbModel).push(scope.$eval(attrs.cbId));
+                          scope.$eval(attrs.cbModel).push(a);
+                        }
                     }
                     // Remove if unchecked
                     else {

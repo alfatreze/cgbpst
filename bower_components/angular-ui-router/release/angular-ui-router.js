@@ -1220,6 +1220,7 @@ Type.prototype.$asArray = function(mode, isSearch) {
     this.name = type.name;
     this.$arrayMode = mode;
   }
+
   return new ArrayType(this, mode);
 };
 
