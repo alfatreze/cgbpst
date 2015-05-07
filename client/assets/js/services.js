@@ -23,12 +23,14 @@ statServices.factory('Dimensoes',Dimensoes);
 statServices.factory('Indicador',Indicador);
 statServices.factory('Texto', Texto);
 statServices.factory('TextoAll', TextoAll);
+statServices.factory('DominioHierarquia', DominioHierarquia);
 
 Dominios.$inject = ['$resource'];
 Dimensoes.$inject = ['$resource'];
 Indicador.$inject = ['$resource'];
 Texto.$inject = ['$resource'];
 TextoAll.$inject = ['$resource'];
+DominioHierarquia.$inject = ['$resource'];
 
 function Dominios($resource){
 

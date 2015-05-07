@@ -9,13 +9,13 @@ statControllers.controller('ConteudoController', ConteudoController);
 statControllers.controller('DragDropController', DragDropController);
 statControllers.controller('EstatisticasTreeController', EstatisticasTreeController);
 
-DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel'];
+DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel', '$stateParams'];
 HeaderController.$inject = ['$scope'];
 ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios','TextoAll'];
 DragDropController.$inject = ['$scope'];
-EstatisticasTreeController.$inject = ['$scope'];
+EstatisticasTreeController.$inject = ['$scope', '$state', '$window', 'DominioHierarquia'];
 
-function EstatisticasTreeController($scope) {
+function EstatisticasTreeController($scope, $state, $window, DominioHierarquia) {
 	function calculateEstatisticasLevels(estatisticasTreeItem, parentLevel)	{
 		var currentLevel = parentLevel + 1;
 		var subdominioItem;
@@ -34,7 +34,7 @@ function EstatisticasTreeController($scope) {
 		
 		$scope.EstatisticasTreeItems = {};
 		
-		$scope.domHierQueryResult = DominioHierarquia.query(function (data) {
+		DominioHierarquia.query(function (data) {
 			$scope.EstatisticasTreeItems = data;
 			
 			var currentLevel = 1;
@@ -46,12 +46,13 @@ function EstatisticasTreeController($scope) {
 				estatisticasTreeItem.level = currentLevel;
 				
 				calculateEstatisticasLevels(estatisticasTreeItem, currentLevel);
-			}				
+			}
 		}, function (error) {
 			//definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
 			alert('Erro:' + JSON.stringify(error));
 			$scope.EstatisticasTreeItems = {};
 		});		
+
     }
 }
 
@@ -586,7 +587,11 @@ function HeaderController($scope) {
 
 }
 
-function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,filterFilter,dominiosModel){
+function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,filterFilter,dominiosModel, $stateParams){
+
+  $scope.domainsLink = $stateParams.link;
+
+  $scope.selectLink($stateParams.link,'Graph');
 
   $scope.dominios = Dominios.query();
   $scope.dominiosModel = dominiosModel;
