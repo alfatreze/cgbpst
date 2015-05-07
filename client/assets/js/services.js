@@ -22,11 +22,13 @@ statServices.factory('Dominios',Dominios);
 statServices.factory('Dimensoes',Dimensoes);
 statServices.factory('Indicador',Indicador);
 statServices.factory('Texto', Texto);
+statServices.factory('TextoAll', TextoAll);
 
 Dominios.$inject = ['$resource'];
 Dimensoes.$inject = ['$resource'];
 Indicador.$inject = ['$resource'];
 Texto.$inject = ['$resource'];
+TextoAll.$inject = ['$resource'];
 
 function Dominios($resource){
 
@@ -45,18 +47,33 @@ function Dimensoes($resource){
 
 function Indicador($resource){
   //return $resource('/api/indicador_1.json',{},{
-  return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/observacao',{ id:'@id'}, {
+  return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/observacao',{id:'@id'}, {
     //return $resource('http://localhost:5000/Portal.svc/indicador/:id',{id:'@id'}, {
-    query: {method:'GET', isArray:false}
+    query: {method:'GET',
+    isArray:false}
   });
 };
 
 function Texto($resource){
     return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/texto/:id', { id: '@id' }, {
     //  return $resource('http://localhost:5000/Portal.svc/texto/:id', { id: '@id' }, {
-    query: {method:'GET', isArray: false
+    query: {method:'GET',
+        isArray: false
     },
-    saveNew: {method:'PUT', isArray: false
+    save: {method:'PUT',
+        isArray: false
+    }
+  });
+};
+  
+function TextoAll($resource){
+    return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/texto', {}, {
+    //  return $resource('http://localhost:5000/Portal.svc/texto/:id', { id: '@id' }, {
+    query: {method:'GET',
+        isArray: true
+    },
+    saveNew: {method:'POST',
+        isArray: false
     }
   });
 };
