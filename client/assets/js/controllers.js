@@ -145,7 +145,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
 
     ];
 
-	$scope.textos = {};
+	$scope.conteudoUniforme = new Array();
     $scope.textosVisible = true;
     $scope.graficosVisible = true;
     $scope.textosLoaded = false;
@@ -177,6 +177,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
     }
 
     $scope.getTextos = function () {
+		var dados;
         if (!$scope.textosLoaded) {
             $scope.textoQueryResult = Texto.query(function (data) {
                 $scope.textos = data;
@@ -187,8 +188,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
                 $scope.textos = {};
             });
         }
-
-        return $scope.conteudosTexto;
+        // return $scope.textoQueryResult;
     }
 
     $scope.getGraficos = function () {
@@ -347,11 +347,11 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
     }
 	
 	$scope.getTodoConteudo = function (){
-		$scope.getTextos();
-		$scope.getGraficos();
-		console.log($scope);
-		console.log($scope.textos);
-		console.log($scope.conteudoGraficos);
+		var textos = $scope.getTextos(),
+			graficos = $scope.getGraficos();
+		console.log(textos);
+		console.log(graficos);
+		
 	}
 
     function getDataPublicacao() {
@@ -547,6 +547,7 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
 
   $scope.dominios = Dominios.query();
   $scope.dominiosModel = dominiosModel;
+  var active;
 
   var pivotMembers = {
                     rows: ["TipoOperacao"],
@@ -563,6 +564,12 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
    $scope.choice.membros =[];
    $scope.indicador = {};
  };
+ 
+ $scope.setActive = function(selecao){
+	 $scope.active=selecao;
+	 console.log(active);
+ };
+
 
  function pivotTable (pivotData,pivotMembers){
       var derivers = $.pivotUtilities.derivers;
@@ -572,6 +579,13 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
   function pivotTableUI (pivotData,pivotMembers){
        var derivers = $.pivotUtilities.derivers;
        $("#output").pivotUI(pivotData,pivotMembers)
+   };
+   
+   $scope.getMetadata = function (){
+	   console.log($scope.dominios);
+	   console.log($scope.dominios.dominio);
+	   console.log($scope.dominios.dominio);
+	   
    };
 
 
