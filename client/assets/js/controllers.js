@@ -586,7 +586,7 @@ function HeaderController($scope) {
 
 }
 
-function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,NotificationFactory,filterFilter,dominiosModel, $stateParams){
+function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,filterFilter,dominiosModel, $stateParams){
 
   $scope.dominios = Dominios.query();
   $scope.dominiosModel = dominiosModel;
