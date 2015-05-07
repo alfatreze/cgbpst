@@ -9,7 +9,30 @@ animationOut: slideOutLeft
 <!-- Left Menu | Hides on < tablet -->   
         
     <zf-accordion id="sidebar-nav" multi-open="true" auto-open="false" class="medium-3 domain-l1">
-        
+        <div ng-controller="EstatisticasTreeController as estatisticasTreeController" ng-init="estatisticasTreeInitTree()">
+			<script type="text/ng-template" id="estatisticasTreeTemplate">
+				<zf-accordion ng-if="estatisticasTreeItem.subdominios">
+					<zf-accordion-item title="{{estatisticasTreeItem.nome}}"  ng-repeat="estatisticasTreeItem in estatisticasTreeItem.subdominios"
+						auto-open="false" class="domain-l{{estatisticasTreeItem.level}}">
+						<div ng-include="'estatisticasTreeTemplate'"></div>
+					</zf-accordion-item >				
+				</zf-accordion>
+			    <div ng-if="estatisticasTreeItem.dados_fonte">
+				   <div class="domain-link"  ng-repeat="estatisticasDadosFonteItem in estatisticasTreeItem.dados_fonte">
+					   <a ui-sref="DomainDetail">
+						   <img zf-iconic="" icon="bookmark" size="small">
+						   {{estatisticasDadosFonteItem.nome}}
+					   </a>
+					</div>				
+				</div>
+			</script>			
+			<zf-accordion auto-open="false">
+				<zf-accordion-item title="{{estatisticasTreeItem.nome}}"  ng-repeat="estatisticasTreeItem in EstatisticasTreeItems.dominio"
+					class="chevron-right domain-l1">
+					<div ng-include="'estatisticasTreeTemplate'"></div>
+				</zf-accordion-item >
+			</zf-accordion>
+		</div>
         <!-- Level 1 --> 
         <zf-accordion-item 
                         title="Estatísticas Monetárias e Financeiras" class="chevron-right domain-l1">

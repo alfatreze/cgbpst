@@ -7,11 +7,54 @@ statControllers.controller('DomainsController', DomainsController);
 statControllers.controller('HeaderController', HeaderController);
 statControllers.controller('ConteudoController', ConteudoController);
 statControllers.controller('DragDropController', DragDropController);
+statControllers.controller('EstatisticasTreeController', EstatisticasTreeController);
 
 DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel'];
 HeaderController.$inject = ['$scope'];
 ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios'];
 DragDropController.$inject = ['$scope'];
+EstatisticasTreeController.$inject = ['$scope'];
+
+function EstatisticasTreeController($scope) {
+	function calculateEstatisticasLevels(estatisticasTreeItem, parentLevel)	{
+		var currentLevel = parentLevel + 1;
+		var subdominioItem;
+		
+		for (var i = 0; i < estatisticasTreeItem.subdominios.length; i++) {
+			subdominioItem = estatisticasTreeItem.subdominios[i];
+			
+			subdominioItem.level = currentLevel;
+			
+			calculateEstatisticasLevels(subdominioItem, currentLevel);
+		}
+	}
+	
+    $scope.estatisticasTreeInitTree = function () {
+		//$scope.EstatisticasTreeItems = {"dominio":[{"id":1,"nome":"Balança de Pagamentos","dados_fonte":[{"id":1,"nome":"Principais componentes","link":""},{"id":2,"nome":"Balança corrente - crédito","link":""}],"subdominios":[]},{"id":2,"nome":"Teste1","dados_fonte":[],"subdominios":[{"id":3,"nome":"Teste2","dados_fonte":[],"subdominios":[]},{"id":4,"nome":"Teste3","dados_fonte":[{"id":3,"nome":"SérieTeste","link":""}],"subdominios":[]}]},{"id":12,"nome":"Teste4","dados_fonte":[],"subdominios":[{"id":13,"nome":"Teste5","dados_fonte":[],"subdominios":[{"id":14,"nome":"Teste6","dados_fonte":[],"subdominios":[{"id":15,"nome":"Teste7","dados_fonte":[{"id":4,"nome":"SerieX","link":"teste.html"}],"subdominios":[]}]}]}]}]};
+		
+		$scope.EstatisticasTreeItems = {};
+		
+		$scope.domHierQueryResult = DominioHierarquia.query(function (data) {
+			$scope.EstatisticasTreeItems = data;
+			
+			var currentLevel = 1;
+			var estatisticasTreeItem;
+			
+			for (var i = 0; i < $scope.EstatisticasTreeItems.dominio.length; i++) {
+				estatisticasTreeItem = $scope.EstatisticasTreeItems.dominio[i];
+				
+				estatisticasTreeItem.level = currentLevel;
+				
+				calculateEstatisticasLevels(estatisticasTreeItem, currentLevel);
+			}				
+		}, function (error) {
+			//definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+			alert('Erro:' + JSON.stringify(error));
+			$scope.EstatisticasTreeItems = {};
+		});		
+    }
+}
+
 
 function DragDropController($scope) {
 

@@ -64,6 +64,12 @@ function Texto($resource){
   });
 };
 
+function DominioHierarquia($resource){
 
+	return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dominio/hierarquia',{},{
+    //return $resource('http://localhost:5000/Portal.svc/dominio/hierarquia',{},{
+    query: {method:'GET', params:{}, isArray:false}
+  });
+};
 
 })();
