@@ -45,21 +45,18 @@ function Dimensoes($resource){
 
 function Indicador($resource){
   //return $resource('/api/indicador_1.json',{},{
-  return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/observacao',{id:'@id'}, {
+  return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/observacao',{ id:'@id'}, {
     //return $resource('http://localhost:5000/Portal.svc/indicador/:id',{id:'@id'}, {
-    query: {method:'GET',
-    isArray:false}
+    query: {method:'GET', isArray:false}
   });
 };
 
 function Texto($resource){
     return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/texto/:id', { id: '@id' }, {
     //  return $resource('http://localhost:5000/Portal.svc/texto/:id', { id: '@id' }, {
-    query: {method:'GET',
-        isArray: false
+    query: {method:'GET', isArray: false
     },
-    saveNew: {method:'PUT',
-        isArray: false
+    saveNew: {method:'PUT', isArray: false
     }
   });
 };
