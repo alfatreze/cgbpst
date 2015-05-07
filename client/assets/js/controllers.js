@@ -591,7 +591,7 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
 
   $scope.domainsLink = $stateParams.link;
 
-  $scope.selectLink($stateParams.link,'Graph');
+  //$scope.selectLink($stateParams.link,'Graph');
 
   $scope.dominios = Dominios.query();
   $scope.dominiosModel = dominiosModel;
