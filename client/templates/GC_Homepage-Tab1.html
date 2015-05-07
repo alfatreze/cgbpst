@@ -6,7 +6,7 @@ parent: GestaoPaginaInicial
 
 <div class="grid-content" ng-controller="ConteudoController as conteudo" ng-init="getTodoConteudo();">
 
-    <div class="grid-block"
+    <!-- <div class="grid-block"
          style="margin: 1.5rem 0"
          animation-in="zoomIn" 
          animation-out="zoomOut">
@@ -20,7 +20,9 @@ parent: GestaoPaginaInicial
             DATA DE PUBLICAÇÃO
         </span>
 
-    </div>
+    </div> -->
+	
+	
 
     <div class="card" ng-repeat="conteudoTexto in textos.texto | orderBy:'posicao'">
         <div class="card-section grid-block">
