@@ -22,11 +22,13 @@ statServices.factory('Dominios',Dominios);
 statServices.factory('Dimensoes',Dimensoes);
 statServices.factory('Indicador',Indicador);
 statServices.factory('Texto', Texto);
+statServices.factory('TextoAll', TextoAll);
 
 Dominios.$inject = ['$resource'];
 Dimensoes.$inject = ['$resource'];
 Indicador.$inject = ['$resource'];
 Texto.$inject = ['$resource'];
+TextoAll.$inject = ['$resource'];
 
 function Dominios($resource){
 
@@ -58,7 +60,19 @@ function Texto($resource){
     query: {method:'GET',
         isArray: false
     },
-    saveNew: {method:'PUT',
+    save: {method:'PUT',
+        isArray: false
+    }
+  });
+};
+  
+function TextoAll($resource){
+    return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/texto', {}, {
+    //  return $resource('http://localhost:5000/Portal.svc/texto/:id', { id: '@id' }, {
+    query: {method:'GET',
+        isArray: true
+    },
+    saveNew: {method:'POST',
         isArray: false
     }
   });

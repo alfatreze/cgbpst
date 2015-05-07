@@ -4,7 +4,7 @@ url: /GestaoPaginaInicial-tab3
 parent: GestaoPaginaInicial
 ---
 
-<div class="grid-content" ng-controller="ConteudoController as conteudo">
+<div class="grid-content" ng-controller="ConteudoController as conteudo" ng-init="getGraficos()">
 
     <div class="grid-block"
          style="margin: 1.5rem 0"
@@ -22,9 +22,8 @@ parent: GestaoPaginaInicial
 
     </div>
 
-    <div class="card" ng-repeat="conteudoGrafico in conteudo.getGraficos() | orderBy:'order'"
-         ng-show="conteudo.graficosVisible">
-        <form ng-submit="conteudo.saveConteudoGrafico(conteudoGrafico)">
+    <div class="card" ng-repeat="conteudoGrafico in conteudosGraficos | orderBy:'order'">
+        <form ng-submit="saveConteudoGrafico(conteudoGrafico)">
             <div class="card-section grid-block">
                 <div class="grid-content">
 
@@ -41,7 +40,7 @@ parent: GestaoPaginaInicial
                 </div>
                 <div class="grid-content shrink">
                     <span><strong>ORDEM</strong></span>
-                    <span>1</span>
+                    <span>{{conteudoGrafico.order}}</span>
                 </div>
                 <div class="grid-content shrink">
                     <div><input type="submit" value="Gravar" class="tiny expand button" /></div>
