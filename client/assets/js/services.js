@@ -23,12 +23,14 @@ statServices.factory('Dimensoes',Dimensoes);
 statServices.factory('Indicador',Indicador);
 statServices.factory('Texto', Texto);
 statServices.factory('TextoAll', TextoAll);
+statServices.factory('DominioHierarquia', DominioHierarquia);
 
 Dominios.$inject = ['$resource'];
 Dimensoes.$inject = ['$resource'];
 Indicador.$inject = ['$resource'];
 Texto.$inject = ['$resource'];
 TextoAll.$inject = ['$resource'];
+DominioHierarquia.$inject = ['$resource'];
 
 function Dominios($resource){
 
@@ -78,6 +80,12 @@ function TextoAll($resource){
   });
 };
 
+function DominioHierarquia($resource){
 
+	return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dominio/hierarquia',{},{
+    //return $resource('http://localhost:5000/Portal.svc/dominio/hierarquia',{},{
+    query: {method:'GET', params:{}, isArray:false}
+  });
+};
 
 })();
