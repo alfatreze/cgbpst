@@ -1,6 +1,6 @@
 ---
 name: DomainDetail
-url: /DomainDetail?link
+url: /DomainDetail
 parent: DomainEstatistica
 controller: DomainsController
 ---
@@ -12,7 +12,7 @@ controller: DomainsController
      class="vertical grid-block medium-4" 
      style="border-right: 1px solid lightgray; background: #fcfcfc;">
     
-    <div class="vertical grid-block shrink">
+    <div class="vertical grid-block shrink" ng-init="init();">
         <div class="grid-content">
         <!--<a zf-close="" class="close-button">×</a>-->
         </div>
@@ -72,9 +72,9 @@ controller: DomainsController
                 
             <hr/>
             <ul class="button-group expand">
-                <li><a href="#" ng-click="getTable()">Tabela</a></li>
-                <li class="secondary"><a href="#" ng-click="getGraph()">Gráfico</a></li>
-                <li class="info" ><a href="#" ng-click="getTable2()">Gráfico 2</a></li>
+                <li><a ng-click="getTable()">Tabela</a></li>
+                <li class="secondary"><a ng-click="getGraph()">Gráfico</a></li>
+                <li class="info" ><a  ng-click="getTable2()">Gráfico 2</a></li>
             </ul>
         </div>
     </div>
@@ -89,8 +89,10 @@ controller: DomainsController
     </div>
     
     <div class="grid-content shrink" style="border-top: 1px solid #D3D3D3; padding: 1em;">
-        <a href="#" class="secondary button float-right" style="margin-bottom: 0">Exportar XLS</a>
-        <a href="#" class="secondary button float-right" style="margin-bottom: 0">Exportar PDF</a>
+        <a  class="secondary button float-right" style="margin-bottom: 0">Exportar XLS</a>
+        <a  class="secondary button float-right" style="margin-bottom: 0">Exportar PDF</a>
+        <a  ng-click="getData('Gra')" class="secondary button float-right" style="margin-bottom: 0">Ver Gráfico</a>
+        <a  ng-click="getData('Tab')" class="secondary button float-right" style="margin-bottom: 0">Ver Tabela</a>    
         <a href="#" zf-toggle="panel-metadata" class="secondary button float-right" style="margin-bottom: 0">Ver Metadata</a>
     </div>
     

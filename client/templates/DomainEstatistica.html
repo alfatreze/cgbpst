@@ -17,13 +17,14 @@ url: /DomainEstatistica
 				</zf-accordion>
 			    <div ng-if="estatisticasTreeItem.dados_fonte">
 				   <div class="domain-link"  ng-repeat="estatisticasDadosFonteItem in estatisticasTreeItem.dados_fonte">
-                       <a ui-sref="DomainDetail({link:estatisticasDadosFonteItem.link})">
+                       <a ng-click="selectLink(estatisticasTreeItem.id,'Tab',['tipo_operacao'],['periodo'])" ui-sref="DomainDetail">
                            <img zf-iconic="" icon="bookmark" size="small">
                            {{estatisticasDadosFonteItem.nome}} {{estatisticasDadosFonteItem.link}}
                        </a>
 					</div>				
 				</div>
-			</script>			
+			</script>		
+			{{dominiosModel}}	
 			<zf-accordion auto-open="false">
 				<zf-accordion-item title="{{estatisticasTreeItem.nome}}"  ng-repeat="estatisticasTreeItem in EstatisticasTreeItems.dominio"
 					class="chevron-right domain-l1">
