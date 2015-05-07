@@ -11,7 +11,7 @@ statControllers.controller('EstatisticasTreeController', EstatisticasTreeControl
 
 DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel'];
 HeaderController.$inject = ['$scope'];
-ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios'];
+ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios','TextoAll'];
 DragDropController.$inject = ['$scope'];
 EstatisticasTreeController.$inject = ['$scope'];
 
@@ -76,7 +76,7 @@ function DragDropController($scope) {
 
 }
 
-function ConteudoController($scope, $state, $window, Texto, Dominios) {
+function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) {
 
     //this is $scope???
 
@@ -188,7 +188,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
 
     ];
 
-
+	$scope.textos = {};
     $scope.textosVisible = true;
     $scope.graficosVisible = true;
     $scope.textosLoaded = false;
@@ -281,7 +281,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
 
     $scope.saveConteudoTexto = function (conteudoTexto) {
         if (conteudoTexto.id == 0) {
-            Texto.saveNew({
+            TextoAll.saveNew({
                 "id": conteudoTexto.id, "titulo": conteudoTexto.titulo,
                 "subtitulo": conteudoTexto.subtitulo,
                 "conteudo": conteudoTexto.conteudo,
@@ -308,8 +308,6 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
                 "conteudo": conteudoTexto.conteudo,
                 "posicao": conteudoTexto.posicao
             }, function (data) {
-                console.log("post ");
-
 				$scope.conteudoTextoEditOn = false;
 
 				$scope.textosLoaded = false;
@@ -342,18 +340,44 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
     }
 
     $scope.ordenarConteudoTexto = function (conteudoTexto,ordem) {
-        conteudoTexto.ordem = conteudoTexto.posicao + ordem;
+        /*conteudoTexto.ordem = conteudoTexto.posicao + ordem;
 
         if (conteudoTexto.posicao < 1) {
             conteudoTexto.posicao = 1;
         }
 
-        $scope.saveConteudoTexto(conteudoTexto);
+        $scope.saveConteudoTexto(conteudoTexto);*/
+		if(ordem>0){
+			if(conteudoTexto.posicao!=1)conteudoTexto.posicao--;
+		}
+		else if(ordem<0){
+			conteudoTexto.posicao++;
+		}
+		
+		return $scope.saveConteudoTexto(conteudoTexto);
+    }
+	
+	$scope.ordenarConteudoGrafico = function (conteudoGrafico,ordem) {
+        /*conteudoTexto.ordem = conteudoTexto.posicao + ordem;
+
+        if (conteudoTexto.posicao < 1) {
+            conteudoTexto.posicao = 1;
+        }
+
+        $scope.saveConteudoTexto(conteudoTexto);*/
+		if(ordem>0){
+			if(conteudoGrafico.order!=1)conteudoTexto.order--;
+		}
+		else if(ordem<0){
+			conteudoGrafico.order++;
+		}
+		
+		return $scope.saveConteudoGrafico(conteudoGrafico);
     }
 
     $scope.saveConteudoGrafico = function (conteudoGrafico) {
         var conteudoToSave = $scope.conteudosGraficos[conteudoGrafico.index];
-
+		console.log($scope.conteudosGraficos);
         conteudoToSave.title = conteudoGrafico.title;
 
         $scope.conteudosGraficos[conteudoGraficos.index] = conteudoToSave;
@@ -364,6 +388,14 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
     $scope.conteudoTextoInitEditor = function (textareaId) {
         //CKEDITOR.replace(textareaId);
     }
+	
+	$scope.getTodoConteudo = function (){
+		$scope.getTextos();
+		$scope.getGraficos();
+		console.log($scope);
+		console.log($scope.textos);
+		console.log($scope.conteudoGraficos);
+	}
 
     function getDataPublicacao() {
         var d = data,
@@ -376,6 +408,8 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
 
         return [day, month, year].join('-');
     }
+	
+
 };
 
 function HeaderController($scope) {
@@ -622,12 +656,11 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         var res = {id:k,value:_.pluck(v,'membro')};
         d.push(res);
     });
-  
+       
     if (jQuery.isEmptyObject($scope.indicador)) { 
         // todo: testar como POST quando existir ligação ao servico REST
         $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
             $scope.indicador = res.toJSON();
-            console.log($scope.indicador.observacao);
             //amp Dimensoes
             _key = jQuery.map($scope.indicador.observacao, function(v, k){ return k;});
         
@@ -695,9 +728,6 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         // todo: testar como POST quando existir ligação ao servico REST
         $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
             $scope.indicador = res.toJSON();
-            
-            console.log($scope.indicador.observacao);
-            
             //amp Dimensoes
             _key = jQuery.map($scope.indicador.observacao, function(v, k){ return k;});
             //map Membros
@@ -796,7 +826,7 @@ statControllers.factory('dominiosModel',function(){
 });
 /***** Directive *****/
  
- statControllers.directive("checkboxGroup", function() {
+statControllers.directive("checkboxGroup", function() {
         return {
             restrict: "A",
             link: function(scope, elem, attrs) {
