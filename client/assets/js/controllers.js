@@ -33,6 +33,7 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
 	}
 	
     $scope.selectLink = function(value,action,cols,rows){
+		
         if ($scope.dominiosModel.link != value){
           $scope.dominiosModel.reset();
           
@@ -407,6 +408,17 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
         return [day, month, year].join('-');
     }
 	
+	$scope.getDataPublicacao2 = function (data) {
+		var parsedDate = new Date(parseInt(data.substr(6)));
+            month = '' + (parsedDate.getMonth() + 1),
+            day = '' + parsedDate.getDate(),
+            year = parsedDate.getFullYear();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+
+        return [day, month, year].join('-');
+    }
 
 };
 
