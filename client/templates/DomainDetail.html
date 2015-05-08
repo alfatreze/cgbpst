@@ -5,50 +5,181 @@ parent: DomainEstatistica
 controller: DomainsController
 ---
 
-
-<div class="grid-content">
-
-
-    <div class="nav-bar right">
-        <ul class="button-group">
-            <li><a href="#" ng-click="selectLink(1,'Table')">Indicador 1</a>
-            </li>
-            <li><a href="#" ng-click="selectLink(2,'Graph')">Indicador 2</a>
-            </li>
-        </ul>
-    </div>
-
-    <div ng-show="dominiosModel.link">
-        <label>
-            Membros:
-            <input id="membros" type="text" ng-model="dominiosModel.sel.membros">
-        </label>
+       
+<div zf-panel="" 
+     id="selection-panel" 
+     class="vertical grid-block medium-4" 
+     style="border-right: 1px solid lightgray; background: #fcfcfc;">
+ 
+ <div ng-show="true" id="div_para_manipular_a_tabela">
+     <div class="vertical grid-block" ng-show="dominiosModel.link">
         
-        <label>Dimensões:</label>        
-        <select ng-model="choice.dimensao" ng-change="showMembros()">
-            <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.id}}">{{obj.nome}}</option>
-        </select>
+        <div class="grid-content shrink">
+            <label>
+                Membros:
+                <input id="membros" type="text" ng-model="dominiosModel.sel.membros1">
+            </label>
+
+            <label>Dimensões:</label>        
+            <select ng-model="choice.dimensao" ng-change="showMembros()">
+                <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.id}}">{{obj.nome}}</option>
+            </select>
+        </div>
         
-        <div>
+        <div class="grid-content shrink">
             <label>Membros seleccionados:</label>
-            <p>{{dominiosModel.sel.membros}}</p>
-            <hr/>
-            <ul>
-                <li ng-repeat="obj in choice.membros.membros">
-                    <input type="checkbox" checkbox-group cb-id="obj.id" cb-model="dominiosModel.sel.membros">{{obj.nome}}</input>
-                </li>
-            </ul>
+            <!--<p>{{dominiosModel.sel.membros}}</p>-->
+            
+            <div style="list-style: none;">
+                <span ng-repeat="membro in dominiosModel.sel.membros" 
+                      class="label"
+                      style="margin: 0 0.3em 1em 0; border-radius: 10em;">
+                    {{membro}}
+                </span>
+            </div>
 
+            <hr/>
+        </div>
+        
+        <div class="grid-content">
+    
+            <section class="block-list">
+                <header>Membros</header>
+                <ul>
+                    <li ng-repeat="obj in choice.membros.membros ">
+                        <input type="checkbox" checkbox-group id="{{obj.id}}" cb-id="obj.id" cb-model="dominiosModel.sel.membros2"></input>
+                        <label for="{{obj.id}}">{{obj.nome}}</label>
+                    </li>
+                </ul>
+            </section>
+    
         </div>
 
+        <div class="grid-content shrink">
+                
+        </div>
+    </div>    
+   
+ </div>    
+ 
+ <div ng-show="false">   
+    <div class="vertical grid-block shrink">
+        <div class="grid-content">
+        <!--<a zf-close="" class="close-button">×</a>-->
+        </div>
 
-        <div>
-            <button class="button" ng-click="getTable()">Tabela</button>
+        <div class="grid-content" style="margin-top: 1em">
+            <ul class="button-group expand">
+                <li><a href="#" ng-click="selectLink(1,'Tab')">Indicador 1</a></li>
+                <li><a href="#" ng-click="selectLink(2,'Gra')">Indicador 2</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="vertical grid-block" ng-show="dominiosModel.link">
+        
+        <div class="grid-content shrink">
+            <label>
+                Membros:
+                <input id="membros" type="text" ng-model="dominiosModel.sel.membros">
+            </label>
 
-            <button class="secondary button" ng-click="getGraph()">Gráfico</button>
+            <label>Dimensões:</label>        
+            <select ng-model="choice.dimensao" ng-change="showMembros()">
+                <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.id}}">{{obj.nome}}</option>
+            </select>
+        </div>
+        
+        <div class="grid-content shrink">
+            <label>Membros seleccionados:</label>
+            <!--<p>{{dominiosModel.sel.membros}}</p>-->
+            
+            <div style="list-style: none;">
+                <span ng-repeat="membro in dominiosModel.sel.membros" 
+                      class="label"
+                      style="margin: 0 0.3em 1em 0; border-radius: 10em;">
+                    {{membro}}
+                </span>
+            </div>
 
-            <button class="info button" ng-click="getTable2()">Gráfico</button>
+            <hr/>
+        </div>
+        
+        <div class="grid-content">
+    
+            <section class="block-list">
+                <header>Membros</header>
+                <ul>
+                    <li ng-repeat="obj in choice.membros.membros">
+                        <input type="checkbox" checkbox-group id="{{obj.id}}" cb-id="obj.id" cb-model="dominiosModel.sel.membros"></input>
+                        <label for="{{obj.id}}">{{obj.nome}}</label>
+                    </li>
+                </ul>
+            </section>
+    
+        </div>
+
+        <div class="grid-content shrink">
+                
+            <hr/>
+            <ul class="button-group expand">
+                <li><a ng-click="getTable()">Tabela</a></li>
+                <li class="secondary"><a ng-click="getGraph()">Gráfico</a></li>
+                <li class="info" ><a  ng-click="getTable2()">Gráfico 2</a></li>
+            </ul>
         </div>
     </div>
 
+
+</div>
+</div>
+<div class="vertical grid-block">
+    
+    <div id="output" class="grid-content" style="padding: 1em;">
+        <div id="panelHide" ng-hide="true">panelHide</div>
+    </div>
+    
+    <div class="grid-content shrink" style="border-top: 1px solid #D3D3D3; padding: 1em;">
+        <a  class="secondary button float-right" style="margin-bottom: 0">Exportar XLS</a>
+        <a  class="secondary button float-right" style="margin-bottom: 0">Exportar PDF</a>
+        <a  ng-click="getData('Gra')" class="secondary button float-right" style="margin-bottom: 0">Ver Gráfico</a>
+        <a  ng-click="getData('Tab')" class="secondary button float-right" style="margin-bottom: 0">Ver Tabela</a>    
+        <a href="#" zf-toggle="panel-metadata" class="secondary button float-right" style="margin-bottom: 0">Ver Metadata</a>
+    </div>
+    
+    <div id="panel-metadata" zf-panel="" position="bottom" style="padding: 1em; height: auto; background: #fcfcfc; border-top: 1px solid lightgray">
+        <a zf-close="" class="close-button">×</a>
+        <h5 style="">METADATA</h5>
+        <hr />
+        <dl>
+            <dt class="float-left" style="margin-right: 1em">Data de criação</dt>
+            <dd>22 Janeiro 2015</dd>
+            <dt class="float-left" style="margin-right: 1em">Data de atualização</dt>
+            <dd>22 Janeiro 2015</dd>
+            <dt class="float-left" style="margin-right: 1em">Periodicidade</dt>
+            <dd>Mensal</dd>
+            <dt class="float-left" style="margin-right: 1em">Unidade</dt>
+            <dd>Euro (€)</dd>
+            <dt>Descrição</dt>
+            <dd>Lorem ipsum dolor est amet.</dd>
+        </dl>
+    </div>
+    
+    <!--<div class="grid-content" style="padding: 1em; max-height: 200px; background: #fcfcfc; border-top: 1px solid lightgray">
+        <h5 style="">METADATA</h5>
+        <hr />
+        <dl>
+            <dt>Data de criação</dt>
+            <dd>22 Janeiro 2015</dd>
+            <dt>Data de atualização</dt>
+            <dd>22 Janeiro 2015</dd>
+            <dt>Periodicidade</dt>
+            <dd>Mensal</dd>
+            <dt>Unidade</dt>
+            <dd>Euro (€)</dd>
+            <dt>Descrição</dt>
+            <dd>Lorem ipsum dolor est amet.</dd>
+        </dl>
+    </div>-->
+    
 </div>

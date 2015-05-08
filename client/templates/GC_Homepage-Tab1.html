@@ -4,9 +4,9 @@ url: /GestaoPaginaInicial-tab1
 parent: GestaoPaginaInicial
 ---
 
-<div class="grid-content">
+<div class="grid-content" ng-controller="ConteudoController as conteudo" ng-init="getTodoConteudo();">
 
-    <div class="grid-block"
+    <!-- <div class="grid-block"
          style="margin: 1.5rem 0"
          animation-in="zoomIn" 
          animation-out="zoomOut">
@@ -20,49 +20,60 @@ parent: GestaoPaginaInicial
             DATA DE PUBLICAÇÃO
         </span>
 
-    </div>
+    </div> -->
+	
+	
 
-    <div class="card">
+    <div class="card" ng-repeat="conteudoTexto in textos.texto | orderBy:'posicao'">
         <div class="card-section grid-block">
             <div class="grid-content">
-
-                    <h4>Título da Notícia</h4>
-
-                <div style="color: #aaa">
-                    <span><strong>Data de Publicação</strong></span>
-                    <span>12/08/2012</span>
+                    <h4>
+                    {{conteudoTexto.titulo}}
+                    </h4>
+                <br />
+                    {{conteudoTexto.subtitulo}}
+                <br />
+                    {{conteudoTexto.conteudo}}
+                <br />
+                    <div style="color: #aaa">
+                        <span><strong>Data de Publicação</strong></span>
+                    <span>{{conteudoTexto.getDataPublicacao()}}</span>
+                    </div>
                 </div>
-            </div>
             <div class="grid-content shrink">
                     <span><strong>ORDEM</strong></span>
-                    <span>1</span>
-            </div>
+                    <span>{{conteudoTexto.posicao}}</span>
+                </div>
             <div class="grid-content shrink">
-                    <div><a class="tiny expand button">EDITAR</a></div>
-                    <div><a class="alert tiny expand button">APAGAR</a></div>
+                    <div><a class="tiny expand button" ng-click="ordenarConteudoTexto(conteudoTexto,1);">MOVER PARA CIMA</a></div>
+                    <div><a class="alert tiny expand button" ng-click="ordenarConteudoTexto(conteudoTexto,-1);">MOVER PARA BAIXO</a></div>
             </div>
         </div>
     </div>
     
     
-    <div class="card">
+    <div class="card" ng-repeat="conteudoGrafico in conteudosGraficos | orderBy:'order'">
         <div class="card-section grid-block">
             <div class="grid-content">
 
-                    <h4>Nome do Gráfico</h4>
+                    <h4>{{conteudoGrafico.title}}</h4>
 
-                <div style="color: #aaa">
-                    <span><strong>Data de Publicação</strong></span>
-                    <span>13/09/2012</span>
-                </div>
+                    <input type="text" placeholder="Título" ng-model="conteudoGrafico.title" />
+
+                    <div id="{{conteudoGrafico.graficoId}}"></div>
+
+                    <div style="color: #aaa">
+                        <span><strong>Data de Publicação</strong></span>
+                        <span>{{conteudoGrafico.textDate}}</span>
+                    </div>
             </div>
             <div class="grid-content shrink">
                     <span><strong>ORDEM</strong></span>
-                    <span>2</span>
+                    <span>{{conteudoGrafico.order}}</span>
             </div>
             <div class="grid-content shrink">
-                    <div><a class="tiny expand button">EDITAR</a></div>
-                    <div><a class="alert tiny expand button">APAGAR</a></div>
+                    <div><a class="tiny expand button" ng-click="ordenarConteudoGrafico(conteudoGrafico,1);">MOVER PARA CIMA</a></div>
+                    <div><a class="alert tiny expand button" ng-click="ordenarConteudoGrafico(conteudoGrafico,-1);">MOVER PARA BAIXO</a></div>
             </div>
         </div>
     </div>

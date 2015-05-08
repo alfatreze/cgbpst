@@ -1,79 +1,44 @@
 ---
 name: DomainEstatistica
 url: /DomainEstatistica
-animationIn: slideInLeft
-animationOut: slideOutLeft
 ---
 
 
 <!-- Left Menu | Hides on < tablet -->   
         
     <zf-accordion id="sidebar-nav" multi-open="true" auto-open="false" class="medium-3 domain-l1">
-        
-        <!-- Level 1 --> 
-        <zf-accordion-item 
-                        title="Estatísticas Monetárias e Financeiras" class="chevron-right domain-l1">
-            
-                <!--<zf-accordion auto-open="false" class="domain-l2">
-
-                    
-                    <zf-accordion-item title="Sub-Domínio 1" class="domain-l3">
-                           <div class="domain-link">
-                               <a ui-sref="DomainDetail">
-                                   <img zf-iconic="" icon="bookmark" size="small">
-                                   Endpoint
-                               </a>
-                        </div>
-                    </zf-accordion-item>
-
-                    <zf-accordion-item title="Sub-Domínio 2" class="domain-l3"></zf-accordion-item>
-
-                    <zf-accordion-item title="Sub-Domínio 3" class="domain-l3"></zf-accordion-item>
-                    
-                    <div class="domain-link">
-                        <a ui-sref="DomainDetail">
-                            <img zf-iconic="" icon="bookmark" size="small">
-                            Endpoint
-                        </a>
-                    </div>
-
-                </zf-accordion>--> 
-            
-        </zf-accordion-item>
-        
-        <zf-accordion-item title="Estatísticas de Instituições Financeiras não Monetárias" class="chevron-right domain-l1"></zf-accordion-item>
-        
-        <zf-accordion-item title="Estatísticas de Emissão de Títulos" class="chevron-right domain-l1"></zf-accordion-item>
-        
-        <zf-accordion-item title="Estatísticas de Balança de Pagamentos" class="chevron-right domain-l1">
-            
-            <zf-accordion auto-open="false" class="domain-l2">
-                <zf-accordion-item title="Balança de Pagamentos" class="domain-l3">
-                       <div class="domain-link">
-                           <a ui-sref="DomainDetail">
-                               <img zf-iconic="" icon="bookmark" size="small">
-                               Principais Componentes
-                           </a>
-                        </div>
-                         <div class="domain-link">
-                           <a ui-sref="DomainDetail">
-                               <img zf-iconic="" icon="bookmark" size="small">
-                               Balança Corrente - Crédito
-                           </a>
-                        </div>
-                    </zf-accordion-item>
-            </zf-accordion>
-            
-        </zf-accordion-item>
+        <div ng-controller="EstatisticasTreeController as estatisticasTreeController" ng-init="estatisticasTreeInitTree()">
+			<script type="text/ng-template" id="estatisticasTreeTemplate">
+				<zf-accordion ng-if="estatisticasTreeItem.subdominios">
+					<zf-accordion-item title="{{estatisticasTreeItem.nome}}"  ng-repeat="estatisticasTreeItem in estatisticasTreeItem.subdominios"
+						auto-open="false" class="domain-l{{estatisticasTreeItem.level}}">
+						<div ng-include="'estatisticasTreeTemplate'"></div>
+					</zf-accordion-item >				
+				</zf-accordion>
+			    <div ng-if="estatisticasTreeItem.dados_fonte">
+				   <div class="domain-link"  ng-repeat="estatisticasDadosFonteItem in estatisticasTreeItem.dados_fonte">
+                       <a ng-click="selectLink(estatisticasTreeItem.id,'Tab',['tipo_operacao'],['periodo'])" ui-sref="DomainDetail">
+                           <img zf-iconic="" icon="bookmark" size="small">
+                           {{estatisticasDadosFonteItem.nome}}
+                       </a>
+					</div>				
+				</div>
+			</script>		
+			{{dominiosModel}}	
+			<zf-accordion auto-open="false">
+				<zf-accordion-item title="{{estatisticasTreeItem.nome}}"  ng-repeat="estatisticasTreeItem in EstatisticasTreeItems.dominio"
+					class="chevron-right domain-l1">
+					<div ng-include="'estatisticasTreeTemplate'"></div>
+				</zf-accordion-item >
+			</zf-accordion>
+		</div>
         
     </zf-accordion>
     
 
     <!-- Content Pane -->
-    <div class="grid-block">
-        <div ui-view class="grid-content">
+    <div ui-view class="grid-block">
 
-            <p class="lead">Content here.</p>
+        <p class="lead">Content here.</p>
 
-        </div>
     </div>
