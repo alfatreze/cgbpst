@@ -22,11 +22,15 @@ statServices.factory('Dominios',Dominios);
 statServices.factory('Dimensoes',Dimensoes);
 statServices.factory('Indicador',Indicador);
 statServices.factory('Texto', Texto);
+statServices.factory('Generico',Generico);
+statServices.factory('DashboardUtilizador',DashboardUtilizador);
 
 Dominios.$inject = ['$resource'];
 Dimensoes.$inject = ['$resource'];
 Indicador.$inject = ['$resource'];
 Texto.$inject = ['$resource'];
+Generico.$inject = ['$resource'];
+DashboardUtilizador = ['$resource'];
 
 function Dominios($resource){
 
@@ -64,6 +68,19 @@ function Texto($resource){
   });
 };
 
+function Generico($resource){
 
+    return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dashboard/generico',{},{
+        //return $resource('http://localhost:5000/Portal.svc/dashboard/generico',{},{
+        query: {method:'GET', isArray:false}
+    });
+};
+
+function DashboardUtilizador($resource){
+    return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dashboard/utilizador',{},{
+        //return $resource('http://localhost:5000/Portal.svc/dashboard/utilizador',{},{
+        query: {method:'GET', isArray:true}
+    });
+};
 
 })();

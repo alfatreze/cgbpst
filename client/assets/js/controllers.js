@@ -10,7 +10,7 @@ statControllers.controller('DragDropController', DragDropController);
 
 DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel'];
 HeaderController.$inject = ['$scope'];
-ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios'];
+ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios', 'Generico', 'DashboardUtilizador'];
 DragDropController.$inject = ['$scope'];
 
 function DragDropController($scope) {
@@ -33,7 +33,7 @@ function DragDropController($scope) {
 
 }
 
-function ConteudoController($scope, $state, $window, Texto, Dominios) {
+function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, DashboardUtilizador) {
 
     //this is $scope???
 
@@ -49,18 +49,39 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
         $scope.textos={};
     });*/
 
+    $scope.generico = Generico.query();
+    $scope.dashboardUtilizador = DashboardUtilizador.query();
+
     function conteudo_gerarGrafico(graficoId) {
+        // $scope.graficosShowLabels é uma variável global que guarda a informação referente a mostrar o gráfico ou mostrar o grafico simplificado
+        // TODO escolher o serviço que retorna os dados das várias linhas e substituir os valores hardcode
         var chart1 = c3.generate({
             bindto: '#' + graficoId,
             width: 450,
+            legend: {
+                show: $scope.graficosShowLabels
+            },
+            tooltip: {
+                show: $scope.graficosShowTooltip
+            },
+            axis: {
+                x: {
+                    show: $scope.graficosShowXaxis
+                },
+                y: {
+                    show: $scope.graficosShowYaxis
+                }
+            },
             data: {
                 columns: [
-                ['data1', 30, 20, 50, 40, 60, 50],
-                ['data2', 200, 130, 90, 240, 130, 220],
-                ['data3', 300, 200, 160, 400, 250, 250]
+                    ['data1', 30, 20, 50, 40, 60, 50],
+                    ['data2', 200, 130, 90, 240, 130, 220],
+                    ['data3', 300, 200, 160, 400, 250, 250],
+                    ['data4', 10, 20, 30, 40, 25, 250]
                 ]
             }
         });
+
     }
 
     function conteudo_getShowLinks(textosVisible, graficosVisible) {
@@ -142,9 +163,27 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
             person: 'Margarida Rebelo',
             textDate: '20 JUL 2015',
         },
+        {
+            title: 'This is a title 4',
+            order: 1,
+            graficoId: 'Graf4',
+            person: 'Margarida Rebelo',
+            textDate: '20 JUL 2015',
+        },
+        {
+            title: 'This is a title 5',
+            order: 1,
+            graficoId: 'Graf5',
+            person: 'Margarida Rebelo',
+            textDate: '20 JUL 2015',
+        },
 
     ];
 
+    $scope.graficosShowLabels = false;
+    $scope.graficosShowTooltip = false;
+    $scope.graficosShowXaxis= true;
+    $scope.graficosShowYaxis = false;
 
     $scope.textosVisible = true;
     $scope.graficosVisible = true;
@@ -192,24 +231,50 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
     }
 
     $scope.getGraficos = function () {
-        if (!$scope.graficosLoaded) {
-            if (localStorage.getItem("BDP_ConteudoGraficosTeste")) {
-                conteudoGraficos = JSON.parse(localStorage.getItem("BDP_ConteudoGraficosTeste"));
-            }
-
+        // Realiza o load dos gráficos se o mesmo não foi já realizado
+        if ($scope.graficosLoaded) {
+            // Os gráficos já foram carregados.
+        } else {
+            // incluír aqui a utilização do $scope.Generico para povoar conteudoGraficos com o 1º gráfico
+            // TODO actualizar com o serviço para o serviço final que devolve os gráficos a mostrar
+            //      se esse serviço devolver apenas 1 grafico ver implementação a baixo
             $scope.conteudosGraficos = new Array();
+            var monthNames = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEC"];
+            // Para um serviço que retorna apenas 1 gráfico (Neste caso é o serviço dashboard/generico)
+            var k =1;
+            var data_criacao = new Date(Number($scope.generico.formatacao.data_criacao.replace("/Date(","").replace("+0000)/","")));
+            var data_criacao_formatada = data_criacao.getDay() + ' ' +  monthNames[data_criacao.getMonth()] + ' ' + data_criacao.getFullYear();
+            var conteudoGrafico = {
+                title: $scope.generico.nome_dados_fonte,
+                order: 1,
+                graficoId: 'Graf' + k,
+                person: '',
+                textDate: data_criacao_formatada,
+                ws_data: $scope.generico
+            };
+            $scope.conteudosGraficos[k-1] = conteudoGrafico;
 
-            var conteudoGrafico;
-
-            for (var i = 0; i < conteudoGraficos.length; i++) {
-                conteudoGrafico = conteudoGraficos[i];
-                conteudoGrafico['index'] = i;
-                $scope.conteudosGraficos[i] = conteudoGrafico;
+            // Para um serviço que retorna mais do que um gráfico (Neste caso é o serviço dashboard/utilizador)
+            // k contém o número de gráficos (actual)
+            for (var i; i < $scope.dashboardUtilizador.length; i++) {
+                k++;
+                var data_criacao = new Date(Number($scope.generico.formatacao.data_criacao.replace("/Date(","").replace("+0000)/","")));
+                var data_criacao_formatada = data_criacao.getDay() + ' ' +  monthNames[data_criacao.getMonth()] + ' ' + data_criacao.getFullYear();
+                var conteudoGrafico = {
+                    title: $scope.dashboardUtilizador[i].nome_dados_fonte,
+                    order: 1,
+                    graficoId: 'Graf' + k,
+                    person: '-',
+                    textDate: new Date(Number($scope.dashboardUtilizador[i].formatacao.data_criacao.replace("/Date(", "").replace("+0000)/", ""))).toDateString(),
+                    ws_data: $scope.dashboardUtilizador[i]
+                };
+                console.log(k);
+                console.log(conteudoGrafico);
+                $scope.conteudosGraficos[k-1] = conteudoGrafico;
             }
 
             $scope.graficosLoaded = true;
         }
-
         return $scope.conteudosGraficos;
     }
 
@@ -307,6 +372,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios) {
     }
 
     $scope.saveConteudoGrafico = function (conteudoGrafico) {
+        console.log('SAVECONTEUDOGRAFICO');
         var conteudoToSave = $scope.conteudosGraficos[conteudoGrafico.index];
 
         conteudoToSave.title = conteudoGrafico.title;
