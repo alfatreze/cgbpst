@@ -33,7 +33,6 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
 	}
 	
     $scope.selectLink = function(value,action,cols,rows){
- 
         if ($scope.dominiosModel.link != value){
           $scope.dominiosModel.reset();
           
@@ -803,12 +802,38 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         $scope.indicador = {};
         $scope.dominiosModel.sel = {};
         $scope.dominiosModel.sel.membros = [];
-        
-        if ($scope.dominiosModel.link)
-          Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
-            $scope.dimensoes = res.toJSON();
-            getData($scope.dominiosModel.action);
-          });
+		
+		//------------------------------------
+		//COMENTÁRIOS DE DEBUG
+		//------------------------------------
+		// console.log('link:'+$scope.dominiosModel.link);
+		// console.log('dominiosModel:');
+		// console.log($scope.dominiosModel);
+		
+		
+        if ($scope.dominiosModel.link){
+			//------------------------------------
+			//Se existir uma variável no localStorage com o identificador "link"+link
+			//por exemplo "link15", ele devolve o conteudo armazenado em localStorage
+			//caso contrário faz a chamada ao WS
+			//sendo que o link é o identificador do dominiosModel
+			//------------------------------------
+			if(localStorage['link'+$scope.dominiosModel.link]){			
+				//console.log('iflinktrue');
+				//console.log(localStorage['link'+$scope.dominiosModel.link]);
+				$scope.dimensoes = localStorage['link'+$scope.dominiosModel.link];
+				getData($scope.dominiosModel.action);
+			}else {
+				//console.log('iflinkfalse');
+				Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
+				$scope.dimensoes = res.toJSON();
+				localStorage['link'+$scope.dominiosModel.link] = $scope.dimensoes;
+				getData($scope.dominiosModel.action);
+			  });
+			}
+		  
+		}
+          
     }
     
     /******************
@@ -844,6 +869,9 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
      * selectLink()
      */
     $scope.selectLink = function(value,action,cols,rows){
+		console.log('Dominios id: '+value);
+		//console.log(treeItem);
+		console.log('Dominios END');
         if ($scope.dominiosModel.link != value){
           reset();
           $scope.dominiosModel.link = value;
