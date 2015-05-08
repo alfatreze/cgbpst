@@ -23,7 +23,10 @@ statServices.factory('Dimensoes',Dimensoes);
 statServices.factory('Indicador',Indicador);
 statServices.factory('Texto', Texto);
 statServices.factory('Generico',Generico);
+statServices.factory('TextoAll', TextoAll);
+statServices.factory('DominioHierarquia', DominioHierarquia);
 statServices.factory('DashboardUtilizador',DashboardUtilizador);
+statServices.factory('Observacao',Observacao);
 
 Dominios.$inject = ['$resource'];
 Dimensoes.$inject = ['$resource'];
@@ -31,6 +34,9 @@ Indicador.$inject = ['$resource'];
 Texto.$inject = ['$resource'];
 Generico.$inject = ['$resource'];
 DashboardUtilizador = ['$resource'];
+TextoAll.$inject = ['$resource'];
+DominioHierarquia.$inject = ['$resource'];
+Observacao.$inject = ['$resource'];
 
 function Dominios($resource){
 
@@ -56,15 +62,44 @@ function Indicador($resource){
   });
 };
 
+function Observacao($resource){
+  //return $resource('/api/indicador_1.json',{},{
+  return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/observacao',{}, {
+    //return $resource('http://localhost:5000/Portal.svc/indicador/:id',{id:'@id'}, {
+    query: {method:'POST',
+    isArray:false}
+  });
+};
+
 function Texto($resource){
     return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/texto/:id', { id: '@id' }, {
     //  return $resource('http://localhost:5000/Portal.svc/texto/:id', { id: '@id' }, {
     query: {method:'GET',
         isArray: false
     },
-    saveNew: {method:'PUT',
+    save: {method:'PUT',
         isArray: false
     }
+  });
+};
+
+function TextoAll($resource){
+    return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/texto', {}, {
+    //  return $resource('http://localhost:5000/Portal.svc/texto/:id', { id: '@id' }, {
+    query: {method:'GET',
+        isArray: true
+    },
+    saveNew: {method:'POST',
+        isArray: false
+    }
+  });
+};
+
+function DominioHierarquia($resource){
+
+	return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dominio/hierarquia',{},{
+    //return $resource('http://localhost:5000/Portal.svc/dominio/hierarquia',{},{
+    query: {method:'GET', params:{}, isArray:false}
   });
 };
 
