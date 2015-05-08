@@ -20,6 +20,7 @@ controller: DomainsController
       </select>
       Membros seleccionados: {{dominiosModel.sel.membros}}
 
+
       <label ng-repeat="obj in choice.membros.membros | selectedMembers:dominiosModel.sel.membros1">
         <input type="checkbox" checkbox-group cb-id="obj.id" cb-model="dominiosModel.sel.membros" ng-click="resetData()">{{obj.nome}}</input>
       </label>

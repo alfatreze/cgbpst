@@ -17,7 +17,7 @@ controller: DomainsController
         <div class="grid-content shrink">
             <label>
                 Membros:
-                <input id="membros" type="text" ng-model="dominiosModel.sel.membros">
+                <input id="membros" type="text" ng-model="dominiosModel.sel.membros1">
             </label>
 
             <label>Dimensões:</label>        
@@ -46,8 +46,8 @@ controller: DomainsController
             <section class="block-list">
                 <header>Membros</header>
                 <ul>
-                    <li ng-repeat="obj in choice.membros.membros">
-                        <input type="checkbox" checkbox-group id="{{obj.id}}" cb-id="obj.id" cb-model="dominiosModel.sel.membros"></input>
+                    <li ng-repeat="obj in choice.membros.membros ">
+                        <input type="checkbox" checkbox-group id="{{obj.id}}" cb-id="obj.id" cb-model="dominiosModel.sel.membros2"></input>
                         <label for="{{obj.id}}">{{obj.nome}}</label>
                     </li>
                 </ul>
@@ -57,12 +57,6 @@ controller: DomainsController
 
         <div class="grid-content shrink">
                 
-            <hr/>
-            <ul class="button-group expand">
-                <li><a ng-click="getTable()">Tabela</a></li>
-                <li class="secondary"><a ng-click="getGraph()">Gráfico</a></li>
-                <li class="info" ><a  ng-click="getTable2()">Gráfico 2</a></li>
-            </ul>
         </div>
     </div>    
    
