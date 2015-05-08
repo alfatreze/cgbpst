@@ -8,48 +8,65 @@ animationOut: fadeOut
 
   <h1>Gestão da Hierarquia de Navegação</h1>
 
-<div>
-    <a class="success button">ADICIONAR</a>
+<div class="card">
+    <div ng-controller="EstatisticasTreeController as estatisticasTreeController" ng-init="estatisticasTreeInitTree()"
+         class="card-section grid-block">
+        <div ng-show="estatisticasTreeEditModeOn">
+            <div class="grid-content">
+                <label>
+                    Nome:
+                    <input id="nome" type="text" ng-model="estatisticasTreeDominioToEdit.nome">
+                </label>
+                <label>Pai:</label>
+                {{estatisticasTreeDominioToEdit.parentItem.nome}}
+                <table>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td>
+                            <ul ng-repeat="dadosFonteItem in EstatisticasTreeDadosFonteAllItems">
+                                <li>
+                                    {{dadosFonteItem.nome}}
+                                    <input type="checkbox" id="dadosFonteItemCBox" ng-model="dadosFonteItem.checked" />
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                <div class="grid-content">
+                    <a class="alert tiny button" ng-click="estatisticasTreeSaveDominio(estatisticasTreeDominioToEdit);">GRAVAR</a>
+                    <a class="tiny button" ng-click="estatisticasTreeCancelEdit();">CANCELAR</a>
+                </div>
+            </div>
+        </div>
+        <div ng-hide="estatisticasTreeEditModeOn">
+            <div>
+                <a class="success button" ng-click="estatisticasTreeStartEditNew();">ADICIONAR</a>
+            </div>
+            <script type="text/ng-template" id="estatisticasTreeTemplate">
+                <div style="border:solid thin;">
+                    <div class="grid-content">
+                        <h4>{{estatisticasTreeItem.nome}}</h4>
+                        <div ng-if="estatisticasTreeItem.subdominios">
+                            <div ng-repeat="estatisticasTreeItem in estatisticasTreeItem.subdominios | orderBy:'posicao'">
+                                <div ng-include="'estatisticasTreeTemplate'"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid-content">
+                        <a class="tiny button" ng-click="estatisticasTreeStartEdit(estatisticasTreeItem);">EDITAR</a>
+                        <a class="tiny button" ng-click="estatisticasTreeOrderDominio(estatisticasTreeItem,-1);" ng-show="estatisticasTreeItem.posicao>1">/\</a>
+                        <a class="tiny button" ng-click="estatisticasTreeOrderDominio(estatisticasTreeItem,1);" ng-show="estatisticasTreeItem.posicao<estatisticasTreeItem.maxPosicao">\/</a>
+                        <a class="tiny button" ng-click="estatisticasTreeStartEditNewOnParent(estatisticasTreeItem);">FILHO</a>
+                        <a class="alert tiny button" ng-click="estatisticasTreeDeleteDominio(estatisticasTreeItem);"
+                           ng-hide="estatisticasTreeItem.subdominios.length>0">APAGAR</a>
+                    </div>
+                </div>
+            </script>
+            <div ng-repeat="estatisticasTreeItem in EstatisticasTreeItems.dominio | orderBy:'posicao'">
+                <div ng-include="'estatisticasTreeTemplate'" class="grid-content"></div>
+            </div>
+        </div>
+    </div>
 </div>
-
-
-    <div class="card">
-        <div class="card-section grid-block">
-            <div class="grid-content">
-                    <h4>Nome do Elemento da Hierarquia L1</h4>
-            </div>
-            <div class="grid-content shrink">
-                    <span><strong>Nível</strong></span>
-                    <span>1</span>
-            </div>
-            <div class="grid-content shrink">
-                    <span><strong>ORDEM</strong></span>
-                    <span>1</span>
-            </div>
-            <div class="grid-content">
-                <a ui-sref="GestaoHierarquiaNavegacao_Edit" class="tiny button">EDITAR</a>
-                <a class="alert tiny button">APAGAR</a>
-            </div>
-        </div>
-    </div>
-    
-    
-    <div class="card">
-        <div class="card-section grid-block">
-            <div class="grid-content">
-                    <h4>Nome do Elemento da Hierarquia L2</h4>
-            </div>
-            <div class="grid-content shrink">
-                    <span><strong>Nível</strong></span>
-                    <span>2</span>
-            </div>
-            <div class="grid-content shrink">
-                    <span><strong>ORDEM</strong></span>
-                    <span>1</span>
-            </div>
-            <div class="grid-content">
-                <a ui-sref="GestaoHierarquiaNavegacao_Edit" class="tiny button">EDITAR</a>
-                <a class="alert tiny button">APAGAR</a>
-            </div>
-        </div>
-    </div>

@@ -7,29 +7,194 @@ statControllers.controller('DomainsController', DomainsController);
 statControllers.controller('HeaderController', HeaderController);
 statControllers.controller('ConteudoController', ConteudoController);
 statControllers.controller('DragDropController', DragDropController);
+statControllers.controller('EstatisticasTreeController', EstatisticasTreeController);
 
 DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel'];
 HeaderController.$inject = ['$scope'];
 ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios', 'Generico', 'DashboardUtilizador'];
 DragDropController.$inject = ['$scope'];
+EstatisticasTreeController.$inject = ['$scope', '$state', '$window', 'DominioHierarquia', 'dominiosModel', 'Dominios', 'Dominio', 'DadosFonte', 'DadosFonteAll','DominioDadosFonte'];
 
-function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,dominiosModel) {
+function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,dominiosModel, Dominios, Dominio, DadosFonte, DadosFonteAll, DominioDadosFonte) {
     
     $scope.dominiosModel = dominiosModel;
       
+    $scope.estatisticasTreeEditModeOn = false;
+    
+    function getEstatisticasMaxPosicao(estatisticasTreeItems) {
+        var maxPosicao = 1;
+        var estatisticasTreeItem;
+
+        for (var i = 0; i < estatisticasTreeItems.length; i++) {
+            estatisticasTreeItem = estatisticasTreeItems[i];
+
+            if (estatisticasTreeItem.posicao > maxPosicao)
+            {
+                maxPosicao = estatisticasTreeItem.posicao;
+            }
+        }
+
+        return maxPosicao;
+    }
+
     function calculateEstatisticasLevels(estatisticasTreeItem, parentLevel)	{
 		var currentLevel = parentLevel + 1;
 		var subdominioItem;
+		var maxPosicao = getEstatisticasMaxPosicao(estatisticasTreeItem.subdominios);
 		
 		for (var i = 0; i < estatisticasTreeItem.subdominios.length; i++) {
 			subdominioItem = estatisticasTreeItem.subdominios[i];
 			
 			subdominioItem.level = currentLevel;
+			subdominioItem.id_pai = estatisticasTreeItem.id;
+			subdominioItem.parentItem = estatisticasTreeItem;
+			subdominioItem.maxPosicao = maxPosicao;
 			
 			calculateEstatisticasLevels(subdominioItem, currentLevel);
 		}
-	}
-	
+    }
+
+    function checkEstatisticasTreeDadosFonte(dadosFonteDominio) {
+        var dadosFonteAllItem;
+        var dadosFonteDominioItem;
+
+        for (var i = 0; i < $scope.EstatisticasTreeDadosFonteAllItems.length; i++) {
+            dadosFonteAllItem = $scope.EstatisticasTreeDadosFonteAllItems[i];
+
+            dadosFonteAllItem.checked = false;
+
+            for (var j = 0; j < dadosFonteDominio.length; j++) {
+                dadosFonteDominioItem = dadosFonteDominio[j];
+
+                if (dadosFonteAllItem.id == dadosFonteDominioItem.id) {
+                    dadosFonteAllItem.checked = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    $scope.estatisticasTreeStartEdit = function (dominioToEdit) {
+        checkEstatisticasTreeDadosFonte(dominioToEdit.dados_fonte);
+
+        $scope.estatisticasTreeDominioToEdit = dominioToEdit;
+        $scope.estatisticasTreeEditModeOn = true;
+    }
+
+    $scope.estatisticasTreeStartEditNew = function () {
+        checkEstatisticasTreeDadosFonte(new Array());
+
+        $scope.estatisticasTreeDominioToEdit = { "id": 0, "nome": "", "id_pai": 0 };
+        $scope.estatisticasTreeEditModeOn = true;
+    }
+
+    $scope.estatisticasTreeStartEditNewOnParent = function (parentItem) {
+        $scope.estatisticasTreeEditModeOn = true;
+        $scope.estatisticasTreeDominioToEdit = { "id": 0, "nome": "", "posicao":1, "id_pai": parentItem.id, "parentItem": parentItem };
+    }
+
+    $scope.estatisticasTreeCancelEdit = function () {
+        $scope.estatisticasTreeEditModeOn = false;
+    }
+
+    $scope.estatisticasTreeOrderDominio = function (dominioToSave, increment) {
+        dominioToSave.posicao = dominioToSave.posicao + increment;
+
+        if (dominioToSave.posicao < 1) {
+            dominioToSave.posicao = 1;
+        }
+
+        Dominio.save({
+            "id": dominioToSave.id, "nome": dominioToSave.nome, "id_pai": dominioToSave.id_pai, "posicao": dominioToSave.posicao
+        }, function (data) {
+            $scope.estatisticasTreeEditModeOn = false;
+            $scope.estatisticasTreeInitTree();
+        }, function (error) {
+            //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+            alert('Erro ' + JSON.stringify(error));
+        });
+    }
+
+    $scope.estatisticasTreeSaveDominio = function (dominioToSave) {
+        if (dominioToSave.id == 0) {
+            Dominios.saveNew({
+                "id": dominioToSave.id, "nome": dominioToSave.nome, "id_pai": dominioToSave.id_pai, "posicao": dominioToSave.posicao
+            }, function (data) {
+                $scope.estatisticasTreeSaveDominioDadosFonte(dominioToSave);
+            }, function (error) {
+                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                alert('Erro: ' + JSON.stringify(error));
+            });
+        } else {
+            Dominio.save({
+                "id": dominioToSave.id, "nome": dominioToSave.nome, "id_pai": dominioToSave.id_pai, "posicao": dominioToSave.posicao
+            }, function (data) {
+                $scope.estatisticasTreeSaveDominioDadosFonte(dominioToSave);
+            }, function (error) {
+                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                alert('Erro ' + JSON.stringify(error));
+            });
+        }
+    }
+
+    $scope.estatisticasTreeSaveDominioDadosFonte = function (dominioToSave) {
+        var dadosFonteAllItem;
+        var dadosFonteDominioItem;
+        var dadosFonteInDominio;
+
+        for (var i = 0; i < $scope.EstatisticasTreeDadosFonteAllItems.length; i++) {
+            dadosFonteAllItem = $scope.EstatisticasTreeDadosFonteAllItems[i];
+
+            dadosFonteInDominio = false;
+
+            for (var j = 0; j < dominioToSave.dados_fonte.length; j++) {
+                dadosFonteDominioItem = dominioToSave.dados_fonte[j];
+
+                if (dadosFonteAllItem.id == dadosFonteDominioItem.id) {
+                    dadosFonteInDominio = true;
+                    break;
+                }
+            }
+
+            if (!dadosFonteAllItem.checked && dadosFonteInDominio)
+            {
+                DominioDadosFonte.delete({
+                    "idDominio": dominioToSave.id, "idFonte": dadosFonteAllItem.id 
+                }, function (data) {
+                    $scope.estatisticasTreeEditModeOn = false;
+                    $scope.estatisticasTreeInitTree();
+                }, function (error) {
+                    //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                    alert('Erro ' + JSON.stringify(error));
+                });
+            }
+
+            if (dadosFonteAllItem.checked && !dadosFonteInDominio) {
+                DominioDadosFonte.save({
+                    "idDominio": dominioToSave.id, "idFonte": dadosFonteAllItem.id
+                }, function (data) {
+                    $scope.estatisticasTreeEditModeOn = false;
+                    $scope.estatisticasTreeInitTree();
+                }, function (error) {
+                    //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                    alert('Erro ' + JSON.stringify(error));
+                });
+            }
+        }
+
+    }
+
+    $scope.estatisticasTreeDeleteDominio = function (dominioToDelete) {
+        Dominio.delete({ "id": dominioToDelete.id }, function (data) {
+            console.log("deleted ");
+
+            $scope.estatisticasTreeEditModeOn = false;
+            $scope.estatisticasTreeInitTree();
+        }, function (error) {
+            //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+            alert('Erro ' + JSON.stringify(error));
+        });
+    }	
     $scope.selectLink = function(value,action,cols,rows){
 		
         if ($scope.dominiosModel.link != value){
@@ -42,22 +207,51 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
         }
     }
     
+    function estatisticasTreeInitAllItems(estatisticasTreeItem) {
+        $scope.EstatisticasTreeAllItems[$scope.EstatisticasTreeAllItems.length] = estatisticasTreeItem;
+        var subdominioItem;
+
+        for (var i = 0; i < estatisticasTreeItem.subdominios.length; i++) {
+            subdominioItem = estatisticasTreeItem.subdominios[i];
+
+            estatisticasTreeInitAllItems(subdominioItem);
+        }
+    }
+    
     $scope.estatisticasTreeInitTree = function () {
 		
-		$scope.EstatisticasTreeItems = {};
+        $scope.EstatisticasTreeDadosFonteAllItems = {};
+
+        DadosFonteAll.query(function (data) {
+            $scope.EstatisticasTreeDadosFonteAllItems = data.dados_fonte;
+        }, function (error) {
+            //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+            alert('Erro:' + JSON.stringify(error));
+            $scope.EstatisticasTreeDadosFonteAllItems = {};
+        });
+
+        $scope.EstatisticasTreeItems = {};
+        $scope.EstatisticasTreeAllItems = new Array();
 		
 		DominioHierarquia.query(function (data) {
 			$scope.EstatisticasTreeItems = data;
 			
 			var currentLevel = 1;
 			var estatisticasTreeItem;
-			
+
+			$scope.EstatisticasTreeAllItems = new Array();
+
+			var maxPosicao = getEstatisticasMaxPosicao($scope.EstatisticasTreeItems.dominio);
+
 			for (var i = 0; i < $scope.EstatisticasTreeItems.dominio.length; i++) {
 				estatisticasTreeItem = $scope.EstatisticasTreeItems.dominio[i];
 				
 				estatisticasTreeItem.level = currentLevel;
+				estatisticasTreeItem.maxPosicao = maxPosicao;
 				
 				calculateEstatisticasLevels(estatisticasTreeItem, currentLevel);
+
+				estatisticasTreeInitAllItems(estatisticasTreeItem);
 			}
 		}, function (error) {
 			//definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
