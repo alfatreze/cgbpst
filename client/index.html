@@ -27,7 +27,7 @@
     <script type="text/javascript" src="/assets/lib/jquery-ui.min.js"></script>
     <script type="text/javascript" src="/assets/lib/underscore-min.js"></script>
     <script type="text/javascript" src="/assets/lib/d3.v3.min.js"></script>
-    <script type="text/javascript" src="/assets/lib/c3.min.js"></script>
+    <script type="text/javascript" src="/assets/lib/c3.min.js"></script> 
     <script type="text/javascript" src="/assets/lib/angular-drag-and-drop-lists.min.js"></script>
     <script type="text/javascript" src="/assets/lib/pivot.min.js"></script>
 <!--    <script type="text/javascript" src="/assets/lib/c3_renderers.js"></script>-->
@@ -59,14 +59,14 @@
                             <a ui-sref="{{ms.uiSref}}">
                                 <img src="assets\img\Logo_BdP.svg">
                             </a>
-                        </li>
+                      </li>
                       <li ng-repeat="ms in menuSections | orderBy:'order'"
                             ui-sref-active="active"
 							              ng-show="isMenuSectionSelected(ms.section)===false">
                             <a ng-click="selectMenuSection(ms.section)" ui-sref="{{ms.uiSref}}">
                                 {{ms.name}}
                             </a>
-                        </li>
+                      </li>
                       <li ng-repeat="link in activeLinks">
                             <a ui-sref="{{link.uiSref}}">
                                 {{link.name}}
@@ -78,8 +78,9 @@
 
                 <div class="menu-group-right">
                     <ul class="menu-bar header-name">
-                        <li class="designation">
-                            <a ui-sref="home" class="text-left">
+                        <li class="designation" ng-repeat="ms in menuSections | orderBy:'order'"
+                            ng-show="isMenuSectionSelected(ms.section)">
+                            <a ui-sref="{{ms.uiSref}}" class="text-left">
                                 <div>PORTAL DAS</div>
                                 <div>ESTATÍSTICAS</div>
                             </a>
