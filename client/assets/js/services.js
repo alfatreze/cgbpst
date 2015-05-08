@@ -79,7 +79,7 @@ function Generico($resource){
 function DashboardUtilizador($resource){
     return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dashboard/utilizador',{},{
         //return $resource('http://localhost:5000/Portal.svc/dashboard/utilizador',{},{
-        query: {method:'GET', isArray:true}
+        query: {method:'GET', isArray:false}
     });
 };
 

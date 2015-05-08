@@ -31,6 +31,7 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
 	}
 	
     $scope.selectLink = function(value,action,cols,rows){
+		
         if ($scope.dominiosModel.link != value){
           $scope.dominiosModel.reset();
           
@@ -107,33 +108,44 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
 
     function conteudo_gerarGrafico(graficoId) {
         // $scope.graficosShowLabels é uma variável global que guarda a informação referente a mostrar o gráfico ou mostrar o grafico simplificado
-        // TODO escolher o serviço que retorna os dados das várias linhas e substituir os valores hardcode
-        var chart1 = c3.generate({
-            bindto: '#' + graficoId,
-            width: 450,
-            legend: {
-                show: $scope.graficosShowLabels
-            },
-            tooltip: {
-                show: $scope.graficosShowTooltip
-            },
-            axis: {
-                x: {
-                    show: $scope.graficosShowXaxis
-                },
-                y: {
-                    show: $scope.graficosShowYaxis
-                }
-            },
-            data: {
-                columns: [
-                    ['data1', 30, 20, 50, 40, 60, 50],
-                    ['data2', 200, 130, 90, 240, 130, 220],
-                    ['data3', 300, 200, 160, 400, 250, 250],
-                    ['data4', 10, 20, 30, 40, 25, 250]
-                ]
+        for(var i = 0; i < $scope.conteudosGraficos.length; i++) {
+            console.log($scope.conteudosGraficos[i].graficoId);
+            console.log(graficoId);
+            if ($scope.conteudosGraficos[i].graficoId === graficoId) {
+                console.log('XXXXXXXXX');
+
+                var chart1 = c3.generate({
+                    bindto: '#' + graficoId,
+                    width: 450,
+                    legend: {
+                        show: $scope.graficosShowLabels
+                    },
+                    tooltip: {
+                        show: $scope.graficosShowTooltip
+                    },
+                    axis: {
+                        x: {
+                            show: $scope.graficosShowXaxis
+                        },
+                        y: {
+                            show: $scope.graficosShowYaxis
+                        }
+                    },
+                    data: {
+                        columns: [
+                            ['data1', 30, 20, 50, 40, 60, 50],
+                            ['data2', 200, 130, 90, 240, 130, 220],
+                            ['data3', 300, 200, 160, 400, 250, 250],
+                            ['data4', 10, 20, 30, 40, 25, 250]
+                        ]
+                    }
+                });
+            } else {
+                // Não é este gráfico. Passar para o seguinte
             }
-        });
+        }
+        // TODO escolher o serviço que retorna os dados das várias linhas e substituir os valores hardcode
+
 
     }
 
@@ -309,20 +321,18 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
 
             // Para um serviço que retorna mais do que um gráfico (Neste caso é o serviço dashboard/utilizador)
             // k contém o número de gráficos (actual)
-            for (var i; i < $scope.dashboardUtilizador.length; i++) {
+            for (var i = 0; i < $scope.dashboardUtilizador.dashboard.length; i++) {
                 k++;
-                var data_criacao = new Date(Number($scope.generico.formatacao.data_criacao.replace("/Date(","").replace("+0000)/","")));
+                var data_criacao = new Date(Number($scope.dashboardUtilizador.dashboard[i].formatacao.data_criacao.replace("/Date(","").replace("+0000)/","")));
                 var data_criacao_formatada = data_criacao.getDay() + ' ' +  monthNames[data_criacao.getMonth()] + ' ' + data_criacao.getFullYear();
                 var conteudoGrafico = {
-                    title: $scope.dashboardUtilizador[i].nome_dados_fonte,
+                    title: $scope.dashboardUtilizador.dashboard[i].nome_dados_fonte,
                     order: 1,
                     graficoId: 'Graf' + k,
                     person: '-',
-                    textDate: new Date(Number($scope.dashboardUtilizador[i].formatacao.data_criacao.replace("/Date(", "").replace("+0000)/", ""))).toDateString(),
-                    ws_data: $scope.dashboardUtilizador[i]
+                    textDate: data_criacao_formatada,
+                    ws_data: $scope.dashboardUtilizador.dashboard[i]
                 };
-                console.log(k);
-                console.log(conteudoGrafico);
                 $scope.conteudosGraficos[k-1] = conteudoGrafico;
             }
 
@@ -450,6 +460,19 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
 
         return [day, month, year].join('-');
     }
+	
+	$scope.getDataPublicacao2 = function (data) {
+		var parsedDate = new Date(parseInt(data.substr(6)));
+            month = '' + (parsedDate.getMonth() + 1),
+            day = '' + parsedDate.getDate(),
+            year = parsedDate.getFullYear();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+
+        return [day, month, year].join('-');
+    }
+
 };
 
 function HeaderController($scope) {
