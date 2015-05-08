@@ -588,6 +588,7 @@ function HeaderController($scope) {
 
 function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,NotificationFactory,filterFilter,dominiosModel){
 
+<<<<<<< Updated upstream
 /* para apagar ***************************
    $scope.setActive = function(selecao){
 	 $scope.active=selecao;
@@ -609,12 +610,25 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
             $scope.init();
     });
 
+=======
+    $scope.dominios = Dominios.query();
+    $scope.dominiosModel = dominiosModel;
+    
+    var pivotMembers = {
+                    rows: ["TipoOperacao"],
+                    cols: ["Periodo"],
+                    vals:["indicador"],
+                    rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers)
+    };
+    
+>>>>>>> Stashed changes
     function reset() {
         $scope.dominiosModel.reset();
         
         $scope.choice = {};
         $scope.choice.dimensao = {};
         $scope.choice.membros =[];
+<<<<<<< Updated upstream
         $scope.indicador = {};
     };
 
@@ -638,15 +652,60 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         });                
     }
  
+=======
+        $scope.choice.membros.membros =[];
+        
+        $scope.indicador = {};
+    };
+    
+    $scope.resetData = function(){
+        $scope.indicador = {};
+    }
+    
+>>>>>>> Stashed changes
     function pivotTable (pivotData,pivotMembers){
       var derivers = $.pivotUtilities.derivers;
       $("#output").pivot(pivotData,pivotMembers)
     };
+<<<<<<< Updated upstream
 
+=======
+    
+>>>>>>> Stashed changes
     function pivotTableUI (pivotData,pivotMembers){
        var derivers = $.pivotUtilities.derivers;
        $("#output").pivotUI(pivotData,pivotMembers)
     };
+<<<<<<< Updated upstream
+=======
+
+    function notificationError(title,content){
+        var notifSet = new NotificationFactory({position: 'top'});
+        notifSet.addNotification({
+            title: title,
+            content: content,
+            color: 'error',
+            autoclose : 5000
+        });                
+    }    
+ 
+     function notificationWarn(title,content){
+        var notifSet = new NotificationFactory({position: 'top'});
+        notifSet.addNotification({
+            title: title,
+            content: content,
+            color: 'warning',
+            autoclose : 5000
+        });                
+    }   
+
+    $scope.showMembros = function (){
+        if (!$scope.choice.dimensao)
+            return;
+        var a = filterFilter($scope.dimensoes.dimensao,{id:$scope.choice.dimensao});
+        $scope.choice.membros = a[0];
+    }
+>>>>>>> Stashed changes
 
     function validateData() {
       
@@ -851,6 +910,36 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
           });
         }
     }
+<<<<<<< Updated upstream
+=======
+  }
+  
+  
+  $scope.getData = function() {
+      
+      if (jQuery.isEmptyObject($scope.indicador)) { 
+
+         $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
+            $scope.indicador = res.toJSON();
+            
+            _key = jQuery.map($scope.indicador.observacao, function(v, k){ return k;});
+        
+            _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
+            
+            $scope.indicador._key = _key;
+            $scope.indicador._value = _value;
+    
+   
+      }, function (error) {
+           notificationError("Observações",JSON.stringify(error))
+                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                alert('Erro:' + JSON.stringify(error));
+                delete $scope.indicador;
+      });
+     }
+  }
+
+>>>>>>> Stashed changes
 
 /******************* 
     $scope.getTable = function() {
@@ -863,18 +952,44 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
     });
        
     if (jQuery.isEmptyObject($scope.indicador)) { 
-        // todo: testar como POST quando existir ligação ao servico REST
+
         $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
             $scope.indicador = res.toJSON();
-            //amp Dimensoes
-            _key = jQuery.map($scope.indicador.observacao, function(v, k){ return k;});
-        
-            //map Membros
-            _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
-            $scope.indicador._key = _key;
-            $scope.indicador._value = _value;
+
+            if (jQuery.isEmptyObject($scope.indicador)) { 
+                notificationWarn("Observações","Sem resultados...");
+                delete $scope.indicador;
+                return;
+            }
             
+            _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
+            
+<<<<<<< Updated upstream
             /* hack table --
+=======
+            if (jQuery.isEmptyObject(_value)) { 
+                notificationWarn("Observações","Sem resultados...");
+                delete $scope.indicador;
+                return;
+            }
+            
+            $scope.dominiosModel.dimensoes = [];
+            
+            var a = [];       
+            var b = [];   
+            _.each(_value[0],function(value,key,field){
+               if (key != 'valor') {
+                    a.push(key);
+                    $scope.dominiosModel.dimensoes = a;
+                    b = b.concat(_.chain(_value).pluck(key).unique().value());
+               }
+            });
+
+            $scope.dominiosModel.sel.membros1 = b;
+            $scope.indicador._value = _value;
+                    
+            /* hack table */
+>>>>>>> Stashed changes
             var sum = $.pivotUtilities.aggregatorTemplates.sum;
             var numberFormat = $.pivotUtilities.numberFormat;
             var intFormat = numberFormat({digitsAfterDecimal: 0});
@@ -895,9 +1010,14 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                         return true;
                       }
             };
+<<<<<<< Updated upstream
    
    
             /* hack --
+=======
+     
+            /* hack */
+>>>>>>> Stashed changes
             pivotTable($scope.indicador._value,pivotMembers);
         });
     } else {
@@ -1021,6 +1141,7 @@ statControllers.factory('dominiosModel',function(){
 
   dominiosModel.reset = function() {
     dominiosModel.link = {};
+<<<<<<< Updated upstream
     dominiosModel.cols = ["tipo_operacao"];
     dominiosModel.rows = ["periodo"];
     dominiosModel.action = "Tab";
@@ -1034,6 +1155,16 @@ statControllers.factory('dominiosModel',function(){
     dominiosModel.cols = ["tipo_operacao"];
     dominiosModel.rows = ["periodo"];
     dominiosModel.action = "Tab";
+=======
+    dominiosModel.cols = ["TipoOperacao"];
+    dominiosModel.rows = ["Período"];  
+    dominiosModel.action = "Tabela";
+
+    dominiosModel.sel = {};
+    dominiosModel.sel.dimensoes = [];
+    dominiosModel.sel.membros = [];
+  }
+>>>>>>> Stashed changes
 
     dominiosModel.sel = {};
     dominiosModel.sel.dimensoes = [];
@@ -1043,11 +1174,32 @@ statControllers.factory('dominiosModel',function(){
   return dominiosModel;
 });
 
+<<<<<<< Updated upstream
 
 /**************************************************************
  *  Directives 
  **************************************************************/
   
+=======
+/**** filters ******/
+ statControllers.filter('selectedMembers', function() {
+    return function(items) {
+        if(!items)
+            items = [];
+    var filtered = [];
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      if ( item.id == '314000024') {
+        filtered.push(item);
+      }
+    }
+    return filtered;
+    };
+ });
+ 
+/***** Directive *****/
+ 
+>>>>>>> Stashed changes
 statControllers.directive("checkboxGroup", function() {
         return {
             restrict: "A",
