@@ -1,9 +1,10 @@
 ---
 name: Dominios
 url: /Dominios
+animationIn: slideInLeft
+animationOut: slideOutLeft
 controller: DomainsController
 ---
-
 <div class="grid-block">
   <div class="small-2 block">
    <div class="nav-bar right">
@@ -19,25 +20,21 @@ controller: DomainsController
           <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.id}}">{{obj.nome}}</option>
       </select>
       Membros seleccionados: {{dominiosModel.sel.membros}}
-
-
-      <label ng-repeat="obj in choice.membros.membros | selectedMembers:dominiosModel.sel.membros1">
-        <input type="checkbox" checkbox-group cb-id="obj.id" cb-model="dominiosModel.sel.membros" ng-click="resetData()">{{obj.nome}}</input>
+      <label ng-repeat="obj in choice.membros.membros">
+        <input type="checkbox" checkbox-group cb-id="obj.id" cb-model="dominiosModel.sel.membros">{{obj.nome}}</input>
       </label>
 
       <label><button ng-click="getTable()">>>> Tabela >>></button></label>
       <label><button ng-click="getGraph()">>>> Gráfico >>></button></label>
 
       <label><button ng-click="getTable2()">>>> Gráfico >>></button></label>
-
     </div>
-
-    <div class="small-8 block">
-        <div id="panelHide" ng-hide="true">panelHide</div>
-        <div id="output" style="margin: 1px;">
-        </div>
+  </div>
+  <div class="small-8 block">
+    <div id="panelHide" ng-hide="true" >panelHide</div>
+    <div id="output" style="margin: 1px;">
     </div>
-
+  </div>
 </div>
 
 

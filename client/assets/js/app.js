@@ -10,7 +10,6 @@
     'controllers',
     // Foundation UI components
     'foundation',
-    'foundation.notification',
     // Routing with front matter
     'foundation.dynamicRouting',
     // Transitioning between views

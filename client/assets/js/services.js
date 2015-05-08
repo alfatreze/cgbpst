@@ -22,15 +22,15 @@ statServices.factory('Dominios',Dominios);
 statServices.factory('Dimensoes',Dimensoes);
 statServices.factory('Indicador',Indicador);
 statServices.factory('Texto', Texto);
-statServices.factory('TextoAll', TextoAll);
-statServices.factory('DominioHierarquia', DominioHierarquia);
+statServices.factory('Generico',Generico);
+statServices.factory('DashboardUtilizador',DashboardUtilizador);
 
 Dominios.$inject = ['$resource'];
 Dimensoes.$inject = ['$resource'];
 Indicador.$inject = ['$resource'];
 Texto.$inject = ['$resource'];
-TextoAll.$inject = ['$resource'];
-DominioHierarquia.$inject = ['$resource'];
+Generico.$inject = ['$resource'];
+DashboardUtilizador = ['$resource'];
 
 function Dominios($resource){
 
@@ -62,30 +62,25 @@ function Texto($resource){
     query: {method:'GET',
         isArray: false
     },
-    save: {method:'PUT',
-        isArray: false
-    }
-  });
-};
-  
-function TextoAll($resource){
-    return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/texto', {}, {
-    //  return $resource('http://localhost:5000/Portal.svc/texto/:id', { id: '@id' }, {
-    query: {method:'GET',
-        isArray: true
-    },
-    saveNew: {method:'POST',
+    saveNew: {method:'PUT',
         isArray: false
     }
   });
 };
 
-function DominioHierarquia($resource){
+function Generico($resource){
 
-	return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dominio/hierarquia',{},{
-    //return $resource('http://localhost:5000/Portal.svc/dominio/hierarquia',{},{
-    query: {method:'GET', params:{}, isArray:false}
-  });
+    return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dashboard/generico',{},{
+        //return $resource('http://localhost:5000/Portal.svc/dashboard/generico',{},{
+        query: {method:'GET', isArray:false}
+    });
+};
+
+function DashboardUtilizador($resource){
+    return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dashboard/utilizador',{},{
+        //return $resource('http://localhost:5000/Portal.svc/dashboard/utilizador',{},{
+        query: {method:'GET', isArray:false}
+    });
 };
 
 })();

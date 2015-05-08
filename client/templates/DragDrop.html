@@ -1,6 +1,8 @@
 ---
 name: DragDrop
 url: /DragDrop
+animationIn: slideInLeft
+animationOut: slideOutLeft
 controller: DragDropController
 ---
 
@@ -27,7 +29,7 @@ controller: DragDropController
 
     <h1>Demo: Simple Lists</h1>
     <div class="grid-block">
-   {{$scope.dominiosModel.dimensoes}}     
+        
         <div ng-repeat="(listName, list) in models.lists" class="grid-block shrink">
             <ul dnd-list="list" class="grid-content" style="padding-right: 2em" dnd-horizontal-list="true">
             <!-- The dnd-draggable directive makes an element draggable and will
