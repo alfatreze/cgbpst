@@ -533,13 +533,6 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
     }
 
     $scope.ordenarConteudoTexto = function (conteudoTexto,ordem) {
-        /*conteudoTexto.ordem = conteudoTexto.posicao + ordem;
-
-        if (conteudoTexto.posicao < 1) {
-            conteudoTexto.posicao = 1;
-        }
-
-        $scope.saveConteudoTexto(conteudoTexto);*/
 		if(ordem>0){
 			if(conteudoTexto.posicao!=1)conteudoTexto.posicao--;
 		}
@@ -551,15 +544,8 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
     }
 	
 	$scope.ordenarConteudoGrafico = function (conteudoGrafico,ordem) {
-        /*conteudoTexto.ordem = conteudoTexto.posicao + ordem;
-
-        if (conteudoTexto.posicao < 1) {
-            conteudoTexto.posicao = 1;
-        }
-
-        $scope.saveConteudoTexto(conteudoTexto);*/
 		if(ordem>0){
-			if(conteudoGrafico.order!=1)conteudoTexto.order--;
+			if(conteudoGrafico.order!=1)conteudoGrafico.order--;
 		}
 		else if(ordem<0){
 			conteudoGrafico.order++;

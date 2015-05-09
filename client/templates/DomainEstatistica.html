@@ -11,7 +11,7 @@ animationOut: fadeOut
     <zf-accordion id="sidebar-nav" multi-open="true" auto-open="false" class="medium-3 domain-l1">
         <div ng-controller="EstatisticasTreeController as estatisticasTreeController" ng-init="estatisticasTreeInitTree()">
 			<script type="text/ng-template" id="estatisticasTreeTemplate">
-				<zf-accordion ng-if="estatisticasTreeItem.subdominios">
+				<zf-accordion  auto-open="false" ng-if="estatisticasTreeItem.subdominios">
 					<zf-accordion-item title="{{estatisticasTreeItem.nome}}"  ng-repeat="estatisticasTreeItem in estatisticasTreeItem.subdominios"
 						auto-open="false" class="domain-l{{estatisticasTreeItem.level}}">
 						<div ng-include="'estatisticasTreeTemplate'"></div>
