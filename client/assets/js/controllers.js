@@ -825,13 +825,13 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
     function pivotTable (pivotData,pivotMembers){
       var derivers = $.pivotUtilities.derivers;
       $("#output").html("");
-      $("#output").pivot(pivotData,pivotMembers,false);
+      $("#output").pivot(pivotData,pivotMembers);
     };
 
     function pivotTableUI (pivotData,pivotMembers){
        var derivers = $.pivotUtilities.derivers;
        $("#output").html("");
-       $("#output").pivotUI(pivotData,pivotMembers,false);
+       $("#output").pivotUI(pivotData,pivotMembers);
     };
 
     function validateData() {
@@ -872,11 +872,15 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                     var config_copy = JSON.parse(JSON.stringify(config));
                     $scope.dominiosModel.cols = config_copy.cols;
                     $scope.dominiosModel.rows = config_copy.rows;
+                    //$(".pvtRenderer").hide();  
+                    //$(".pvtAggregator").hide();
+                    //$(".pvtAttrDropdown").hide();
                   }
         };
     
         /* hack */
-        pivotTableUI($scope.indicador._value,pivotMembers);    
+        pivotTableUI($scope.indicador._value,pivotMembers);  
+
     }
 
     function drawGraph() {
@@ -899,11 +903,14 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                     var config_copy = JSON.parse(JSON.stringify(config));
                     $scope.dominiosModel.cols = config_copy.cols;
                     $scope.dominiosModel.rows = config_copy.rows;
+                    //$(".pvtRenderer").hide();  
+                    //$(".pvtAggregator").hide();
+                    //$(".pvtAttrDropdown").hide();                   
                   }
         };
     
         /* hack */
-        pivotTableUI($scope.indicador._value,pivotMembers);       
+       pivotTableUI($scope.indicador._value,pivotMembers);       
     }
     
     function getData(action) {
