@@ -88,3 +88,9 @@ table.pvtTable tr td {
     max-height: 200px;
 }
 .pvtCheckContainer p{ margin: 5px; }
+
+.pvtFilterBox {
+    
+    left: 120px !important;
+    top: 50px !important;
+}

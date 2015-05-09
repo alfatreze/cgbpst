@@ -948,7 +948,7 @@
       while (x.hasChildNodes()) {
         x.removeChild(x.lastChild);
       }
-console.log("---->" + result);
+
       return this.append(result);
     };
 
