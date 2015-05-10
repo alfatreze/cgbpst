@@ -51,16 +51,15 @@ animationOut: fadeOut
                     {{membro}}
                 </span>
             </div>
-
+            <input type="text" ng-model="filterMembros" placeholder="< filtro de membros >"/>
             <hr/>
         </div>
         
         <div class="grid-content">
-    
             <section class="block-list">
                 <header>Membros</header>
                 <ul>
-                    <li ng-repeat="obj in choice.membros.membros">
+                    <li ng-repeat="obj in choice.membros.membros | filter:filterMembros">
                         <input type="checkbox" checkbox-group id="{{obj.id}}" cb-id="obj.id" cb-model="dominiosModel.sel.membros"></input>
                         <label for="{{obj.id}}">{{obj.nome}}</label>
                     </li>
