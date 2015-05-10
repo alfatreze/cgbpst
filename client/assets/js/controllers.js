@@ -286,6 +286,47 @@ function DragDropController($scope) {
 
 function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) {
 
+    function getData(cols,rows,members,obj) {
+
+            $scope.indicador = Indicador.save({"id_membros":members},function(res) { 
+			$scope.indicador = res.toJSON();
+    
+                _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
+                $scope.indicador._value = _value;
+                      
+                /* hack table */
+                var sum = $.pivotUtilities.aggregatorTemplates.sum;
+                var numberFormat = $.pivotUtilities.numberFormat;
+                var intFormat = numberFormat({digitsAfterDecimal: 0});
+                var pivotMembers = {
+                          rows: rows,
+                          cols: cols,
+                          vals: ["valor"],
+                          aggregator: sum(intFormat)(["valor"]),
+                          //google chart
+                          //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
+                          //renderer: $.pivotUtilities.renderers["Line Chart"],
+                          //rendererName: "Line Chart",
+                          //c3 chart
+                          rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
+                          renderer:$.pivotUtilities.renderers["Line Chart C3"],
+                          //rendererName: "Line Chart C3",
+                          filter : function(filter) {
+                            return true;
+                          }   
+                }
+    
+                /* hack */
+                $(obj).pivot($scope.indicador._value,pivotMembers);
+                
+            /* error getting indicador */   
+            }, function (error) {
+                    alert(error);
+                    //notificationError("Observações",JSON.stringify(error));
+                    delete $scope.indicador;               
+            });
+    } /*** End getData() ***/
+
     function conteudo_gerarGrafico(graficoId) {
         var chart1 = c3.generate({
             bindto: '#' + graficoId,
