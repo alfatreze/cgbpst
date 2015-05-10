@@ -19,7 +19,7 @@ animationOut: fadeOut
 				</zf-accordion>
 			    <div ng-if="estatisticasTreeItem.dados_fonte">
 				   <div class="domain-link"  ng-repeat="estatisticasDadosFonteItem in estatisticasTreeItem.dados_fonte">
-                       <a ng-click="selectLink(estatisticasTreeItem.id,'Tab',['tipo_operacao'],['periodo'])" ui-sref="DomainDetail">
+                       <a ng-click="selectLink(estatisticasDadosFonteItem)" ui-sref="DomainDetail">
                            <img zf-iconic="" icon="bookmark" size="small">
                            {{estatisticasDadosFonteItem.nome}}
                        </a>

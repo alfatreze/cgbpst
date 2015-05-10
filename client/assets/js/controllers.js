@@ -187,8 +187,6 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
 
     $scope.estatisticasTreeDeleteDominio = function (dominioToDelete) {
         Dominio.delete({ "id": dominioToDelete.id }, function (data) {
-            console.log("deleted ");
-
             $scope.estatisticasTreeEditModeOn = false;
             $scope.estatisticasTreeInitTree();
         }, function (error) {
@@ -197,18 +195,21 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
         });
     }	
     
-    $scope.selectLink = function(value,action,cols,rows){
- 
-        if ($scope.dominiosModel.link != value){
+    $scope.selectLink = function(obj){
+        if ($scope.dominiosModel.link != obj.id){
           $scope.dominiosModel.reset();
+          $scope.dominiosModel.link = obj.id;
+          if (obj.formatacao.tipo_formato =="Quadro")
+            $scope.dominiosModel.action = "Tab";
+          else
+            $scope.dominiosModel.action = "Gra";
+          $scope.dominiosModel.cols = obj.formatacao.colunas;
+          $scope.dominiosModel.rows = obj.formatacao.linhas;
+          $scope.dominiosModel.sel.membros = obj.formatacao.filtros;
           
-          $scope.dominiosModel.link = value;
-          $scope.dominiosModel.action = action;
-          $scope.dominiosModel.cols = cols;
-          $scope.dominiosModel.rows = rows;
         }
     }
-    
+         
     function estatisticasTreeInitAllItems(estatisticasTreeItem) {
         $scope.EstatisticasTreeAllItems[$scope.EstatisticasTreeAllItems.length] = estatisticasTreeItem;
         var subdominioItem;
@@ -480,17 +481,11 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
                 "conteudo": conteudoTexto.conteudo,
                 "posicao": conteudoTexto.posicao
             }, function (data) {
-                console.log("put ");
-
 				$scope.conteudoTextoEditOn = false;
 
 				$scope.textosLoaded = false;
 				$scope.getTextos();
-                //$scope.textos = data;
-                //$scope.textos = JSON.stringify(data));
-                //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
-                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
                 alert('Erro: ' + JSON.stringify(error));
                 $scope.textos = {};
             });
@@ -505,11 +500,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
 
 				$scope.textosLoaded = false;
 				$scope.getTextos();
-                //$scope.textos = data;
-                //$scope.textos = JSON.stringify(data));
-                //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
-                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
                 alert('Erro ' + JSON.stringify(error));
                 $scope.textos = {};
             });
@@ -518,15 +509,9 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
 
     $scope.deleteConteudoTexto = function (conteudoTexto) {
         Texto.delete({ "id": conteudoTexto.id }, function (data) {
-            console.log("deleted ");
-
             $scope.textosLoaded = false;
             $scope.getTextos();
-            //$scope.textos = data;
-            //$scope.textos = JSON.stringify(data));
-            //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
-                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
                 alert('Erro ' + JSON.stringify(error));
                 $scope.textos = {};
             });
@@ -556,7 +541,6 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
 
     $scope.saveConteudoGrafico = function (conteudoGrafico) {
         var conteudoToSave = $scope.conteudosGraficos[conteudoGrafico.index];
-		console.log($scope.conteudosGraficos);
         conteudoToSave.title = conteudoGrafico.title;
 
         $scope.conteudosGraficos[conteudoGraficos.index] = conteudoToSave;
@@ -571,9 +555,6 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
 	$scope.getTodoConteudo = function (){
 		var textos = $scope.getTextos(),
 			graficos = $scope.getGraficos();
-		console.log(textos);
-		console.log(graficos);
-		
 	}
 
     function getDataPublicacao() {
@@ -773,8 +754,6 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
     $scope.dominiosModel = dominiosModel;
 
     $scope.$watch('dominiosModel.link', function(newValue, oldValue) {
-        console.log(oldValue);
-        console.log(newValue);
         if (newValue != {})
             $scope.init();
     });
@@ -811,15 +790,21 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
     function pivotTable (pivotData,pivotMembers){
       var derivers = $.pivotUtilities.derivers;
       $("#output").html("");
-      $("#output").pivot(pivotData,pivotMembers);
+      $("#output").pivot(pivotData,pivotMembers,true);
     };
 
     function pivotTableUI (pivotData,pivotMembers){
        var derivers = $.pivotUtilities.derivers;
-       $("#output").html("");
-       $("#output").pivotUI(pivotData,pivotMembers);
+
+       $("#output").pivotUI(pivotData,pivotMembers,true);
     };
 
+    function pivotGraphUI (pivotData,pivotMembers){
+       var derivers = $.pivotUtilities.derivers;
+
+       $("#output").pivotUI(pivotData,pivotMembers,true);
+    };
+    
     function validateData() {
       
       if (!$scope.dominiosModel.sel.membros)
@@ -831,7 +816,6 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
     }
   
     function draw(action){
-        console.log(action);
         if (action=="Tab")
             drawTable();
         if (action=="Gra")
@@ -839,7 +823,6 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
      }
     
     function drawTable() {
-        
         var sum = $.pivotUtilities.aggregatorTemplates.sum;
         var numberFormat = $.pivotUtilities.numberFormat;
         var intFormat = numberFormat({digitsAfterDecimal: 0});
@@ -852,7 +835,15 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                   renderer: $.pivotUtilities.renderers["Line Chart"],
                   rendererName: "Table",
                   filter : function(filter) {
-                    return true;
+                      return true;
+                      if ($scope.dominiosModel.sel.membros.indexOf(filter['tipo_operacao']) != -1  ||
+                          $scope.dominiosModel.sel.membros.indexOf(filter['periodo']) != -1  ||
+                          $scope.dominiosModel.sel.membros.indexOf(filter['tipo_valor']) != -1  ||
+                          $scope.dominiosModel.sel.membros.indexOf(filter['cae']) != -1  ||
+                          $scope.dominiosModel.sel.membros.indexOf(filter['sector_int']) != -1 )  
+                         return true;
+                      else  
+                         return false;
                   },
                   onRefresh: function(config) {
                     var config_copy = JSON.parse(JSON.stringify(config));
@@ -870,7 +861,6 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
     }
 
     function drawGraph() {
-        
         var sum = $.pivotUtilities.aggregatorTemplates.sum;
         var numberFormat = $.pivotUtilities.numberFormat;
         var intFormat = numberFormat({digitsAfterDecimal: 0});
@@ -896,16 +886,13 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         };
     
         /* hack */
-       pivotTableUI($scope.indicador._value,pivotMembers);       
+       pivotGraphUI($scope.indicador._value,pivotMembers);       
     }
     
     function getData(action) {
+
         if (jQuery.isEmptyObject($scope.indicador)) { 
-    
-            //VALIDA DATA PARA PIVOTTABLE
-			//console.log($scope.dominiosModel);
-			//console.log($scope.dominiosModel.sel.membros);
-            //$scope.indicador = Observacao.query({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
+ 
             $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) { 
 			$scope.indicador = res.toJSON();
     
@@ -956,8 +943,6 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
      *  init()
      */ 
     $scope.init = function() {
-        console.log("init:: Read Dominios");
-        
         if ($scope.dominiosModel.link == {})
             return;
         
@@ -1018,10 +1003,7 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
      *  metadata()
      */
     $scope.getMetadata = function (){
-       console.log($scope.dominios);
-       console.log($scope.dominios.dominio);
-       console.log($scope.dominios.dominio);
-       
+       console.log($scope.dominios);     
     };
 
     /*******************
@@ -1034,26 +1016,35 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         $scope.choice.membros = a[0];
     }
   
-  
     /*******************
      * selectLink()
      */
-    $scope.selectLink = function(value,action,cols,rows){
-        if ($scope.dominiosModel.link != value){
+    $scope.selectLink = function(obj){
+        if ($scope.dominiosModel.link != obj.id){
           reset();
-          $scope.dominiosModel.link = value;
-          $scope.dominiosModel.action = action;
-          $scope.dominiosModel.cols = cols;
-          $scope.dominiosModel.rows = rows;
+          $scope.dominiosModel.link = obj.id;
+          $scope.dominiosModel.action = obj.tipo_formato;
+          $scope.dominiosModel.cols = obj.colunas;
+          $scope.dominiosModel.rows = obj.linhas;
+          $scope.dominiosModel.membros = obj.filtros;
         
           Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
             $scope.dimensoes = res.toJSON();
           });
         }
     }
+    /*******************
+    * switchTo()
+    */
+    $scope.switchTo = function(action){
+        $("select.pvtRenderer").val(action);
+    }
+    
+    $scope.getNewData= function(action) {
+        delete $scope.indicador;
+        getData(action);
+    }
 }
-
-
 
 /**************************************************************
  *  Models 
