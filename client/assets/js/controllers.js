@@ -10,7 +10,7 @@ statControllers.controller('DragDropController', DragDropController);
 
 DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel'];
 HeaderController.$inject = ['$scope'];
-ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios', 'Generico', 'DashboardUtilizador'];
+ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios', 'Generico', 'DashboardUtilizador', 'Indicador', 'Observacao'];
 DragDropController.$inject = ['$scope'];
 
 function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,dominiosModel) {
@@ -86,7 +86,7 @@ function DragDropController($scope) {
 
 }
 
-function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, DashboardUtilizador) {
+function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, DashboardUtilizador, Indicador, Observacao) {
 
     //this is $scope???
 
@@ -102,50 +102,97 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
         $scope.textos={};
     });*/
 
+ //   $scope.dados_observacao = { id_membros: [] };
+ //   $scope.observacao = Observacao.query($scope.dados_observacao);
+
     $scope.generico = Generico.query();
     $scope.dashboardUtilizador = DashboardUtilizador.query();
 
+    $scope.onetime = true;
+
     function conteudo_gerarGrafico(graficoId) {
+
+
+
         // $scope.graficosShowLabels é uma variável global que guarda a informação referente a mostrar o gráfico ou mostrar o grafico simplificado
         for(var i = 0; i < $scope.conteudosGraficos.length; i++) {
-            console.log($scope.conteudosGraficos[i].graficoId);
-            console.log(graficoId);
             if ($scope.conteudosGraficos[i].graficoId === graficoId) {
-                console.log('XXXXXXXXX');
+                console.log(graficoId);
+                var dados_obs = { id_membros: [] };
+                console.log($scope.conteudosGraficos[i].ws_data.formatacao.filtros.length);
+                for (var p = 0; p < $scope.conteudosGraficos[i].ws_data.formatacao.filtros.length; p++) {
+                    // Preenche a estrutura a enviar ao webservice
+                    dados_obs.id_membros.push($scope.conteudosGraficos[i].ws_data.formatacao.filtros[p]);
+                }
 
-                var chart1 = c3.generate({
-                    bindto: '#' + graficoId,
-                    width: 450,
-                    legend: {
-                        show: $scope.graficosShowLabels
-                    },
-                    tooltip: {
-                        show: $scope.graficosShowTooltip
-                    },
-                    axis: {
-                        x: {
-                            show: $scope.graficosShowXaxis
-                        },
-                        y: {
-                            show: $scope.graficosShowYaxis
+                var dados = Observacao.save(dados_obs, function(res) {
+                    var linhas = [];
+                    for(var k = 0;k < dados.observacao.length; k++) {
+                        var tipo_operacao = dados.observacao[k].tipo_operacao; // ROW
+                        var periodo = dados.observacao[k].periodo; // COL
+                        var valor = dados.observacao[k].valor; // VAL
+                        var tipo_valor = dados.observacao[k].tipo_valor;
+                        var cae = dados.observacao[k].cae;
+                        var sector_inst = dados.observacao[k].sector_inst;
+
+                        var temLinha = false;
+                        for (var j = 0; j < linhas.length && linhas[j].length > 1; j++) {
+                            // SE o agrupamento não for por TIPO_OPERACAO, mudar aqui.
+                            if (linhas[j][0] === '' + tipo_operacao) {
+                                linhas[j].push(valor);
+                                temLinha = true;
+                            }
                         }
-                    },
-                    data: {
-                        columns: [
-                            ['data1', 30, 20, 50, 40, 60, 50],
-                            ['data2', 200, 130, 90, 240, 130, 220],
-                            ['data3', 300, 200, 160, 400, 250, 250],
-                            ['data4', 10, 20, 30, 40, 25, 250]
-                        ]
+
+                        if (!temLinha) {
+                            // SE o agrupamento não for por TIPO_OPERACAO, mudar aqui.
+                            var linha = ['' + tipo_operacao, valor];
+                            linhas.push(linha);
+                            temLinha = true;
+                        }
                     }
+                    //console.log(linhas);
+                    var chart1 = c3.generate({
+                        bindto: '#' + graficoId,
+                        width: 450,
+                        legend: {
+                            show: $scope.graficosShowLabels
+                        },
+                        tooltip: {
+                            show: $scope.graficosShowTooltip
+                        },
+                        axis: {
+                            x: {
+                                show: $scope.graficosShowXaxis
+                            },
+                            y: {
+                                show: $scope.graficosShowYaxis
+                            }
+                        },
+                        data: {
+                            columns: linhas
+                        }
+                    });
+
+
                 });
+
+                //console.log(dados);
+
+
+
+                //if ($scope.onetime) {
+                //    var dados = Observacao.query(dados_obs);
+                //    console.log('CHAMADA SERVIÇO OBSERVAÇÃO');
+                //    console.log(dados);
+                //    $scope.onetime = false;
+                //    console.log($scope.onetime);
+                //}
+
             } else {
                 // Não é este gráfico. Passar para o seguinte
             }
         }
-        // TODO escolher o serviço que retorna os dados das várias linhas e substituir os valores hardcode
-
-
     }
 
     function conteudo_getShowLinks(textosVisible, graficosVisible) {
@@ -300,12 +347,11 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
             // Os gráficos já foram carregados.
         } else {
             // incluír aqui a utilização do $scope.Generico para povoar conteudoGraficos com o 1º gráfico
-            // TODO actualizar com o serviço para o serviço final que devolve os gráficos a mostrar
-            //      se esse serviço devolver apenas 1 grafico ver implementação a baixo
             $scope.conteudosGraficos = new Array();
             var monthNames = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEC"];
             // Para um serviço que retorna apenas 1 gráfico (Neste caso é o serviço dashboard/generico)
             var k =1;
+           // console.log($scope.generico);
             var data_criacao = new Date(Number($scope.generico.formatacao.data_criacao.replace("/Date(","").replace("+0000)/","")));
             var data_criacao_formatada = data_criacao.getDay() + ' ' +  monthNames[data_criacao.getMonth()] + ' ' + data_criacao.getFullYear();
             var conteudoGrafico = {
@@ -316,6 +362,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
                 textDate: data_criacao_formatada,
                 ws_data: $scope.generico
             };
+          //  $scope.dados_observacao = { id_membros : [Math.random()] };
             $scope.conteudosGraficos[k-1] = conteudoGrafico;
 
             // Para um serviço que retorna mais do que um gráfico (Neste caso é o serviço dashboard/utilizador)
@@ -328,12 +375,13 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
                     title: $scope.dashboardUtilizador.dashboard[i].nome_dados_fonte,
                     order: 1,
                     graficoId: 'Graf' + k,
-                    person: '-',
+                    person: '',
                     textDate: data_criacao_formatada,
                     ws_data: $scope.dashboardUtilizador.dashboard[i]
                 };
                 $scope.conteudosGraficos[k-1] = conteudoGrafico;
             }
+            console.log($scope.dashboardUtilizador.formatacao);
 
             $scope.graficosLoaded = true;
         }
@@ -932,7 +980,7 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
             _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
             $scope.indicador._key = _key;
             $scope.indicador._value = _value;
-            
+
             /* hack table */
             var sum = $.pivotUtilities.aggregatorTemplates.sum;
             var numberFormat = $.pivotUtilities.numberFormat;
