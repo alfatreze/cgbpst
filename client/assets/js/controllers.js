@@ -672,20 +672,6 @@ function HeaderController($scope) {
             section: 'FO',
             uiSref: 'DomainEstatistica',
             enabled: '',
-        },
-        {
-            name: 'Estatistica Pinto',
-            order: 2,
-            section: 'FO',
-            uiSref: 'Dominios',
-            enabled: '',
-        },
-        {
-            name: 'DragDrop',
-            order: 3,
-            section: 'FO',
-            uiSref: 'DragDrop',
-            enabled: '',
         }
     ];
 
@@ -831,8 +817,12 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                   cols: $scope.dominiosModel.cols,
                   vals: ["valor"],
                   aggregatorName : "Sum",
+                  //google chart
                   rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
                   renderer: $.pivotUtilities.renderers["Line Chart"],
+                  //c3 chart
+                  //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
+                  //renderer: $.pivotUtilities.renderers["Line Chart C3"],
                   rendererName: "Table",
                   filter : function(filter) {
                       return true;
@@ -849,9 +839,6 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                     var config_copy = JSON.parse(JSON.stringify(config));
                     $scope.dominiosModel.cols = config_copy.cols;
                     $scope.dominiosModel.rows = config_copy.rows;
-                    //$(".pvtRenderer").hide();  
-                    //$(".pvtAggregator").hide();
-                    //$(".pvtAttrDropdown").hide();
                   }
         };
     
@@ -869,9 +856,14 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                   cols: $scope.dominiosModel.cols,
                   vals: ["valor"],
                   aggregatorName : "Sum",
+                  //google chart
                   rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
                   renderer: $.pivotUtilities.renderers["Line Chart"],
                   rendererName: "Line Chart",
+                  //c3 chart
+                  //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
+                  //renderer:$.pivotUtilities.renderers["Line Chart C3"],
+                  //rendererName: "Line Chart C3",
                   filter : function(filter) {
                     return true;
                   },
@@ -879,9 +871,6 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                     var config_copy = JSON.parse(JSON.stringify(config));
                     $scope.dominiosModel.cols = config_copy.cols;
                     $scope.dominiosModel.rows = config_copy.rows;
-                    //$(".pvtRenderer").hide();  
-                    //$(".pvtAggregator").hide();
-                    //$(".pvtAttrDropdown").hide();                   
                   }
         };
     
@@ -1038,6 +1027,7 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
     */
     $scope.switchTo = function(action){
         $("select.pvtRenderer").val(action);
+        $("select.pvtRenderer").change();
     }
     
     $scope.getNewData= function(action) {
