@@ -21,6 +21,8 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
     $scope.dominiosModel = dominiosModel;
       
     $scope.estatisticasTreeEditModeOn = false;
+    $scope.estatisticasTreeEditDadosFonteModeOn = false;
+    $scope.estatisticasTreeEditDadosFonteVer = false;
     
     function getEstatisticasMaxPosicao(estatisticasTreeItems) {
         var maxPosicao = 1;
@@ -81,12 +83,40 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
         $scope.estatisticasTreeDominioToEdit = dominioToEdit;
         $scope.estatisticasTreeEditModeOn = true;
     }
+    
+    $scope.estatisticasTreeStartVerDadosFonte = function(){
+        $scope.estatisticasTreeEditDadosFonteVer = true;
+    }
+    
+    $scope.estatisticasTreeCancelVerDadosFonte = function(){
+        $scope.estatisticasTreeEditDadosFonteVer = false;
+        
+    }
+    
+    $scope.estatisticasTreeStartEditDadosFonte = function (dadosFonteToEdit) {
+        
+        $scope.dadosFonteItem = dadosFonteToEdit;
+        $scope.estatisticasTreeEditDadosFonteModeOn = true;
+    }
 
     $scope.estatisticasTreeStartEditNew = function () {
         checkEstatisticasTreeDadosFonte(new Array());
 
         $scope.estatisticasTreeDominioToEdit = { "id": 0, "nome": "", "id_pai": 0 };
         $scope.estatisticasTreeEditModeOn = true;
+    }
+    
+
+    $scope.estatisticasTreeStartNewDadosFonte = function () {
+        $scope.dadosFonteItem = {                       "id": 0,
+                                                        "nome": "",
+                                                        "link": "",
+                                                	    "periodicidade": "",
+                                                	    "unidade": "",
+                                                	    "descricao": "",
+                                                	    "formatacao": {}
+                                            };
+        $scope.estatisticasTreeEditDadosFonteModeOn = true;
     }
 
     $scope.estatisticasTreeStartEditNewOnParent = function (parentItem) {
@@ -96,6 +126,10 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
 
     $scope.estatisticasTreeCancelEdit = function () {
         $scope.estatisticasTreeEditModeOn = false;
+    }
+    
+    $scope.estatisticasTreeCancelEditDadosFonte = function () {
+        $scope.estatisticasTreeEditDadosFonteModeOn = false;
     }
 
     $scope.estatisticasTreeOrderDominio = function (dominioToSave, increment) {
@@ -114,6 +148,39 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
             //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
             alert('Erro ' + JSON.stringify(error));
         });
+    }
+    
+    $scope.estatisticasTreeSaveDadosFonte = function (dadoFonteToSave) {
+
+        if (dadoFonteToSave.id == 0) {
+            DadosFonteAll.saveNew({
+                "nome": dadoFonteToSave.nome,
+                "link": dadoFonteToSave.link,
+        	    "periodicidade": dadoFonteToSave.periodicidade,
+        	    "unidade": dadoFonteToSave.unidade,
+        	    "descricao": dadoFonteToSave.descricao
+            }, function (data) {
+                $scope.estatisticasTreeEditDadosFonteModeOn = false;
+                $scope.estatisticasTreeInitTree();
+            }, function (error) {
+                alert('Erro: ' + JSON.stringify(error));
+            });
+        }
+        else {
+            DadosFonte.save({
+                "id": dadoFonteToSave.id, 
+                "nome": dadoFonteToSave.nome,
+                "link": dadoFonteToSave.link,
+        	    "periodicidade": dadoFonteToSave.periodicidade,
+        	    "unidade": dadoFonteToSave.unidade,
+        	    "descricao": dadoFonteToSave.descricao
+            }, function (data) {
+                $scope.estatisticasTreeEditDadosFonteModeOn = false;
+                $scope.estatisticasTreeInitTree();
+            }, function (error) {
+                alert('Erro ' + JSON.stringify(error));
+            });
+        }
     }
 
     $scope.estatisticasTreeSaveDominio = function (dominioToSave) {
@@ -184,6 +251,15 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
         }
 
     }
+    
+    $scope.estatisticasTreeDeleteDadosFonte = function (dadosFonteToDelete) {
+        DadosFonte.delete({ "id": dadosFonteToDelete.id }, function (data) {
+            $scope.estatisticasTreeInitTree();
+        }, function (error) {
+            //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+            alert('Erro ' + JSON.stringify(error));
+        });
+    }	
 
     $scope.estatisticasTreeDeleteDominio = function (dominioToDelete) {
         Dominio.delete({ "id": dominioToDelete.id }, function (data) {
