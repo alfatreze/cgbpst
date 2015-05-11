@@ -396,8 +396,8 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll, 
                           vals: ["valor"],
                           aggregator: sum(intFormat)(["valor"]),
                           rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
-                          renderer:$.pivotUtilities.renderers["Simplified Line Chart C3"],
-                          rendererName: "Simplified Line Chart C3",
+                          renderer:$.pivotUtilities.renderers["Line Chart C3"],
+                          rendererName: "Line Chart C3",
                           filter : function(filter) {
                             return true;
                           }   
