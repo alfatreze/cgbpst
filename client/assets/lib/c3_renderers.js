@@ -61,7 +61,7 @@
           bindto: result[0],
           size: {
             height: $(window).height() / 1.4,
-            width: $(window).width() / 1.4
+            width: $(window).width()
           },
           axis: {
             x: {
@@ -71,6 +71,9 @@
           },
           data: {
             columns: columns
+          },
+          legend: {
+            hide:true
           }
         };
         if (chartType != null) {

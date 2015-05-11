@@ -40,7 +40,9 @@ var paths = {
     'bower_components/angular-ui-router/release/angular-ui-router.js',
     'bower_components/foundation-apps/js/vendor/**/*.js',
     'bower_components/angular-resource/angular-resource.min.js',
-    'bower_components/foundation-apps/js/angular/**/*.js',
+    'bower_components/foundation-apps/js/angular/**/*.js'
+    //'bower_components/angular-spinkit/build/angular-spinkit.min.js'
+    //'bower_components/angular-busy/dist/angular-busy.min.js'
     // 3rd party
     //'bower_components/c3/c3.js',
     //'node_modules/d3/d3.js',
@@ -51,7 +53,7 @@ var paths = {
     //'client/assets/js/*.js'
     'client/assets/js/app.js',
     'client/assets/js/services.js',
-    'client/assets/js/controllers.js',
+    'client/assets/js/controllers.js'
     //'client/assets/js/angular-resources.js'
     //'node_modules/d3/d3.js',
     //'bower_components/c3/c3.js',
