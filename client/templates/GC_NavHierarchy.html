@@ -11,7 +11,7 @@ animationOut: fadeOut
 <div class="card">
     <div ng-controller="EstatisticasTreeController as estatisticasTreeController" ng-init="estatisticasTreeInitTree()"
          class="card-section grid-block">
-         <div ng-show="estatisticasTreeEditDadosFonteModeOn">
+         <div zf-modal="" id="dadoFonteEditModal">
             <div class="grid-content">
                 <label>
                     Nome:
@@ -34,27 +34,13 @@ animationOut: fadeOut
                     <input id="descricao" type="text" ng-model="dadosFonteItem.descricao">
                 </label>
                 <div class="grid-content">
-                    <a class="alert tiny button" ng-click="estatisticasTreeSaveDadosFonte(dadosFonteItem);">GRAVAR</a>
-                    <a class="tiny button" ng-click="estatisticasTreeCancelEditDadosFonte();">CANCELAR</a>
+                    <a class="alert tiny button" ng-click="estatisticasTreeSaveDadosFonte(dadosFonteItem, domainToSave);" zf-close="">GRAVAR</a>
+                    <a class="tiny button" ng-click="estatisticasTreeCancelEditDadosFonte();" zf-close="">CANCELAR</a>
                 </div>
             </div>
         </div>
-        <div ng-show="estatisticasTreeEditDadosFonteVer">
-            <div class="grid-content" >
-                <ul ng-repeat="dadosFonteItem in EstatisticasTreeDadosFonteAllItems">
-                    <li>
-                        {{dadosFonteItem.nome}}
-                        <a class="tiny button" ng-click="estatisticasTreeStartEditDadosFonte(dadosFonteItem);">EDITAR</a>
-                        <a class="alert tiny button" ng-click="estatisticasTreeDeleteDadosFonte(dadosFonteItem);">APAGAR</a>
-                    </li>
-                </ul>
-                
-                <div class="grid-content">
-                    <a class="tiny button" ng-click="estatisticasTreeCancelVerDadosFonte();">CANCELAR</a>
-                </div>
-            </div>
-        </div>
-        <div ng-show="estatisticasTreeEditModeOn">
+
+        <div zf-modal="" id="dominioEditModal">
             <div class="grid-content">
                 <label>
                     Nome:
@@ -68,44 +54,71 @@ animationOut: fadeOut
                             &nbsp;
                         </td>
                         <td>
-                            <ul ng-repeat="dadosFonteItem in EstatisticasTreeDadosFonteAllItems">
+                            <ul ng-repeat="dimensaoItem in EstatisticasTreeDimensoes">
                                 <li>
-                                    {{dadosFonteItem.nome}}
-                                    <input type="checkbox" id="dadosFonteItemCBox" ng-model="dadosFonteItem.checked" />
+                                    {{dimensaoItem.nome}}
+                                    <input type="checkbox" id="dimensaoItemCBox" ng-model="dimensaoItem.checked" />
                                 </li>
                             </ul>
                         </td>
                     </tr>
                 </table>
                 <div class="grid-content">
-                    <a class="alert tiny button" ng-click="estatisticasTreeSaveDominio(estatisticasTreeDominioToEdit);">GRAVAR</a>
-                    <a class="tiny button" ng-click="estatisticasTreeCancelEdit();">CANCELAR</a>
+                    <a class="alert tiny button" ng-click="estatisticasTreeSaveDominio(estatisticasTreeDominioToEdit);" zf-close="">GRAVAR</a>
+                    <a class="tiny button" ng-click="estatisticasTreeCancelEdit();" zf-close="">CANCELAR</a>
                 </div>
             </div>
         </div>
-        <div ng-hide="estatisticasTreeEditModeOn">
+        <!--<div ng-show="estatisticasTreeEditDadosFonteVer">
+            <div class="grid-content" >
+                <ul ng-repeat="dadosFonteItem in EstatisticasTreeDadosFonteAllItems">
+                    <li>
+                        {{dadosFonteItem.nome}}
+                        <a class="tiny button" ng-click="estatisticasTreeStartEditDadosFonte(dadosFonteItem);">EDITAR</a>
+                        <a class="alert tiny button" ng-click="estatisticasTreeDeleteDadosFonte(dadosFonteItem);">APAGAR</a>
+                    </li>
+                </ul>
+                
+                <div class="grid-content">
+                    <a class="tiny button" ng-click="estatisticasTreeCancelVerDadosFonte();">CANCELAR</a>
+                </div>
+            </div>
+        </div>-->
+
+        <div>
             <div>
-                <a class="success button" ng-click="estatisticasTreeStartEditNew();">ADICIONAR</a>
-                <a class="success button" ng-click="estatisticasTreeStartNewDadosFonte();">Adicionar Dados Fonte</a>
-                <a class="success button" ng-click="estatisticasTreeStartVerDadosFonte();">Ver Dados Fonte</a>
+                <a class="success button" ng-click="estatisticasTreeStartEditNew();" zf-open="dominioEditModal">Adicionar Domínio</a>
             </div>
             <script type="text/ng-template" id="estatisticasTreeTemplate">
                 <div style="border:solid thin;">
                     <div class="grid-content">
-                        <h4>{{estatisticasTreeItem.nome}}</h4>
+                        <h4>{{estatisticasTreeItem.nome}} - Posição: {{estatisticasTreeItem.posicao}}</h4>
                         <div ng-if="estatisticasTreeItem.subdominios">
                             <div ng-repeat="estatisticasTreeItem in estatisticasTreeItem.subdominios | orderBy:'posicao'">
                                 <div ng-include="'estatisticasTreeTemplate'"></div>
                             </div>
                         </div>
                     </div>
+                    <div class="grid-content" >
+                        <ul ng-repeat="dadosFonteItem in estatisticasTreeItem.dados_fonte | orderBy:'posicao'">
+                            <li>
+                                {{dadosFonteItem.nome}} - Posição: {{dadosFonteItem.posicao}}
+                                <a class="tiny button" ng-click="estatisticasTreeStartEditDadosFonte(dadosFonteItem, estatisticasTreeItem);" zf-open="dadoFonteEditModal">Editar Dado Fonte</a>
+                                <a class="tiny button" ng-click="estatisticasTreeOrderDadosFonte(dadosFonteItem,estatisticasTreeItem,-1);" ng-show="dadosFonteItem.posicao>1">/\</a>
+                                <a class="tiny button" ng-click="estatisticasTreeOrderDadosFonte(dadosFonteItem,estatisticasTreeItem,1);" ng-show="dadosFonteItem.posicao<getEstatisticasMaxPosicaoDadosFonte(estatisticasTreeItem)">\/</a>
+                                <a class="alert tiny button" ng-click="estatisticasTreeDeleteDadosFonte(dadosFonteItem, estatisticasTreeItem);">Apagar Dado Fonte</a>
+                            </li>
+                        </ul>
+                        </br>
+                        <a class="success button" ng-click="estatisticasTreeStartNewDadosFonte(estatisticasTreeItem);" zf-open="dadoFonteEditModal">Adicionar Dado Fonte</a>
+                    </div>
                     <div class="grid-content">
-                        <a class="tiny button" ng-click="estatisticasTreeStartEdit(estatisticasTreeItem);">EDITAR</a>
+                        <a class="tiny button" zf-open="dominioEditModal" ng-click="estatisticasTreeStartEdit(estatisticasTreeItem);">Editar Domínio</a>
                         <a class="tiny button" ng-click="estatisticasTreeOrderDominio(estatisticasTreeItem,-1);" ng-show="estatisticasTreeItem.posicao>1">/\</a>
                         <a class="tiny button" ng-click="estatisticasTreeOrderDominio(estatisticasTreeItem,1);" ng-show="estatisticasTreeItem.posicao<estatisticasTreeItem.maxPosicao">\/</a>
-                        <a class="tiny button" ng-click="estatisticasTreeStartEditNewOnParent(estatisticasTreeItem);">FILHO</a>
+                        <a class="tiny button" ng-click="estatisticasTreeStartEditNewOnParent(estatisticasTreeItem);" zf-open="dominioEditModal">Adicionar Filho</a>
                         <a class="alert tiny button" ng-click="estatisticasTreeDeleteDominio(estatisticasTreeItem);"
-                           ng-hide="estatisticasTreeItem.subdominios.length>0">APAGAR</a>
+                           ng-hide="estatisticasTreeItem.subdominios.length>0">Apagar Domínio</a>
                     </div>
                 </div>
             </script>

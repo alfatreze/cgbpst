@@ -189,7 +189,9 @@ function DominioDadosFonte($resource) {
 
     return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/dominio/:idDominio/dados_fonte/:idFonte', { idDominio: '@idDominio', idFonte: '@idFonte' }, {
         query: { method: 'GET', isArray: false },
-        save: { method: 'POST', isArray: false }
+        save: { method: 'POST', isArray: false },
+        edit: { method: 'PUT', isArray: false },
+        delete: { method: 'DELETE', isArray: false }
     });
 };
 
