@@ -20,8 +20,6 @@
     
     }
     
-
-    
     // horizontal axis
     .pvtHorizList  { }
     
@@ -44,4 +42,6 @@
 
     .pvtRenderer { display: none; }
     
+    .pvtTotalLabel, .rowTotal, .colTotal, .pvtGrandTotal { display: none; }
+
 }

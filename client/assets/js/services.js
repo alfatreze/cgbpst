@@ -14,13 +14,13 @@
     */
     
     // AZURE SERVER
-    const serverServices = 'http://cgptazrbdp01.cloudapp.net:5000';
+    //const serverServices = 'http://cgptazrbdp01.cloudapp.net:5000';
     
     // VMWARE SERVER
-    // const serverServices = 'http://83.240.151.253:5000'; 
+    const serverServices = 'http://10.0.22.138:5000'; 
     
     // LOCALHOST
-    // const serverServices = 'http://localhost:5000'; 
+    //const serverServices = 'http://localhost:5000'; 
     
     var statServices = angular.module('statServices', ['ngResource']);
     statServices.factory('Dominios', Dominios);
@@ -32,7 +32,6 @@
     statServices.factory('DominioHierarquia', DominioHierarquia);
     statServices.factory('DashboardUtilizador', DashboardUtilizador);
     statServices.factory('Observacao', Observacao);
-    statServices.factory('DominioHierarquia', DominioHierarquia);
     statServices.factory('Dominio', Dominio);
     statServices.factory('DadosFonte', DadosFonte);
     statServices.factory('DadosFonteAll', DadosFonteAll);
@@ -162,7 +161,7 @@
 
     function Dominios($resource) {
 
-        return $resource(serverServices + '0/Portal.svc/dominio', {}, {
+        return $resource(serverServices + '/Portal.svc/dominio', {}, {
             //return $resource('http://localhost:5000/Portal.svc/dominio',{},{
             query: {
                 method: 'GET',

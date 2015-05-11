@@ -137,10 +137,24 @@ table.pvtTable {
         &.custom-disabled {
             @include button-disabled;
         }
-        
     
     }
     
+    // Extend the base modal class to get core structural styles
+    @extend %modal;
+    
+    // Use the layout mixin to define the modal's width
+    @include modal-layout(
+        $width: 300px // Can be an absolute value or percentage
+    );
+    
+    // Use the style mixin to define the modal's visual style
+    @include modal-style(
+        $border: 1px solid black,
+        $radius: 10px, // Border radius
+        $shadow: 0 4px 10px #000 // Box shadow
+    );
+
 }
 
 // Filter Box List
