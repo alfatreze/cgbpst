@@ -12,7 +12,7 @@ statControllers.controller('EstatisticasTreeController', EstatisticasTreeControl
 DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','NotificationFactory','filterFilter','dominiosModel'];
 //DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','NotificationFactory','filterFilter','dominiosModel','Observacao'];
 HeaderController.$inject = ['$scope'];
-ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios','TextoAll'];
+ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios','TextoAll','Generico','Indicador','DashboardUtilizador'];
 DragDropController.$inject = ['$scope'];
 EstatisticasTreeController.$inject = ['$scope', '$state', '$window', 'DominioHierarquia', 'dominiosModel', 'Dominios', 'Dominio', 'DadosFonte', 'DadosFonteAll','DominioDadosFonte'];
 
@@ -96,6 +96,9 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
     $scope.estatisticasTreeStartEditDadosFonte = function (dadosFonteToEdit) {
         
         $scope.dadosFonteItem = dadosFonteToEdit;
+        selectLinkToEdit(dadosFonteToEdit)
+
+
         $scope.estatisticasTreeEditDadosFonteModeOn = true;
     }
 
@@ -272,6 +275,7 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
     }	
     
     $scope.selectLink = function(obj){
+        console.log(obj);
         if ($scope.dominiosModel.link != obj.id){
           $scope.dominiosModel.reset();
           $scope.dominiosModel.link = obj.id;
@@ -284,6 +288,25 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
           $scope.dominiosModel.sel.membros = obj.formatacao.filtros;
           
         }
+        console.log($scope.dominiosModel);
+    }
+
+    function selectLinkToEdit(obj){
+        console.log(obj);
+        if ($scope.dominiosModel.link != obj.id){
+          $scope.dominiosModel.reset();
+          $scope.dominiosModel.link = obj.id;
+          if(obj.formatação){
+            if (obj.formatacao.tipo_formato =="Quadro")
+                $scope.dominiosModel.action = "Tab";
+            else
+                $scope.dominiosModel.action = "Gra";
+            $scope.dominiosModel.cols = obj.formatacao.colunas;
+            $scope.dominiosModel.rows = obj.formatacao.linhas;
+            $scope.dominiosModel.sel.membros = obj.formatacao.filtros;
+          }
+        }
+        console.log($scope.dominiosModel);
     }
          
     function estatisticasTreeInitAllItems(estatisticasTreeItem) {
@@ -360,16 +383,9 @@ function DragDropController($scope) {
 
 }
 
-function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) {
+function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll, Generico, Indicador, DashboardUtilizador) {
 
-    function getData(cols,rows,members,obj) {
-
-            $scope.indicador = Indicador.save({"id_membros":members},function(res) { 
-			$scope.indicador = res.toJSON();
-    
-                _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
-                $scope.indicador._value = _value;
-                      
+    function getData(cols,rows,members,observacao,obj) {
                 /* hack table */
                 var sum = $.pivotUtilities.aggregatorTemplates.sum;
                 var numberFormat = $.pivotUtilities.numberFormat;
@@ -379,31 +395,122 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
                           cols: cols,
                           vals: ["valor"],
                           aggregator: sum(intFormat)(["valor"]),
-                          //google chart
-                          //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
-                          //renderer: $.pivotUtilities.renderers["Line Chart"],
-                          //rendererName: "Line Chart",
-                          //c3 chart
                           rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
-                          renderer:$.pivotUtilities.renderers["Line Chart C3"],
-                          //rendererName: "Line Chart C3",
+                          renderer:$.pivotUtilities.renderers["Simplified Line Chart C3"],
+                          rendererName: "Simplified Line Chart C3",
                           filter : function(filter) {
                             return true;
                           }   
                 }
-    
+
                 /* hack */
-                $(obj).pivot($scope.indicador._value,pivotMembers);
-                
-            /* error getting indicador */   
-            }, function (error) {
-                    alert(error);
-                    //notificationError("Observações",JSON.stringify(error));
-                    delete $scope.indicador;               
-            });
+                $("#" + obj).pivot(observacao,pivotMembers);
     } /*** End getData() ***/
 
     function conteudo_gerarGrafico(graficoId) {
+        //console.log('...................................................................................................................................');
+        //console.log(graficoId);
+        // $scope.graficosShowLabels é uma variável global que guarda a informação referente a mostrar o gráfico ou mostrar o grafico simplificado
+        for(var i = 0; i < $scope.conteudosGraficos.length; i++) {
+
+            if ($scope.conteudosGraficos[i].graficoId === graficoId) {
+        //        console.log(graficoId);
+                if ($scope.conteudosGraficos[i].ws_data != null && $scope.conteudosGraficos[i].ws_data.formatacao) {
+                    if ($scope.conteudosGraficos[i].ws_data.formatacao.linhas != null
+                        && $scope.conteudosGraficos[i].ws_data.formatacao.colunas != null
+                        && $scope.conteudosGraficos[i].ws_data.formatacao.filtros != null) {
+
+                        getData($scope.conteudosGraficos[i].ws_data.formatacao.linhas,
+                            $scope.conteudosGraficos[i].ws_data.formatacao.colunas,
+                            $scope.conteudosGraficos[i].ws_data.formatacao.filtros,
+							$scope.conteudosGraficos[i].observacao,
+                            graficoId);
+                    } else {
+          //              console.log($scope.conteudosGraficos[i].formatacao);
+                    }
+                } else {
+          //          console.log($scope.conteudosGraficos[i]);
+                }
+
+          /*      console.log(graficoId);
+                var dados_obs = { id_membros: [] };
+                console.log($scope.conteudosGraficos[i].ws_data.formatacao.filtros.length);
+                for (var p = 0; p < $scope.conteudosGraficos[i].ws_data.formatacao.filtros.length; p++) {
+                    // Preenche a estrutura a enviar ao webservice
+                    dados_obs.id_membros.push($scope.conteudosGraficos[i].ws_data.formatacao.filtros[p]);
+                }
+
+                var dados = Observacao.save(dados_obs, function(res) {
+                    var linhas = [];
+                    for(var k = 0;k < dados.observacao.length; k++) {
+                        var tipo_operacao = dados.observacao[k].tipo_operacao; // ROW
+                        var periodo = dados.observacao[k].periodo; // COL
+                        var valor = dados.observacao[k].valor; // VAL
+                        var tipo_valor = dados.observacao[k].tipo_valor;
+                        var cae = dados.observacao[k].cae;
+                        var sector_inst = dados.observacao[k].sector_inst;
+
+                        var temLinha = false;
+                        for (var j = 0; j < linhas.length && linhas[j].length > 1; j++) {
+                            // SE o agrupamento não for por TIPO_OPERACAO, mudar aqui.
+                            if (linhas[j][0] === '' + tipo_operacao) {
+                                linhas[j].push(valor);
+                                temLinha = true;
+                            }
+                        }
+
+                        if (!temLinha) {
+                            // SE o agrupamento não for por TIPO_OPERACAO, mudar aqui.
+                            var linha = ['' + tipo_operacao, valor];
+                            linhas.push(linha);
+                            temLinha = true;
+                        }
+                    }
+                    //console.log(linhas);
+                    var chart1 = c3.generate({
+                        bindto: '#' + graficoId,
+                        width: 450,
+                        legend: {
+                            show: $scope.graficosShowLabels
+                        },
+                        tooltip: {
+                            show: $scope.graficosShowTooltip
+                        },
+                        axis: {
+                            x: {
+                                show: $scope.graficosShowXaxis
+                            },
+                            y: {
+                                show: $scope.graficosShowYaxis
+                            }
+                        },
+                        data: {
+                            columns: linhas
+                        }
+                    });
+
+
+                });
+
+                //console.log(dados);
+
+
+
+                //if ($scope.onetime) {
+                //    var dados = Observacao.query(dados_obs);
+                //    console.log('CHAMADA SERVIÇO OBSERVAÇÃO');
+                //    console.log(dados);
+                //    $scope.onetime = false;
+                //    console.log($scope.onetime);
+                //}
+*/
+            } else {
+                // Não é este gráfico. Passar para o seguinte
+            //    console.log('Not grafic ' + graficoId);
+            }
+
+        }
+/*
         var chart1 = c3.generate({
             bindto: '#' + graficoId,
             width: 450,
@@ -415,6 +522,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
                 ]
             }
         });
+*/
     }
 
     function conteudo_getShowLinks(textosVisible, graficosVisible) {
@@ -544,6 +652,39 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
         }
         // return $scope.textoQueryResult;
     }
+	
+	function loadGraficoIndicadores(data)
+	{
+		var monthNames = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEC"];
+		
+		var data_criacao = new Date();
+		var data_criacao_formatada = '';
+		
+		if (data.formatacao != null && data.formatacao.data_criacao != null) {
+			data_criacao = new Date(Number(data.formatacao.data_criacao.replace("/Date(","").replace("+0000)/","")));
+			data_criacao_formatada = data_criacao.getDay() + ' ' +  monthNames[data_criacao.getMonth()] + ' ' + data_criacao.getFullYear();
+		}				
+		
+		Indicador.save({"id_membros":data.formatacao.filtros},function(res) {
+			var indicadorRes = res.toJSON();
+			
+			var indicadorResObs = jQuery.map(indicadorRes.observacao, function(v, k){ return v;});
+			
+			var k = $scope.conteudosGraficos.length;
+
+			$scope.conteudosGraficos[k] = {
+				title: data.nome_dados_fonte,
+				order: 1,
+				graficoId: 'Graf' + k,
+				person: '',
+				textDate: data_criacao_formatada,
+				ws_data: data,
+				observacao: indicadorResObs
+			};				
+		}, function (error) {
+				console.log(error);
+		});			
+	}
 
     $scope.getGraficos = function () {
         if (!$scope.graficosLoaded) {
@@ -553,18 +694,26 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
 
             $scope.conteudosGraficos = new Array();
 
-            var conteudoGrafico;
-
-            for (var i = 0; i < conteudoGraficos.length; i++) {
-                conteudoGrafico = conteudoGraficos[i];
-                conteudoGrafico['index'] = i;
-                $scope.conteudosGraficos[i] = conteudoGrafico;
-            }
-
+            $scope.genericoQueryResult = Generico.query(function (data) {
+				loadGraficoIndicadores(data);
+            }, function (error) {
+                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                alert('Erro:' + JSON.stringify(error));
+                $scope.textos = {};
+            });
+			
+            $scope.dashboardQueryResult = DashboardUtilizador.query(function (data) {
+				for (var i = 0; i < data.dashboard.length; i++) {
+					loadGraficoIndicadores(data.dashboard[i]);
+				}
+            }, function (error) {
+                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                alert('Erro:' + JSON.stringify(error));
+                $scope.textos = {};
+            });			
+			
             $scope.graficosLoaded = true;
         }
-
-        return $scope.conteudosGraficos;
     }
 
     $scope.gerarGrafico = function (graficoId) {
@@ -686,6 +835,19 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
         return [day, month, year].join('-');
     }
 	
+    $scope.getDataPublicacao2 = function(data) {
+        var date = new Date(parseInt(data.substr(6)));
+
+        var d = date,
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+
+        return [day, month, year].join('-');
+    }
 
 };
 
@@ -1062,38 +1224,41 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
 		//------------------------------------
 		//COMENTÁRIOS DE DEBUG
 		//------------------------------------
-		// console.log('link:'+$scope.dominiosModel.link);
-		// console.log('dominiosModel:');
-		// console.log($scope.dominiosModel);
+		console.log('link:'+$scope.dominiosModel.link);
+		console.log('dominiosModel:');
+		console.log($scope.dominiosModel);
 		
 		
-        // if ($scope.dominiosModel.link){
-			// //------------------------------------
-			// //Se existir uma variável no localStorage com o identificador "link"+link
-			// //por exemplo "link15", ele devolve o conteudo armazenado em localStorage
-			// //caso contrário faz a chamada ao WS
-			// //sendo que o link é o identificador do dominiosModel
-			// //------------------------------------
-			// if(localStorage['link'+$scope.dominiosModel.link]){			
-				// //console.log('iflinktrue');
-				// //console.log(localStorage['link'+$scope.dominiosModel.link]);
-				// $scope.dimensoes = localStorage['link'+$scope.dominiosModel.link];
-				// getData($scope.dominiosModel.action);
-			// }else {
-				// //console.log('iflinkfalse');
-				// Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
-				// $scope.dimensoes = res.toJSON();
-				// localStorage['link'+$scope.dominiosModel.link] = $scope.dimensoes;
-				// getData($scope.dominiosModel.action);
-			  // });
-			// }
+        if ($scope.dominiosModel.link){
+			//------------------------------------
+			//Se existir uma variável no localStorage com o identificador "link"+link
+			//por exemplo "link15", ele devolve o conteudo armazenado em localStorage
+			//caso contrário faz a chamada ao WS
+			//sendo que o link é o identificador do dominiosModel
+			//------------------------------------
+			if(localStorage['link'+$scope.dominiosModel.link]){			
+				console.log('iflinktrue');
+				console.log(localStorage['link'+$scope.dominiosModel.link]);
+				$scope.dimensoes = localStorage['link'+$scope.dominiosModel.link];
+				getData($scope.dominiosModel.action);
+			}else {
+				console.log('iflinkfalse');
+
+				Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
+                console.log(res);
+				$scope.dimensoes = res.toJSON();
+				localStorage['link'+$scope.dominiosModel.link] = $scope.dimensoes;
+				getData($scope.dominiosModel.action);
+			  });
+			}
 		  
-		// }
-		if ($scope.dominiosModel.link)
-          Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
-            $scope.dimensoes = res.toJSON();
-            getData($scope.dominiosModel.action);
-          });
+		}
+		
+        // if ($scope.dominiosModel.link)
+        //   Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
+        //     $scope.dimensoes = res.toJSON();
+        //     getData($scope.dominiosModel.action);
+        //   });
         
     }
     

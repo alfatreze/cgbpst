@@ -24,7 +24,7 @@ url: /home
     </div>
     
     
-    <div class="grid-block small-up-1 medium-up-4" ng-init="getTextos()">
+    <div class="grid-block small-up-1 medium-up-4" ng-init="getTextos();getGraficos();">
 
         <div ng-repeat="conteudoTexto in textos.texto | orderBy:'order'"
              ng-show="textosVisible"
@@ -55,8 +55,8 @@ url: /home
                 </div>
             </div>
         </div>
-<!--
-        <div ng-repeat="conteudoGrafico in getGraficos() | orderBy:'order'"
+
+        <div ng-repeat="conteudoGrafico in conteudosGraficos | orderBy:'order'"
              ng-show="graficosVisible"
              class="grid-content"
              animation-in="zoomIn"
@@ -82,7 +82,7 @@ url: /home
                 {{gerarGrafico(conteudoGrafico.graficoId)}}
             </div>
         </div>
-        -->
+
     </div>
 
 </div>
