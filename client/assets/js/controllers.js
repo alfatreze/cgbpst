@@ -7,56 +7,254 @@ statControllers.controller('DomainsController', DomainsController);
 statControllers.controller('HeaderController', HeaderController);
 statControllers.controller('ConteudoController', ConteudoController);
 statControllers.controller('DragDropController', DragDropController);
+statControllers.controller('EstatisticasTreeController', EstatisticasTreeController);
 
-DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','filterFilter','dominiosModel'];
+DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','NotificationFactory','filterFilter','dominiosModel'];
+//DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','NotificationFactory','filterFilter','dominiosModel','Observacao'];
 HeaderController.$inject = ['$scope'];
 ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios', 'Generico', 'DashboardUtilizador', 'Indicador', 'Observacao'];
 DragDropController.$inject = ['$scope'];
+EstatisticasTreeController.$inject = ['$scope', '$state', '$window', 'DominioHierarquia', 'dominiosModel', 'Dominios', 'Dominio', 'DadosFonte', 'DadosFonteAll','DominioDadosFonte'];
 
-function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,dominiosModel) {
+function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,dominiosModel, Dominios, Dominio, DadosFonte, DadosFonteAll, DominioDadosFonte) {
     
     $scope.dominiosModel = dominiosModel;
       
+    $scope.estatisticasTreeEditModeOn = false;
+    
+    function getEstatisticasMaxPosicao(estatisticasTreeItems) {
+        var maxPosicao = 1;
+        var estatisticasTreeItem;
+
+        for (var i = 0; i < estatisticasTreeItems.length; i++) {
+            estatisticasTreeItem = estatisticasTreeItems[i];
+
+            if (estatisticasTreeItem.posicao > maxPosicao)
+            {
+                maxPosicao = estatisticasTreeItem.posicao;
+            }
+        }
+
+        return maxPosicao;
+    }
+
     function calculateEstatisticasLevels(estatisticasTreeItem, parentLevel)	{
 		var currentLevel = parentLevel + 1;
 		var subdominioItem;
+		var maxPosicao = getEstatisticasMaxPosicao(estatisticasTreeItem.subdominios);
 		
 		for (var i = 0; i < estatisticasTreeItem.subdominios.length; i++) {
 			subdominioItem = estatisticasTreeItem.subdominios[i];
 			
 			subdominioItem.level = currentLevel;
+			subdominioItem.id_pai = estatisticasTreeItem.id;
+			subdominioItem.parentItem = estatisticasTreeItem;
+			subdominioItem.maxPosicao = maxPosicao;
 			
 			calculateEstatisticasLevels(subdominioItem, currentLevel);
 		}
-	}
-	
-    $scope.selectLink = function(value,action,cols,rows){
-        if ($scope.dominiosModel.link != value){
+    }
+
+    function checkEstatisticasTreeDadosFonte(dadosFonteDominio) {
+        var dadosFonteAllItem;
+        var dadosFonteDominioItem;
+
+        for (var i = 0; i < $scope.EstatisticasTreeDadosFonteAllItems.length; i++) {
+            dadosFonteAllItem = $scope.EstatisticasTreeDadosFonteAllItems[i];
+
+            dadosFonteAllItem.checked = false;
+
+            for (var j = 0; j < dadosFonteDominio.length; j++) {
+                dadosFonteDominioItem = dadosFonteDominio[j];
+
+                if (dadosFonteAllItem.id == dadosFonteDominioItem.id) {
+                    dadosFonteAllItem.checked = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    $scope.estatisticasTreeStartEdit = function (dominioToEdit) {
+        checkEstatisticasTreeDadosFonte(dominioToEdit.dados_fonte);
+
+        $scope.estatisticasTreeDominioToEdit = dominioToEdit;
+        $scope.estatisticasTreeEditModeOn = true;
+    }
+
+    $scope.estatisticasTreeStartEditNew = function () {
+        checkEstatisticasTreeDadosFonte(new Array());
+
+        $scope.estatisticasTreeDominioToEdit = { "id": 0, "nome": "", "id_pai": 0 };
+        $scope.estatisticasTreeEditModeOn = true;
+    }
+
+    $scope.estatisticasTreeStartEditNewOnParent = function (parentItem) {
+        $scope.estatisticasTreeEditModeOn = true;
+        $scope.estatisticasTreeDominioToEdit = { "id": 0, "nome": "", "posicao":1, "id_pai": parentItem.id, "parentItem": parentItem };
+    }
+
+    $scope.estatisticasTreeCancelEdit = function () {
+        $scope.estatisticasTreeEditModeOn = false;
+    }
+
+    $scope.estatisticasTreeOrderDominio = function (dominioToSave, increment) {
+        dominioToSave.posicao = dominioToSave.posicao + increment;
+
+        if (dominioToSave.posicao < 1) {
+            dominioToSave.posicao = 1;
+        }
+
+        Dominio.save({
+            "id": dominioToSave.id, "nome": dominioToSave.nome, "id_pai": dominioToSave.id_pai, "posicao": dominioToSave.posicao
+        }, function (data) {
+            $scope.estatisticasTreeEditModeOn = false;
+            $scope.estatisticasTreeInitTree();
+        }, function (error) {
+            //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+            alert('Erro ' + JSON.stringify(error));
+        });
+    }
+
+    $scope.estatisticasTreeSaveDominio = function (dominioToSave) {
+        if (dominioToSave.id == 0) {
+            Dominios.saveNew({
+                "id": dominioToSave.id, "nome": dominioToSave.nome, "id_pai": dominioToSave.id_pai, "posicao": dominioToSave.posicao
+            }, function (data) {
+                $scope.estatisticasTreeSaveDominioDadosFonte(dominioToSave);
+            }, function (error) {
+                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                alert('Erro: ' + JSON.stringify(error));
+            });
+        } else {
+            Dominio.save({
+                "id": dominioToSave.id, "nome": dominioToSave.nome, "id_pai": dominioToSave.id_pai, "posicao": dominioToSave.posicao
+            }, function (data) {
+                $scope.estatisticasTreeSaveDominioDadosFonte(dominioToSave);
+            }, function (error) {
+                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                alert('Erro ' + JSON.stringify(error));
+            });
+        }
+    }
+
+    $scope.estatisticasTreeSaveDominioDadosFonte = function (dominioToSave) {
+        var dadosFonteAllItem;
+        var dadosFonteDominioItem;
+        var dadosFonteInDominio;
+
+        for (var i = 0; i < $scope.EstatisticasTreeDadosFonteAllItems.length; i++) {
+            dadosFonteAllItem = $scope.EstatisticasTreeDadosFonteAllItems[i];
+
+            dadosFonteInDominio = false;
+
+            for (var j = 0; j < dominioToSave.dados_fonte.length; j++) {
+                dadosFonteDominioItem = dominioToSave.dados_fonte[j];
+
+                if (dadosFonteAllItem.id == dadosFonteDominioItem.id) {
+                    dadosFonteInDominio = true;
+                    break;
+                }
+            }
+
+            if (!dadosFonteAllItem.checked && dadosFonteInDominio)
+            {
+                DominioDadosFonte.delete({
+                    "idDominio": dominioToSave.id, "idFonte": dadosFonteAllItem.id 
+                }, function (data) {
+                    $scope.estatisticasTreeEditModeOn = false;
+                    $scope.estatisticasTreeInitTree();
+                }, function (error) {
+                    //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                    alert('Erro ' + JSON.stringify(error));
+                });
+            }
+
+            if (dadosFonteAllItem.checked && !dadosFonteInDominio) {
+                DominioDadosFonte.save({
+                    "idDominio": dominioToSave.id, "idFonte": dadosFonteAllItem.id
+                }, function (data) {
+                    $scope.estatisticasTreeEditModeOn = false;
+                    $scope.estatisticasTreeInitTree();
+                }, function (error) {
+                    //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+                    alert('Erro ' + JSON.stringify(error));
+                });
+            }
+        }
+
+    }
+
+    $scope.estatisticasTreeDeleteDominio = function (dominioToDelete) {
+        Dominio.delete({ "id": dominioToDelete.id }, function (data) {
+            $scope.estatisticasTreeEditModeOn = false;
+            $scope.estatisticasTreeInitTree();
+        }, function (error) {
+            //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+            alert('Erro ' + JSON.stringify(error));
+        });
+    }	
+    
+    $scope.selectLink = function(obj){
+        if ($scope.dominiosModel.link != obj.id){
           $scope.dominiosModel.reset();
+          $scope.dominiosModel.link = obj.id;
+          if (obj.formatacao.tipo_formato =="Quadro")
+            $scope.dominiosModel.action = "Tab";
+          else
+            $scope.dominiosModel.action = "Gra";
+          $scope.dominiosModel.cols = obj.formatacao.colunas;
+          $scope.dominiosModel.rows = obj.formatacao.linhas;
+          $scope.dominiosModel.sel.membros = obj.formatacao.filtros;
           
-          $scope.dominiosModel.link = value;
-          $scope.dominiosModel.action = action;
-          $scope.dominiosModel.cols = cols;
-          $scope.dominiosModel.rows = rows;
+        }
+    }
+         
+    function estatisticasTreeInitAllItems(estatisticasTreeItem) {
+        $scope.EstatisticasTreeAllItems[$scope.EstatisticasTreeAllItems.length] = estatisticasTreeItem;
+        var subdominioItem;
+
+        for (var i = 0; i < estatisticasTreeItem.subdominios.length; i++) {
+            subdominioItem = estatisticasTreeItem.subdominios[i];
+
+            estatisticasTreeInitAllItems(subdominioItem);
         }
     }
     
     $scope.estatisticasTreeInitTree = function () {
 		
-		$scope.EstatisticasTreeItems = {};
+        $scope.EstatisticasTreeDadosFonteAllItems = {};
+
+        DadosFonteAll.query(function (data) {
+            $scope.EstatisticasTreeDadosFonteAllItems = data.dados_fonte;
+        }, function (error) {
+            //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+            alert('Erro:' + JSON.stringify(error));
+            $scope.EstatisticasTreeDadosFonteAllItems = {};
+        });
+
+        $scope.EstatisticasTreeItems = {};
+        $scope.EstatisticasTreeAllItems = new Array();
 		
 		DominioHierarquia.query(function (data) {
 			$scope.EstatisticasTreeItems = data;
 			
 			var currentLevel = 1;
 			var estatisticasTreeItem;
-			
+
+			$scope.EstatisticasTreeAllItems = new Array();
+
+			var maxPosicao = getEstatisticasMaxPosicao($scope.EstatisticasTreeItems.dominio);
+
 			for (var i = 0; i < $scope.EstatisticasTreeItems.dominio.length; i++) {
 				estatisticasTreeItem = $scope.EstatisticasTreeItems.dominio[i];
 				
 				estatisticasTreeItem.level = currentLevel;
+				estatisticasTreeItem.maxPosicao = maxPosicao;
 				
 				calculateEstatisticasLevels(estatisticasTreeItem, currentLevel);
+
+				estatisticasTreeInitAllItems(estatisticasTreeItem);
 			}
 		}, function (error) {
 			//definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
@@ -88,19 +286,46 @@ function DragDropController($scope) {
 
 function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, DashboardUtilizador, Indicador, Observacao) {
 
-    //this is $scope???
+    function getData(cols,rows,members,obj) {
 
-    //tem que devolver uma estrutura do tipo {textos : [{"id":1,"titulo":"titulo1","subtitulo":"subtitulo1","conteudo":"content1","posicao":1,"data":"\/Date(1430131939000+0000)\/"},{"id":2,"titulo":"titulo2","subtitulo":"subtitulo2","conteudo":"content2"]}
-    //pedir para alterarem o serviço rest para devolver na estrutura correcta
-    /*$scope.texto = Texto.query(function(data){
-        $scope.textos = data;
-        //$scope.textos = JSON.stringify(data));
-        //console.log("Textos: " + JSON.stringify($scope.textos));
-    }, function(error){
-        //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
-        alert(JSON.stringify(error));
-        $scope.textos={};
-    });*/
+            $scope.indicador = Indicador.save({"id_membros":members},function(res) { 
+			$scope.indicador = res.toJSON();
+    
+                _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
+                $scope.indicador._value = _value;
+                      
+                /* hack table */
+                var sum = $.pivotUtilities.aggregatorTemplates.sum;
+                var numberFormat = $.pivotUtilities.numberFormat;
+                var intFormat = numberFormat({digitsAfterDecimal: 0});
+                var pivotMembers = {
+                          rows: rows,
+                          cols: cols,
+                          vals: ["valor"],
+                          aggregator: sum(intFormat)(["valor"]),
+                          //google chart
+                          //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
+                          //renderer: $.pivotUtilities.renderers["Line Chart"],
+                          //rendererName: "Line Chart",
+                          //c3 chart
+                          rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
+                          renderer:$.pivotUtilities.renderers["Line Chart C3"],
+                          //rendererName: "Line Chart C3",
+                          filter : function(filter) {
+                            return true;
+                          }   
+                }
+    
+                /* hack */
+                $(obj).pivot($scope.indicador._value,pivotMembers);
+                
+            /* error getting indicador */   
+            }, function (error) {
+                    alert(error);
+                    //notificationError("Observações",JSON.stringify(error));
+                    delete $scope.indicador;               
+            });
+    } /*** End getData() ***/
 
  //   $scope.dados_observacao = { id_membros: [] };
  //   $scope.observacao = Observacao.query($scope.dados_observacao);
@@ -274,28 +499,10 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
             person: 'Margarida Rebelo',
             textDate: '20 JUL 2015',
         },
-        {
-            title: 'This is a title 4',
-            order: 1,
-            graficoId: 'Graf4',
-            person: 'Margarida Rebelo',
-            textDate: '20 JUL 2015',
-        },
-        {
-            title: 'This is a title 5',
-            order: 1,
-            graficoId: 'Graf5',
-            person: 'Margarida Rebelo',
-            textDate: '20 JUL 2015',
-        },
 
     ];
 
-    $scope.graficosShowLabels = false;
-    $scope.graficosShowTooltip = false;
-    $scope.graficosShowXaxis= true;
-    $scope.graficosShowYaxis = false;
-
+	$scope.conteudoUniforme = new Array();
     $scope.textosVisible = true;
     $scope.graficosVisible = true;
     $scope.textosLoaded = false;
@@ -327,6 +534,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
     }
 
     $scope.getTextos = function () {
+		var dados;
         if (!$scope.textosLoaded) {
             $scope.textoQueryResult = Texto.query(function (data) {
                 $scope.textos = data;
@@ -337,8 +545,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
                 $scope.textos = {};
             });
         }
-
-        return $scope.conteudosTexto;
+        // return $scope.textoQueryResult;
     }
 
     $scope.getGraficos = function () {
@@ -385,6 +592,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
 
             $scope.graficosLoaded = true;
         }
+
         return $scope.conteudosGraficos;
     }
 
@@ -413,23 +621,17 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
 
     $scope.saveConteudoTexto = function (conteudoTexto) {
         if (conteudoTexto.id == 0) {
-            Texto.saveNew({
+            TextoAll.saveNew({
                 "id": conteudoTexto.id, "titulo": conteudoTexto.titulo,
                 "subtitulo": conteudoTexto.subtitulo,
                 "conteudo": conteudoTexto.conteudo,
                 "posicao": conteudoTexto.posicao
             }, function (data) {
-                console.log("put ");
-
 				$scope.conteudoTextoEditOn = false;
 
 				$scope.textosLoaded = false;
 				$scope.getTextos();
-                //$scope.textos = data;
-                //$scope.textos = JSON.stringify(data));
-                //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
-                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
                 alert('Erro: ' + JSON.stringify(error));
                 $scope.textos = {};
             });
@@ -444,11 +646,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
 
 				$scope.textosLoaded = false;
 				$scope.getTextos();
-                //$scope.textos = data;
-                //$scope.textos = JSON.stringify(data));
-                //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
-                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
                 alert('Erro ' + JSON.stringify(error));
                 $scope.textos = {};
             });
@@ -457,34 +655,38 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
 
     $scope.deleteConteudoTexto = function (conteudoTexto) {
         Texto.delete({ "id": conteudoTexto.id }, function (data) {
-            console.log("deleted ");
-
             $scope.textosLoaded = false;
             $scope.getTextos();
-            //$scope.textos = data;
-            //$scope.textos = JSON.stringify(data));
-            //console.log("Textos: " + JSON.stringify($scope.textos));
             }, function (error) {
-                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
                 alert('Erro ' + JSON.stringify(error));
                 $scope.textos = {};
             });
     }
 
     $scope.ordenarConteudoTexto = function (conteudoTexto,ordem) {
-        conteudoTexto.ordem = conteudoTexto.posicao + ordem;
-
-        if (conteudoTexto.posicao < 1) {
-            conteudoTexto.posicao = 1;
-        }
-
-        $scope.saveConteudoTexto(conteudoTexto);
+		if(ordem>0){
+			if(conteudoTexto.posicao!=1)conteudoTexto.posicao--;
+		}
+		else if(ordem<0){
+			conteudoTexto.posicao++;
+		}
+		
+		return $scope.saveConteudoTexto(conteudoTexto);
+    }
+	
+	$scope.ordenarConteudoGrafico = function (conteudoGrafico,ordem) {
+		if(ordem>0){
+			if(conteudoGrafico.order!=1)conteudoGrafico.order--;
+		}
+		else if(ordem<0){
+			conteudoGrafico.order++;
+		}
+		
+		return $scope.saveConteudoGrafico(conteudoGrafico);
     }
 
     $scope.saveConteudoGrafico = function (conteudoGrafico) {
-        console.log('SAVECONTEUDOGRAFICO');
         var conteudoToSave = $scope.conteudosGraficos[conteudoGrafico.index];
-
         conteudoToSave.title = conteudoGrafico.title;
 
         $scope.conteudosGraficos[conteudoGraficos.index] = conteudoToSave;
@@ -495,6 +697,11 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
     $scope.conteudoTextoInitEditor = function (textareaId) {
         //CKEDITOR.replace(textareaId);
     }
+	
+	$scope.getTodoConteudo = function (){
+		var textos = $scope.getTextos(),
+			graficos = $scope.getGraficos();
+	}
 
     function getDataPublicacao() {
         var d = data,
@@ -507,7 +714,10 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, Generico, 
 
         return [day, month, year].join('-');
     }
+	
+
 };
+
 
 function HeaderController($scope) {
 
@@ -608,20 +818,6 @@ function HeaderController($scope) {
             section: 'FO',
             uiSref: 'DomainEstatistica',
             enabled: '',
-        },
-        {
-            name: 'Estatistica Pinto',
-            order: 2,
-            section: 'FO',
-            uiSref: 'Dominios',
-            enabled: '',
-        },
-        {
-            name: 'DragDrop',
-            order: 3,
-            section: 'FO',
-            uiSref: 'DragDrop',
-            enabled: '',
         }
     ];
 
@@ -683,242 +879,266 @@ function HeaderController($scope) {
 
 }
 
-function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,filterFilter,dominiosModel){
+//function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,NotificationFactory,filterFilter,dominiosModel, Observacao){
+function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,NotificationFactory,filterFilter,dominiosModel){
+    
+    $scope.dominios = Dominios.query();
+    $scope.dominiosModel = dominiosModel;
 
-  $scope.dominios = Dominios.query();
-  $scope.dominiosModel = dominiosModel;
+    $scope.$watch('dominiosModel.link', function(newValue, oldValue) {
+        if (newValue != {})
+            $scope.init();
+    });
 
-  var pivotMembers = {
-                    rows: ["TipoOperacao"],
-                    cols: ["Periodo"],
-                    vals:["indicador"],
-                    rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers)
-  };
-
- function reset() {
-   $scope.dominiosModel.reset();
-
-   $scope.choice = {};
-   $scope.choice.dimensao = {};
-   $scope.choice.membros =[];
-   $scope.indicador = {};
- };
-
- function pivotTable (pivotData,pivotMembers){
-      var derivers = $.pivotUtilities.derivers;
-      $("#output").pivot(pivotData,pivotMembers)
-  };
-
-  function pivotTableUI (pivotData,pivotMembers){
-       var derivers = $.pivotUtilities.derivers;
-       $("#output").pivotUI(pivotData,pivotMembers)
-   };
-
-    function validateData() {
-
-        if (!$scope.dominiosModel.sel.membros)
-            $scope.dominiosModel.sel.membros = [];
-
-        if ($scope.dominiosModel.rows == [] || $scope.dominiosModel.cols == [])
-            $scope.dominiosModel.init();
-
-    }
-
-    function getData(action) {
-        if (jQuery.isEmptyObject($scope.indicador)) {
-
-            //VALIDA DATA PARA PIVOTTABLE
-
-            $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
-                $scope.indicador = res.toJSON();
-
-                if (jQuery.isEmptyObject($scope.indicador)) {
-                    notificationWarn("Observações","Sem resultados...");
-                    delete $scope.indicador;
-                    return;
-                }
-
-                _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
-
-                if (jQuery.isEmptyObject(_value)) {
-                    notificationWarn("Observações","Sem resultados...");
-                    delete $scope.indicador;
-                    return;
-                }
-
-                $scope.dominiosModel.dimensoes = [];
-
-                var a = [];
-                var b = [];
-                _.each(_value[0],function(value,key,field){
-                    if (key != 'valor') {
-                        a.push(key);
-                        $scope.dominiosModel.dimensoes = a;
-                        b = b.concat(_.chain(_value).pluck(key).unique().value());
-                    }
-                });
-
-                $scope.dominiosModel.sel.membros1 = b;
-                $scope.dominiosModel.sel.membros2 = b.slice(0);
-                $scope.indicador._value = _value;
-                console.log($scope.dominiosModel.dimensoes);
-                /* hack table */
-                if (action == 'Tab') {
-                    var sum = $.pivotUtilities.aggregatorTemplates.sum;
-                    var numberFormat = $.pivotUtilities.numberFormat;
-                    var intFormat = numberFormat({digitsAfterDecimal: 0});
-                    var pivotMembers = {
-                        rows: $scope.dominiosModel.rows,
-                        cols: $scope.dominiosModel.cols,
-                        aggregator: sum(intFormat)(["valor"]),
-                        filter : function(filter) {
-                            /*var aaa = [];aaa.push(filter);
-                             var bbb = $scope.dominiosModel.sel.membros;
-                             _.each(bbb, function (val){
-                             delete val.dimensao;
-                             console.log(val);
-                             console.log(_.where(aaa,val));
-                             });
-                             */
-                            //todo: definir filtro com _.where
-                            return true;
-                        }
-                    };
-
-                    /* hack */
-                    pivotTable($scope.indicador._value,pivotMembers);
-                } else {
-
-                    var sum = $.pivotUtilities.aggregatorTemplates.sum;
-                    var numberFormat = $.pivotUtilities.numberFormat;
-                    var intFormat = numberFormat({digitsAfterDecimal: 0});
-                    var pivotMembers = {
-                        rows: $scope.dominiosModel.rows,
-                        cols: $scope.dominiosModel.cols,
-                        aggregatorName : "Nome do indicador",
-                        aggregator: sum(intFormat)(["valor"]),
-                        //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
-                        rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
-                        renderer: $.pivotUtilities.renderers["Line Chart"]
-                    };
-                    /* hack */
-                    pivotTable($scope.indicador._value,pivotMembers);
-                }
-
-                /* error getting indicador */
-            }, function (error) {
-                notificationError("Observações",JSON.stringify(error));
-                delete $scope.indicador;
-            });
-        } else {
-            if (action == 'Tab') {
-                var sum = $.pivotUtilities.aggregatorTemplates.sum;
-                var numberFormat = $.pivotUtilities.numberFormat;
-                var intFormat = numberFormat({digitsAfterDecimal: 0});
-                var pivotMembers = {
-                    rows: $scope.dominiosModel.rows,
-                    cols: $scope.dominiosModel.cols,
-                    aggregator: sum(intFormat)(["valor"]),
-                    filter : function(filter) {
-                        /*var aaa = [];aaa.push(filter);
-                         var bbb = $scope.dominiosModel.sel.membros;
-                         _.each(bbb, function (val){
-                         delete val.dimensao;
-                         console.log(val);
-                         console.log(_.where(aaa,val));
-                         });
-                         */
-                        //todo: definir filtro com _.where
-                        return true;
-                    }
-                };
-
-                /* hack */
-                pivotTable($scope.indicador._value,pivotMembers);
-            } else {
-                var sum = $.pivotUtilities.aggregatorTemplates.sum;
-                var numberFormat = $.pivotUtilities.numberFormat;
-                var intFormat = numberFormat({digitsAfterDecimal: 0});
-                var pivotMembers = {
-                    rows: $scope.dominiosModel.rows,
-                    cols: $scope.dominiosModel.cols,
-                    aggregatorName : "Nome do indicador",
-                    aggregator: sum(intFormat)(["valor"]),
-                    //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
-                    rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
-                    renderer: $.pivotUtilities.renderers["Line Chart"]
-                };
-                /* hack */
-                pivotTable($scope.indicador._value,pivotMembers);
-            }
-        }
-    } /*** End getData() ***/
-
-    /******************
-     *  init()
-     */
-    $scope.init = function() {
-        console.log("init:: Read Dominios")
-
-        if ($scope.dominiosModel.link == {})
-            return;
-
+    function reset() {
+        $scope.dominiosModel.reset();
+        
         $scope.choice = {};
         $scope.choice.dimensao = {};
         $scope.choice.membros =[];
         $scope.indicador = {};
-        $scope.dominiosModel.sel = {};
+    };
+
+   function notificationError(title,content){
+        var notifSet = new NotificationFactory({position: 'top'});
+        notifSet.addNotification({
+            title: title,
+            content: content,
+            color: 'error',
+            autoclose : 5000
+        });                
+    }    
+ 
+    function notificationWarn(title,content){
+        var notifSet = new NotificationFactory({position: 'top'});
+        notifSet.addNotification({
+            title: title,
+            content: content,
+            color: 'warning',
+            autoclose : 5000
+         });                
+    }
+ 
+    function pivotTable (pivotData,pivotMembers){
+      var derivers = $.pivotUtilities.derivers;
+      $("#output").html("");
+      $("#output").pivot(pivotData,pivotMembers,true);
+    };
+
+    function pivotTableUI (pivotData,pivotMembers){
+       var derivers = $.pivotUtilities.derivers;
+
+       $("#output").pivotUI(pivotData,pivotMembers,true);
+    };
+
+    function pivotGraphUI (pivotData,pivotMembers){
+       var derivers = $.pivotUtilities.derivers;
+
+       $("#output").pivotUI(pivotData,pivotMembers,true);
+    };
+    
+    function validateData() {
+      
+      if (!$scope.dominiosModel.sel.membros)
         $scope.dominiosModel.sel.membros = [];
-
-        //------------------------------------
-        //COMENTÁRIOS DE DEBUG
-        //------------------------------------
-        // console.log('link:'+$scope.dominiosModel.link);
-        // console.log('dominiosModel:');
-        // console.log($scope.dominiosModel);
-
-
-        if ($scope.dominiosModel.link){
-            //------------------------------------
-            //Se existir uma variável no localStorage com o identificador "link"+link
-            //por exemplo "link15", ele devolve o conteudo armazenado em localStorage
-            //caso contrário faz a chamada ao WS
-            //sendo que o link é o identificador do dominiosModel
-            //------------------------------------
-            if(localStorage['link'+$scope.dominiosModel.link]){
-                //console.log('iflinktrue');
-                //console.log(localStorage['link'+$scope.dominiosModel.link]);
-                $scope.dimensoes = localStorage['link'+$scope.dominiosModel.link];
-                getData($scope.dominiosModel.action);
-            }else {
-                //console.log('iflinkfalse');
-                Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
-                    $scope.dimensoes = res.toJSON();
-                    localStorage['link'+$scope.dominiosModel.link] = $scope.dimensoes;
-                    getData($scope.dominiosModel.action);
-                });
-            }
-
-        }
+       
+       if ($scope.dominiosModel.rows == [] || $scope.dominiosModel.cols == [])
+            $scope.dominiosModel.init();
+      
+    }
+  
+    function draw(action){
+        if (action=="Tab")
+            drawTable();
+        if (action=="Gra")
+            drawGraph();    
+     }
+    
+    function drawTable() {
+        var sum = $.pivotUtilities.aggregatorTemplates.sum;
+        var numberFormat = $.pivotUtilities.numberFormat;
+        var intFormat = numberFormat({digitsAfterDecimal: 0});
+        var pivotMembers = {
+                  rows: $scope.dominiosModel.rows,
+                  cols: $scope.dominiosModel.cols,
+                  vals: ["valor"],
+                  aggregatorName : "Sum",
+                  //google chart
+                  rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
+                  renderer: $.pivotUtilities.renderers["Line Chart"],
+                  //c3 chart
+                  //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
+                  //renderer: $.pivotUtilities.renderers["Line Chart C3"],
+                  rendererName: "Table",
+                  filter : function(filter) {
+                      return true;
+                      if ($scope.dominiosModel.sel.membros.indexOf(filter['tipo_operacao']) != -1  ||
+                          $scope.dominiosModel.sel.membros.indexOf(filter['periodo']) != -1  ||
+                          $scope.dominiosModel.sel.membros.indexOf(filter['tipo_valor']) != -1  ||
+                          $scope.dominiosModel.sel.membros.indexOf(filter['cae']) != -1  ||
+                          $scope.dominiosModel.sel.membros.indexOf(filter['sector_int']) != -1 )  
+                         return true;
+                      else  
+                         return false;
+                  },
+                  onRefresh: function(config) {
+                    var config_copy = JSON.parse(JSON.stringify(config));
+                    $scope.dominiosModel.cols = config_copy.cols;
+                    $scope.dominiosModel.rows = config_copy.rows;
+                  }
+        };
+    
+        /* hack */
+        pivotTableUI($scope.indicador._value,pivotMembers);  
 
     }
 
+    function drawGraph() {
+        var sum = $.pivotUtilities.aggregatorTemplates.sum;
+        var numberFormat = $.pivotUtilities.numberFormat;
+        var intFormat = numberFormat({digitsAfterDecimal: 0});
+        var pivotMembers = {
+                  rows: $scope.dominiosModel.rows,
+                  cols: $scope.dominiosModel.cols,
+                  vals: ["valor"],
+                  aggregatorName : "Sum",
+                  //google chart
+                  rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
+                  renderer: $.pivotUtilities.renderers["Line Chart"],
+                  rendererName: "Line Chart",
+                  //c3 chart
+                  //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
+                  //renderer:$.pivotUtilities.renderers["Line Chart C3"],
+                  //rendererName: "Line Chart C3",
+                  filter : function(filter) {
+                    return true;
+                  },
+                  onRefresh: function(config) {
+                    var config_copy = JSON.parse(JSON.stringify(config));
+                    $scope.dominiosModel.cols = config_copy.cols;
+                    $scope.dominiosModel.rows = config_copy.rows;
+                  }
+        };
+    
+        /* hack */
+       pivotGraphUI($scope.indicador._value,pivotMembers);       
+    }
+    
+    function getData(action) {
+
+        if (jQuery.isEmptyObject($scope.indicador)) { 
+ 
+            $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) { 
+			$scope.indicador = res.toJSON();
+    
+                if (jQuery.isEmptyObject($scope.indicador)) { 
+                    notificationWarn("Observações","Sem resultados...");
+                    delete $scope.indicador;
+                    return;
+                }
+                
+                _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
+                
+                if (jQuery.isEmptyObject(_value)) { 
+                    notificationWarn("Observações","Sem resultados...");
+                    delete $scope.indicador;
+                    return;
+                }
+                
+                $scope.dominiosModel.dimensoes = [];
+                
+                var a = [];       
+                var b = [];   
+                _.each(_value[0],function(value,key,field){
+                   if (key != 'valor') {
+                        a.push(key);
+                        $scope.dominiosModel.dimensoes = a;
+                        b = b.concat(_.chain(_value).pluck(key).unique().value());
+                   }
+                });
+    
+                $scope.dominiosModel.sel.membros1 = b;
+                $scope.dominiosModel.sel.membros2 = b.slice(0);
+                $scope.indicador._value = _value;
+                      
+                /* hack table */
+                draw(action);
+                
+            /* error getting indicador */   
+            }, function (error) {
+                    notificationError("Observações",JSON.stringify(error));
+                    delete $scope.indicador;               
+            });
+        } else {
+            draw(action);
+        }
+    } /*** End getData() ***/
+    
     /******************
-     * getData()
-     */
-    $scope.getData = function(action) {
+     *  init()
+     */ 
+    $scope.init = function() {
+        if ($scope.dominiosModel.link == {})
+            return;
+        
+        $scope.choice = {};
+        $scope.choice.dimensao = {};
+        $scope.choice.membros =[];
+        $scope.indicador = {};
+        //$scope.dominiosModel.sel = {};
+        //$scope.dominiosModel.sel.membros = [];
+        
+		//------------------------------------
+		//COMENTÁRIOS DE DEBUG
+		//------------------------------------
+		// console.log('link:'+$scope.dominiosModel.link);
+		// console.log('dominiosModel:');
+		// console.log($scope.dominiosModel);
+		
+		
+        // if ($scope.dominiosModel.link){
+			// //------------------------------------
+			// //Se existir uma variável no localStorage com o identificador "link"+link
+			// //por exemplo "link15", ele devolve o conteudo armazenado em localStorage
+			// //caso contrário faz a chamada ao WS
+			// //sendo que o link é o identificador do dominiosModel
+			// //------------------------------------
+			// if(localStorage['link'+$scope.dominiosModel.link]){			
+				// //console.log('iflinktrue');
+				// //console.log(localStorage['link'+$scope.dominiosModel.link]);
+				// $scope.dimensoes = localStorage['link'+$scope.dominiosModel.link];
+				// getData($scope.dominiosModel.action);
+			// }else {
+				// //console.log('iflinkfalse');
+				// Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
+				// $scope.dimensoes = res.toJSON();
+				// localStorage['link'+$scope.dominiosModel.link] = $scope.dimensoes;
+				// getData($scope.dominiosModel.action);
+			  // });
+			// }
+		  
+		// }
+		if ($scope.dominiosModel.link)
+          Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
+            $scope.dimensoes = res.toJSON();
+            getData($scope.dominiosModel.action);
+          });
+        
+    }
+    
+    /******************
+    * getData()
+    */
+    $scope.getData = function(action) {    
         validateData();
         getData(action);
     }
-
+    
     /******************
      *  metadata()
      */
     $scope.getMetadata = function (){
-        console.log($scope.dominios);
-        console.log($scope.dominios.dominio);
-        console.log($scope.dominios.dominio);
-
+       console.log($scope.dominios);     
     };
 
     /*******************
@@ -930,33 +1150,22 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         var a = filterFilter($scope.dimensoes.dimensao,{id:$scope.choice.dimensao});
         $scope.choice.membros = a[0];
     }
-
-    $scope.showPivotTable = function() {
-        pivotTable();
-    }
-
-    $scope.init = function() {
-        console.log("init:: Read Dominios")
-    }
-
-
+  
     /*******************
      * selectLink()
      */
-    $scope.selectLink = function(value,action,cols,rows){
-        console.log('Dominios id: '+value);
-        //console.log(treeItem);
-        console.log('Dominios END');
-        if ($scope.dominiosModel.link != value){
-            reset();
-            $scope.dominiosModel.link = value;
-            $scope.dominiosModel.action = action;
-            $scope.dominiosModel.cols = cols;
-            $scope.dominiosModel.rows = rows;
-
-            Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
-                $scope.dimensoes = res.toJSON();
-            });
+    $scope.selectLink = function(obj){
+        if ($scope.dominiosModel.link != obj.id){
+          reset();
+          $scope.dominiosModel.link = obj.id;
+          $scope.dominiosModel.action = obj.tipo_formato;
+          $scope.dominiosModel.cols = obj.colunas;
+          $scope.dominiosModel.rows = obj.linhas;
+          $scope.dominiosModel.membros = obj.filtros;
+        
+          Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
+            $scope.dimensoes = res.toJSON();
+          });
         }
     }
 
@@ -1032,112 +1241,53 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
             /* hack */
             pivotTable($scope.indicador._value,pivotMembers);
     }
-   }
-
-  $scope.getGraph = function() {
-      
-    if (jQuery.isEmptyObject($scope.indicador)) {       
-        // todo: testar como POST quando existir ligação ao servico REST
-        $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
-            $scope.indicador = res.toJSON();
-            //amp Dimensoes
-            _key = jQuery.map($scope.indicador.observacao, function(v, k){ return k;});
-            //map Membros
-            _value = jQuery.map($scope.indicador.observacao, function(v, k){ return v;});
-            $scope.indicador._key = _key;
-            $scope.indicador._value = _value;
     
-          /* hack */
-          var sum = $.pivotUtilities.aggregatorTemplates.sum;
-          var numberFormat = $.pivotUtilities.numberFormat;
-          var intFormat = numberFormat({digitsAfterDecimal: 0});
-          var pivotMembers = {
-                          rows: ["tipo_operacao"],
-                          cols: ["periodo"],
-                            aggregatorName : "Nome do indicador",
-                            aggregator: sum(intFormat)(["valor"]),
-                            //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
-                            rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
-                            renderer: $.pivotUtilities.renderers["Line Chart"]
-            };
-
-          /* hack */
-          pivotTable($scope.indicador._value,pivotMembers);
-        });
-    } else {
-          /* hack */
-          var sum = $.pivotUtilities.aggregatorTemplates.sum;
-          var numberFormat = $.pivotUtilities.numberFormat;
-          var intFormat = numberFormat({digitsAfterDecimal: 0});
-          var pivotMembers = {
-                          rows: ["tipo_operacao"],
-                          cols: ["periodo"],
-                            aggregatorName : "Nome do indicador",
-                            aggregator: sum(intFormat)(["valor"]),
-                            //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
-                            rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
-                            renderer: $.pivotUtilities.renderers["Line Chart"]
-            };
-
-          /* hack */
-          pivotTable($scope.indicador._value,pivotMembers);        
+    $scope.getNewData= function(action) {
+        delete $scope.indicador;
+        getData(action);
     }
-  }
-
-  $scope.getTable2 = function() {
-
-      $scope.indicador = Indicador.query({"id":$scope.dominiosModel.sel.membros},function(res) {
-        $scope.indicador = res.toJSON();
-        _key = jQuery.map($scope.indicador, function(v, k){ return k;});
-        _value = jQuery.map($scope.indicador, function(v, k){ return v;});
-        $scope.indicador._key = _key;
-        $scope.indicador._value = _value;
-
-        /* hack */
-        var pivotMembers = {
-                          rows: ["TipoOperacao"],
-                          cols: ["Periodo"],
-                          aggregatorName: "Integer Sum",
-                          //rendererName : "Line Chart C3",
-                          panelHide : jQuery("#panelHide"),
-                          panelCols : jQuery("#panelCols"),
-                          panelRows : jQuery("#panelRows"),
-                          panelMembers : jQuery("#panelMembers"),
-                          vals:["indicador"],
-                          //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers)
-                          rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers)
-        };
-        if ($scope.dominiosModel.sel.membros == 2)
-          pivotMembers.rows.push("TipoValor");
-        /* hack */
-
-        pivotTableUI($scope.indicador._value,pivotMembers);
-      });
-  };
-
 }
 
-
-
-/****** model *******/
+/**************************************************************
+ *  Models 
+ **************************************************************/
 
 statControllers.factory('dominiosModel',function(){
   var dominiosModel= {};
 
   dominiosModel.reset = function() {
     dominiosModel.link = {};
-    dominiosModel.cols = ["TipoOperacao"];
-    dominiosModel.rows = ["Período"];
-    dominiosModel.action = "Tabela";
+    dominiosModel.cols = ["tipo_operacao"];
+    dominiosModel.rows = ["periodo"];
+    dominiosModel.action = "Tab";
 
     dominiosModel.sel = {};
-    dominiosModel.sel.membros = [];
-  }
+    dominiosModel.sel.dimensoes = [];
+    dominiosModel.sel.membros = [200801,200802,200803];
+  };
+  
+  dominiosModel.init = function() {
+    dominiosModel.cols = ["tipo_operacao"];
+    dominiosModel.rows = ["periodo"];
+    dominiosModel.action = "Tab";
 
+    dominiosModel.sel = {};
+    dominiosModel.sel.dimensoes = [];
+    dominiosModel.sel.membros = [200801,200802,200803];
+  };
+  
   return dominiosModel;
 });
-/***** Directive *****/
- 
+
+/**************************************************************
+ *  Filters 
+ **************************************************************/
+
+
+/**************************************************************
+ *  Directives 
+ **************************************************************/
+  
 statControllers.directive("checkboxGroup", function() {
         return {
             restrict: "A",
@@ -1172,49 +1322,3 @@ statControllers.directive("checkboxGroup", function() {
         }
     });
  
- 
-/* hack... todo: pass key and id insted of dimensao:scope.choice dimensao */
-statControllers.directive("checkboxGroup-hack", function() {
-        return {
-            restrict: "A",
-            link: function(scope, elem, attrs) {
-
-                //check model
-                if (!scope.$eval(attrs.cbModel))
-                  scope.$eval(attrs.cbMode) = [];
-
-                // Determine initial checked boxes
-                var a = {"dimensao":scope.choice.dimensao,"membro":scope.$eval(attrs.cbId)}
-                //if (scope.$eval(attrs.cbModel).indexOf(scope.$eval(attrs.cbId)) !== -1) {
-                if (_.findIndex(scope.$eval(attrs.cbModel), a) !== -1) {
-                    elem[0].checked = true;
-                }
-
-                // Update array on click
-                elem.bind('click', function() {
-                    var a = {"dimensao":scope.choice.dimensao,"membro":scope.$eval(attrs.cbId)}
-                   //var index = scope.$eval(attrs.cbModel).indexOf(scope.$eval(attrs.cbId));
-                   var index = _.findIndex(scope.$eval(attrs.cbModel), a);
-                    // Add if checked
-                    if (elem[0].checked) {
-                        if (index === -1) {
-                          var a = {"dimensao":scope.choice.dimensao,"membro":scope.$eval(attrs.cbId)}
-                          //scope.$eval(attrs.cbModel).push(scope.$eval(attrs.cbId));
-                          scope.$eval(attrs.cbModel).push(a);
-                        }
-                    }
-                    // Remove if unchecked
-                    else {
-                        if (index !== -1) {
-                          
-                            scope.$eval(attrs.cbModel).splice(index, 1);
-                        }
-                    }
-                    // Sort and update DOM display
-                    scope.$apply(scope.$eval(attrs.cbModel).sort(function(a, b) {
-                        return a - b
-                    }));
-                });
-            }
-        }
-    });

@@ -73,7 +73,7 @@ function Observacao($resource){
   return $resource('http://cgptazrbdp01.cloudapp.net:5000/Portal.svc/observacao',{}, {
     //return $resource('http://localhost:5000/Portal.svc/indicador/:id',{id:'@id'}, {
     query: {method:'POST',
-    isArray:true}
+    isArray:false}
   });
 };
 
