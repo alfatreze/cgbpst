@@ -14,9 +14,9 @@ DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes
 HeaderController.$inject = ['$scope'];
 ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios','TextoAll'];
 DragDropController.$inject = ['$scope'];
-EstatisticasTreeController.$inject = ['$scope', '$state', '$window', 'DominioHierarquia', 'dominiosModel', 'Dominios', 'Dominio', 'DadosFonte', 'DadosFonteAll','DominioDadosFonte', 'Dimensoes'];
+EstatisticasTreeController.$inject = ['$scope', '$state', '$window', 'DominioHierarquia', 'dominiosModel', 'Dominios', 'Dominio', 'DadosFonte', 'DadosFonteAll','DominioDadosFonte'];
 
-function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,dominiosModel, Dominios, Dominio, DadosFonte, DadosFonteAll, DominioDadosFonte, Dimensoes) {
+function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,dominiosModel, Dominios, Dominio, DadosFonte, DadosFonteAll, DominioDadosFonte) {
     
     $scope.dominiosModel = dominiosModel;
       
@@ -28,32 +28,14 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
         var maxPosicao = 1;
         var estatisticasTreeItem;
 
-        /*for (var i = 0; i < estatisticasTreeItems.length; i++) {
+        for (var i = 0; i < estatisticasTreeItems.length; i++) {
             estatisticasTreeItem = estatisticasTreeItems[i];
 
             if (estatisticasTreeItem.posicao > maxPosicao)
             {
                 maxPosicao = estatisticasTreeItem.posicao;
             }
-        }*/
-        maxPosicao = estatisticasTreeItems.length;
-
-        return maxPosicao;
-    }
-
-    $scope.getEstatisticasMaxPosicaoDadosFonte = function(estatisticasTreeItems) {
-        var maxPosicao = 1;
-        var estatisticasTreeItem;
-
-        /*for (var i = 0; i < estatisticasTreeItems.length; i++) {
-            estatisticasTreeItem = estatisticasTreeItems[i];
-
-            if (estatisticasTreeItem.posicao > maxPosicao)
-            {
-                maxPosicao = estatisticasTreeItem.posicao;
-            }
-        }*/
-        maxPosicao = estatisticasTreeItems.dados_fonte.length;
+        }
 
         return maxPosicao;
     }
@@ -111,9 +93,8 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
         
     }
     
-    $scope.estatisticasTreeStartEditDadosFonte = function (dadosFonteToEdit, domainToEdit) {
-        $scope.domainToSave = domainToEdit;
-
+    $scope.estatisticasTreeStartEditDadosFonte = function (dadosFonteToEdit) {
+        
         $scope.dadosFonteItem = dadosFonteToEdit;
         $scope.estatisticasTreeEditDadosFonteModeOn = true;
     }
@@ -126,7 +107,7 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
     }
     
 
-    $scope.estatisticasTreeStartNewDadosFonte = function (domainToSave) {
+    $scope.estatisticasTreeStartNewDadosFonte = function () {
         $scope.dadosFonteItem = {                       "id": 0,
                                                         "nome": "",
                                                         "link": "",
@@ -135,7 +116,6 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
                                                 	    "descricao": "",
                                                 	    "formatacao": {}
                                             };
-        $scope.domainToSave= domainToSave;
         $scope.estatisticasTreeEditDadosFonteModeOn = true;
     }
 
@@ -169,32 +149,10 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
             alert('Erro ' + JSON.stringify(error));
         });
     }
-
-    $scope.estatisticasTreeOrderDadosFonte = function (dadosFonteToSave,dominioToSave, increment) {
-        dadosFonteToSave.posicao = dadosFonteToSave.posicao + increment;
-
-        if (dadosFonteToSave.posicao < 1) {
-            dadosFonteToSave.posicao = 1;
-        }
-
-        DominioDadosFonte.edit({
-            "idDominio": dominioToSave.id, 
-            "idFonte": dadosFonteToSave.id
-        }, 
-        {
-            "posicao": dadosFonteToSave.posicao
-        }, function (data) {
-            $scope.estatisticasTreeInitTree();
-        }, function (error) {
-            //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
-            alert('Erro ' + JSON.stringify(error));
-        });
-    }
     
-    $scope.estatisticasTreeSaveDadosFonte = function (dadoFonteToSave, domainToSave) {
+    $scope.estatisticasTreeSaveDadosFonte = function (dadoFonteToSave) {
 
         if (dadoFonteToSave.id == 0) {
-            var newDadoFonteId = 0;
             DadosFonteAll.saveNew({
                 "nome": dadoFonteToSave.nome,
                 "link": dadoFonteToSave.link,
@@ -202,13 +160,8 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
         	    "unidade": dadoFonteToSave.unidade,
         	    "descricao": dadoFonteToSave.descricao
             }, function (data) {
-                DominioDadosFonte.save({"idDominio": domainToSave.id, "idFonte":data.id},
-                    function (data) {
-                        $scope.estatisticasTreeEditDadosFonteModeOn = false;
-                        $scope.estatisticasTreeInitTree();
-                    }, function (error) {
-                        alert('Erro: ' + JSON.stringify(error));
-                    });
+                $scope.estatisticasTreeEditDadosFonteModeOn = false;
+                $scope.estatisticasTreeInitTree();
             }, function (error) {
                 alert('Erro: ' + JSON.stringify(error));
             });
@@ -299,8 +252,8 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
 
     }
     
-    $scope.estatisticasTreeDeleteDadosFonte = function (dadosFonteToDelete, domainToDelete) {
-        DominioDadosFonte.delete({ "idDominio": domainToDelete.id, "idFonte": dadosFonteToDelete.id }, function (data) {
+    $scope.estatisticasTreeDeleteDadosFonte = function (dadosFonteToDelete) {
+        DadosFonte.delete({ "id": dadosFonteToDelete.id }, function (data) {
             $scope.estatisticasTreeInitTree();
         }, function (error) {
             //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
@@ -347,14 +300,6 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
     $scope.estatisticasTreeInitTree = function () {
 		
         $scope.EstatisticasTreeDadosFonteAllItems = {};
-        $scope.EstatisticasTreeDimensoes = {};
-        
-        Dimensoes.query (function (data) {
-            $scope.EstatisticasTreeDimensoes = data.dimensao; 
-        }, function (error) {
-            alert('Erro:' + JSON.stringify(error));
-            $scope.EstatisticasTreeDimensoes = {};
-        });
 
         DadosFonteAll.query(function (data) {
             $scope.EstatisticasTreeDadosFonteAllItems = data.dados_fonte;
@@ -990,11 +935,11 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                   vals: ["valor"],
                   aggregatorName : "Sum",
                   //google chart
-                  rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
-                  renderer: $.pivotUtilities.renderers["Line Chart"],
+                  //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
+                  //renderer: $.pivotUtilities.renderers["Line Chart"],
                   //c3 chart
-                  //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
-                  //renderer: $.pivotUtilities.renderers["Line Chart C3"],
+                  rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
+                  renderer: $.pivotUtilities.renderers["Line Chart C3"],
                   rendererName: "Table",
                   filter : function(filter) {
                       return true;
@@ -1029,13 +974,13 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                   vals: ["valor"],
                   aggregatorName : "Sum",
                   //google chart
-                  rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
-                  renderer: $.pivotUtilities.renderers["Line Chart"],
-                  rendererName: "Line Chart",
+                  //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.gchart_renderers),
+                  //renderer: $.pivotUtilities.renderers["Line Chart"],
+                  //rendererName: "Line Chart",
                   //c3 chart
-                  //rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
-                  //renderer:$.pivotUtilities.renderers["Line Chart C3"],
-                  //rendererName: "Line Chart C3",
+                  rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
+                  renderer:$.pivotUtilities.renderers["Line Chart C3"],
+                  rendererName: "Line Chart C3",
                   filter : function(filter) {
                     return true;
                   },
@@ -1283,7 +1228,7 @@ statControllers.directive("checkboxGroup", function() {
     });
 
 // SPINKIT DIRECTIVE
-statControllers.directive('stateLoadingIndicator', function($rootScope) {
+/*statControllers.directive('stateLoadingIndicator', function($rootScope) {
   return {
     restrict: 'E',
     template: "<div ng-show='isStateLoading' class='loading-indicator'>" +
@@ -1304,7 +1249,7 @@ statControllers.directive('stateLoadingIndicator', function($rootScope) {
       });
     }
   };
-});
+});*/
 
 angular.module('application').controller('bpBusy',function($scope,$http){
 

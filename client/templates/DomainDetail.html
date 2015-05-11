@@ -37,7 +37,9 @@ controller: DomainsController
                     <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.id}}">{{obj.nome}}</option>
                 </select>
             </div>
-
+            <div class="grid-content shrink">
+                <input type="text" ng-model="filterMembros" placeholder="filtro"/>
+            </div>
             <div class="grid-content">
                 <section class="block-list">
                     <header>Membros</header>
@@ -89,7 +91,7 @@ controller: DomainsController
     <div class="grid-content shrink" style="border-top: 1px solid #D3D3D3; padding: 1em;">
         <a  class="secondary button float-right" style="margin-bottom: 0">Exportar XLS</a>
         <a  class="secondary button float-right" style="margin-bottom: 0">Exportar PDF</a>
-        <a  ng-click="switchTo('Line Chart')" class="secondary button float-right" style="margin-bottom: 0">Ver Gráfico</a>
+        <a  ng-click="switchTo('Line Chart C3')" class="secondary button float-right" style="margin-bottom: 0">Ver Gráfico</a>
         <a  ng-click="switchTo('Table')" class="secondary button float-right" style="margin-bottom: 0">Ver Tabela</a>    
         <a href="#" zf-toggle="panel-metadata" class="secondary button float-right" style="margin-bottom: 0">Ver Metadata</a>
         <a href="#" zf-toggle="selection-panel" class="secondary button float-right" style="margin-bottom: 0">

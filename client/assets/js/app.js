@@ -16,8 +16,8 @@
     // Transitioning between views
     'foundation.dynamicRouting.animations',
     // Spinner
-    'angular-spinkit',
-    'cgBusy',
+    //'angular-spinkit',
+    //'cgBusy',
     //services
     'statServices',
     //controllers
