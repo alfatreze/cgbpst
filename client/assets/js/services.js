@@ -19,11 +19,10 @@
     // VMWARE SERVER
     // const serverServices = 'http://83.240.151.253:5000'; 
     
-    // LCALHOST
+    // LOCALHOST
     // const serverServices = 'http://localhost:5000'; 
-
+    
     var statServices = angular.module('statServices', ['ngResource']);
-
     statServices.factory('Dominios', Dominios);
     statServices.factory('Dimensoes', Dimensoes);
     statServices.factory('Indicador', Indicador);
@@ -38,7 +37,6 @@
     statServices.factory('DadosFonte', DadosFonte);
     statServices.factory('DadosFonteAll', DadosFonteAll);
     statServices.factory('DominioDadosFonte', DominioDadosFonte);
-
     Dominios.$inject = ['$resource'];
     Dimensoes.$inject = ['$resource'];
     Indicador.$inject = ['$resource'];
