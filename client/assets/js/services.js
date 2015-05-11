@@ -160,6 +160,10 @@ function DadosFonte($resource) {
         save: {
             method: 'PUT',
             isArray: false
+        },
+        delete: {
+            method: 'DELETE',
+            isArray: false
         }
     });
 };

@@ -8,13 +8,53 @@ animationOut: fadeOut
 
   <h1>Gestão da Hierarquia de Navegação</h1>
 
-<div>
-    <a class="success button">ADICIONAR</a>
-</div>
-
-
-    <div class="card">
-        <div class="card-section grid-block">
+<div class="card">
+    <div ng-controller="EstatisticasTreeController as estatisticasTreeController" ng-init="estatisticasTreeInitTree()"
+         class="card-section grid-block">
+         <div ng-show="estatisticasTreeEditDadosFonteModeOn">
+            <div class="grid-content">
+                <label>
+                    Nome:
+                    <input id="nome" type="text" ng-model="dadosFonteItem.nome">
+                </label>
+                <label>
+                    link:
+                    <input id="link" type="text" ng-model="dadosFonteItem.link">
+                </label>
+                <label>
+                    periodicidade:
+                    <input id="periodicidade" type="text" ng-model="dadosFonteItem.periodicidade">
+                </label>
+                <label>
+                    unidade:
+                    <input id="unidade" type="text" ng-model="dadosFonteItem.unidade">
+                </label>
+                <label>
+                    descricao:
+                    <input id="descricao" type="text" ng-model="dadosFonteItem.descricao">
+                </label>
+                <div class="grid-content">
+                    <a class="alert tiny button" ng-click="estatisticasTreeSaveDadosFonte(dadosFonteItem);">GRAVAR</a>
+                    <a class="tiny button" ng-click="estatisticasTreeCancelEditDadosFonte();">CANCELAR</a>
+                </div>
+            </div>
+        </div>
+        <div ng-show="estatisticasTreeEditDadosFonteVer">
+            <div class="grid-content" >
+                <ul ng-repeat="dadosFonteItem in EstatisticasTreeDadosFonteAllItems">
+                    <li>
+                        {{dadosFonteItem.nome}}
+                        <a class="tiny button" ng-click="estatisticasTreeStartEditDadosFonte(dadosFonteItem);">EDITAR</a>
+                        <a class="alert tiny button" ng-click="estatisticasTreeDeleteDadosFonte(dadosFonteItem);">APAGAR</a>
+                    </li>
+                </ul>
+                
+                <div class="grid-content">
+                    <a class="tiny button" ng-click="estatisticasTreeCancelVerDadosFonte();">CANCELAR</a>
+                </div>
+            </div>
+        </div>
+        <div ng-show="estatisticasTreeEditModeOn">
             <div class="grid-content">
                     <h4>Nome do Elemento da Hierarquia L1</h4>
             </div>
@@ -38,6 +78,8 @@ animationOut: fadeOut
         <div class="card-section grid-block">
             <div class="grid-content">
                     <h4>Nome do Elemento da Hierarquia L2</h4>
+                <a class="success button" ng-click="estatisticasTreeStartNewDadosFonte();">Adicionar Dados Fonte</a>
+                <a class="success button" ng-click="estatisticasTreeStartVerDadosFonte();">Ver Dados Fonte</a>
             </div>
             <div class="grid-content shrink">
                     <span><strong>Nível</strong></span>
