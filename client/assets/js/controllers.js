@@ -115,6 +115,9 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
         $scope.domainToSave = domainToEdit;
 
         $scope.dadosFonteItem = dadosFonteToEdit;
+        selectLinkToEdit(dadosFonteToEdit)
+
+
         $scope.estatisticasTreeEditDadosFonteModeOn = true;
     }
 
@@ -319,6 +322,7 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
     }	
     
     $scope.selectLink = function(obj){
+        console.log(obj);
         if ($scope.dominiosModel.link != obj.id){
           $scope.dominiosModel.reset();
           $scope.dominiosModel.link = obj.id;
@@ -331,6 +335,25 @@ function EstatisticasTreeController($scope, $state, $window, DominioHierarquia,d
           $scope.dominiosModel.sel.membros = obj.formatacao.filtros;
           
         }
+        console.log($scope.dominiosModel);
+    }
+
+    function selectLinkToEdit(obj){
+        console.log(obj);
+        if ($scope.dominiosModel.link != obj.id){
+          $scope.dominiosModel.reset();
+          $scope.dominiosModel.link = obj.id;
+          if(obj.formatação){
+            if (obj.formatacao.tipo_formato =="Quadro")
+                $scope.dominiosModel.action = "Tab";
+            else
+                $scope.dominiosModel.action = "Gra";
+            $scope.dominiosModel.cols = obj.formatacao.colunas;
+            $scope.dominiosModel.rows = obj.formatacao.linhas;
+            $scope.dominiosModel.sel.membros = obj.formatacao.filtros;
+          }
+        }
+        console.log($scope.dominiosModel);
     }
          
     function estatisticasTreeInitAllItems(estatisticasTreeItem) {
@@ -741,6 +764,19 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll) 
         return [day, month, year].join('-');
     }
 	
+    $scope.getDataPublicacao2 = function(data) {
+        var date = new Date(parseInt(data.substr(6)));
+
+        var d = date,
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+
+        return [day, month, year].join('-');
+    }
 
 };
 
@@ -1117,38 +1153,41 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
 		//------------------------------------
 		//COMENTÁRIOS DE DEBUG
 		//------------------------------------
-		// console.log('link:'+$scope.dominiosModel.link);
-		// console.log('dominiosModel:');
-		// console.log($scope.dominiosModel);
+		console.log('link:'+$scope.dominiosModel.link);
+		console.log('dominiosModel:');
+		console.log($scope.dominiosModel);
 		
 		
-        // if ($scope.dominiosModel.link){
-			// //------------------------------------
-			// //Se existir uma variável no localStorage com o identificador "link"+link
-			// //por exemplo "link15", ele devolve o conteudo armazenado em localStorage
-			// //caso contrário faz a chamada ao WS
-			// //sendo que o link é o identificador do dominiosModel
-			// //------------------------------------
-			// if(localStorage['link'+$scope.dominiosModel.link]){			
-				// //console.log('iflinktrue');
-				// //console.log(localStorage['link'+$scope.dominiosModel.link]);
-				// $scope.dimensoes = localStorage['link'+$scope.dominiosModel.link];
-				// getData($scope.dominiosModel.action);
-			// }else {
-				// //console.log('iflinkfalse');
-				// Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
-				// $scope.dimensoes = res.toJSON();
-				// localStorage['link'+$scope.dominiosModel.link] = $scope.dimensoes;
-				// getData($scope.dominiosModel.action);
-			  // });
-			// }
+        if ($scope.dominiosModel.link){
+			//------------------------------------
+			//Se existir uma variável no localStorage com o identificador "link"+link
+			//por exemplo "link15", ele devolve o conteudo armazenado em localStorage
+			//caso contrário faz a chamada ao WS
+			//sendo que o link é o identificador do dominiosModel
+			//------------------------------------
+			if(localStorage['link'+$scope.dominiosModel.link]){			
+				console.log('iflinktrue');
+				console.log(localStorage['link'+$scope.dominiosModel.link]);
+				$scope.dimensoes = localStorage['link'+$scope.dominiosModel.link];
+				getData($scope.dominiosModel.action);
+			}else {
+				console.log('iflinkfalse');
+
+				Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
+                console.log(res);
+				$scope.dimensoes = res.toJSON();
+				localStorage['link'+$scope.dominiosModel.link] = $scope.dimensoes;
+				getData($scope.dominiosModel.action);
+			  });
+			}
 		  
-		// }
-		if ($scope.dominiosModel.link)
-          Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
-            $scope.dimensoes = res.toJSON();
-            getData($scope.dominiosModel.action);
-          });
+		}
+		
+        // if ($scope.dominiosModel.link)
+        //   Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
+        //     $scope.dimensoes = res.toJSON();
+        //     getData($scope.dominiosModel.action);
+        //   });
         
     }
     
