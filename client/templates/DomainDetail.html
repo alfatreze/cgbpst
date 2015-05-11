@@ -83,11 +83,12 @@ animationOut: fadeOut
 
 <div class="vertical grid-block">
     
-    <div id="output" class="grid-content" style="padding: 1em;">
+    <!-- RENDER GRAPH -->
+    <div id="output" class="pivot-ovr grid-content" style="padding: 1em;">
         <div id="panelHide" ng-hide="true">panelHide</div>
     </div>
 
-    
+    <!-- TOOLBAR -->
     <div class="grid-content shrink" style="border-top: 1px solid #D3D3D3; padding: 1em;">
         <a  class="secondary button float-right" style="margin-bottom: 0">Exportar XLS</a>
         <a  class="secondary button float-right" style="margin-bottom: 0">Exportar PDF</a>
@@ -96,6 +97,7 @@ animationOut: fadeOut
         <a href="#" zf-toggle="panel-metadata" class="secondary button float-right" style="margin-bottom: 0">Ver Metadata</a>
     </div>
     
+    <!-- METADATA -->
     <div id="panel-metadata" zf-panel="" position="bottom" style="padding: 1em; height: auto; background: #fcfcfc; border-top: 1px solid lightgray">
         <a zf-close="" class="close-button">×</a>
         <h5 style="">METADATA</h5>

@@ -1,0 +1,222 @@
+.pvtUi {
+    color: red;
+}
+
+// Table Styles
+table.pvtTable {
+    font-size: 8pt;
+    text-align: left;
+    border-collapse: collapse;
+    
+    tr {
+        
+        th, td { 
+            padding: 5px;
+            border: 1px solid #ddd;
+
+        }
+    
+        th {
+            background-color: #f4f4f4;
+            font-size: 8pt;
+            
+        }
+    
+        td {
+            color: #333;
+            background-color: #FFF;
+            vertical-align: top;
+            text-align: right;
+        }  
+    }
+        
+    .pvtColLabel {
+        text-align: center;
+    }
+
+    .pvtTotalLabel {
+        text-align: right;
+    }
+    
+}
+
+.pvtTotal,
+.pvtGrandTotal {
+    font-weight: bold;
+}
+
+.pvtVals {
+    text-align: center;
+}
+
+.pvtAggregator {
+    margin-bottom: 5px;
+}
+
+// main axis
+.pvtAxisContainer,
+.pvtVals {
+    border: none; //1px solid #ccc;
+    background: transparent;
+    padding: 1em 0;
+    min-width: 20px;
+    min-height: 20px;
+    
+    &.pvtUnused { border-bottom: 1px solid #ccc !important }
+}
+
+.pvtAxisContainer li {
+    padding: 8px;
+    list-style-type: none;
+    cursor: move;
+    font-size: 14px;
+    
+    &.pvtPlaceholder {
+        padding: 3px 15px;
+        border-radius: 0;
+        border: 1px dashed #aaa;
+    }
+    
+    span.pvtAttr {
+        background: #fff;
+        border: 1px solid $primary-color;
+        color: $primary-color;
+        padding: 2px 5px;
+        white-space: nowrap;
+        border-radius: 0;
+    }
+}
+
+.pvtTriangle {
+    cursor: pointer;
+    color: $primary-color;
+}
+
+.pvtHorizList li { display: inline; }
+
+.pvtVertList { vertical-align: top; }
+
+.pvtFilteredAttribute { font-style: italic }
+
+// Modal Filter Box
+.pvtFilterBox {
+    z-index: 100;
+    width: 280px;
+    border: 1px solid gray;
+    background-color: #fff;
+    position: absolute;
+    padding: 1em;
+    padding-bottom: 0;
+    text-align: center;
+    
+    h4 { font-size: 18px; text-transform: uppercase; }
+
+    p { margin: 0; margin-top: 1em }
+
+    label { font-weight: normal; }
+
+    input[type='checkbox'] { margin-right: 5px; }
+    
+    button {
+        // Extend the base selector to get core styles
+        @extend %button;
+        
+        // Use the size mixin to set a size
+        @include button-size(
+            $size: medium, // tiny, small, medium, or large
+            $expand: false
+        );
+        
+        // Use the style mixin to set visual styles
+        @include button-style(
+            $background: $primary-color, // Background color
+            $background-hover: #fff, // Background color on hover. Use "auto" to generate automatically
+            $color: #000, // Text color
+            $style: hollow // Can be solid or hollow
+        );
+        &.custom-disabled {
+            @include button-disabled;
+        }
+        
+    
+    }
+    
+}
+
+// Filter Box List
+.pvtCheckContainer {
+    text-align: left;
+    overflow: auto;
+    width: 100%;
+    max-height: 200px;
+    
+    p { margin: 5px; }
+    
+    /*
+    // This gets you basic styles
+    @include block-list-container( 
+        $font-size: 1rem, // Base font size for entire list
+        $full-bleed: true // If true, negative margins are added on the left and right to push the list to the edge of the container
+    );
+    
+    // This adds support for text fields, dropdowns, and radio/check inputs
+    @include block-list-inputs( 
+        $color: #000, // Foreground color
+        $background: #fff, // Background color
+        $background-hover: #fff, // Background color of elements on hover
+        $padding: 1rem //
+    );
+    
+    // This adds support for icons
+    &.with-icons {
+        @include block-list-icons( 
+            $size: 0.8, // This should be a decimal point. 0.8 makes the icon 80% the size of its parent
+            $item-selector: 'li' // This should be whatever tag or class your block list uses for items
+        );
+    }
+    
+    // Define what tag or class your list items are with this mixin
+    li {
+        @include block-list-item( 
+            $color: #000, // Color of items
+            //$color-hover, // Color of items on hover
+            //$color-disabled, // Color of items when disabled
+            $background: transparent, // Background color
+            $background-hover: #ccc, // Background color on hover
+            $border: 1px solid #ccc, // Top and bottom border of items
+            $padding: 1rem
+        );
+        
+        // Add styles for list items with chevrons
+        &.with-chevron {
+            @include block-list-chevron(
+                $color: #000, // Color of chevron
+                $padding: 1rem, // Insert the same padding as the block list item here
+                $label-class: 'block-list-label' // Insert the class you're using for labels
+            );
+        }
+    }
+    
+    // Define what tag or class your headers are with this mixin
+    header {
+        @include block-list-header( 
+            $color: #000, // Text color
+            $font-size: 1rem, // Font size
+            $uppercase: true, // If true, the text becomes all-caps
+            $offset: 1rem // Left-side offset for text
+        );
+    }
+    
+    // Define the class for labels
+    .block-list-label {
+        @include block-list-label( 
+            $color: #999, // Color of label
+            $left-class: 'left', // Define a modifier class for left-aligned labels
+            $left-padding: 1rem // Padding to add when a label is left-aligned
+        );
+    }
+    */
+    
+}
+
+.pvtRendererArea { padding: 0; }

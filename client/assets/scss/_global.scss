@@ -4,129 +4,44 @@
     .menu-bar { background: transparent; }
 }
 
-.accordion-item {
-    background: #fff;
+.pivot-ovr {
     
-    // a { padding: 1em; }
-    
-    border-bottom: 1px solid #ddd;
-    
-    &:before { background-image: url(../svg/iconmonstr-arrow-25-icon.svg)}
-    
-    &.is-active { 
-        //background: cyan !important
+    // General Table styles
+    table { 
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100%!important;
         
-        > .accordion-title { 
-            //background: #fafafa;
-            &:after { transform: rotate(270deg); }
-        }
-
-    }
-    
-    .accordion-title { 
-        background: transparent;
+        tr {}
         
-        &:after {
-            content: "";
-            background: url(../svg/iconmonstr-arrow-25-icon.svg);
-            background-size: 18px;
-            width: 18px;
-            height: 18px;
-            display: block;
-            float: right;
-            background-repeat: no-repeat;
-            transform: rotate(90deg);
-            opacity: 0.3;
-        }
+        th {}
+        
+        td {}
+    
+    }
+    
 
+    
+    // horizontal axis
+    .pvtHorizList  { }
+    
+    // Unused values
+    .pvtUnused  {
+        
+        // Hide first value - should always be = valor
+        > .axis_0 { display: none }
     }
     
-    & .accordion-content {
-        padding: 0;
-    }
+    // selected cols
+    .pvtCols  { }
     
-    & .accordion-item, 
-    & .accordion { border: none; }
     
-            
-    .domain-link { 
-        padding: 1em;
-        font-weight: 300;
-        //background: yellow;
-    }
+    // Pivot table hide
+    .pvtVals { 
+        border: none;
+        background: #fff;
+        > * { display: none; } }
 
+    .pvtRenderer { display: none; }
+    
 }
-
-.domain {
-        &-l1, &-l2, &-l3 { position: relative; }
-        &-l1 { 
-            .accordion-content { position: relative; }
-            font-weight: 600;
-            font-size: 0.98em;
-            
-            // Push level 2 item
-            > .accordion-content { 
-                margin-left: 2em;
-                
-                // Display level line
-                &:before {
-                    content:"";
-                    display: block;
-                    float: left;
-                    top: 1em;
-                    bottom: 1em;
-                    left: -0.5em;
-                    width: 1px;
-                    background: #ddd;
-                    position: absolute;
-                    z-index: 1;
-                }
-            }
-        }
-    
-        &-l2 { 
-            font-weight: 600; 
-            color: gray;
-            
-                        // Push level 2 item
-            > .accordion-content { 
-                margin-left: 2em;
-                
-                // Display level line
-                &:before {
-                    content:"";
-                    display: block;
-                    float: left;
-                    top: 1em;
-                    bottom: 1em;
-                    left: -0.5em;
-                    width: 1px;
-                    background: #ddd;
-                    position: absolute;
-                    z-index: 1;
-                }
-            }
-        }
-        &-l3 { 
-            font-weight: 300;
-                    // Push level 2 item
-            > .accordion-content { 
-                margin-left: 2em;
-                
-                // Display level line
-                &:before {
-                    content:"";
-                    display: block;
-                    float: left;
-                    top: 1em;
-                    bottom: 1em;
-                    left: -0.5em;
-                    width: 1px;
-                    background: #ddd;
-                    position: absolute;
-                    z-index: 1;
-                }
-            }
-        }
-    
-    }
