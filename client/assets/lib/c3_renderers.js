@@ -81,7 +81,7 @@
               show: false
             },
             tooltip: {
-              show: true
+              show: graficosShowTooltip//true
             },
             data: {
               columns: columns

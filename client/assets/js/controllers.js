@@ -415,7 +415,11 @@ function DragDropController($scope) {
 
 }
 
+var graficosShowTooltip = false;
+
 function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll, Generico, Indicador, DashboardUtilizador) {
+
+
 
     function getData(cols,rows,members,observacao,obj) {
         /* hack table */
@@ -430,6 +434,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll, 
             rendereres:$.extend($.pivotUtilities.renderers,$.pivotUtilities.c3_renderers),
             renderer:$.pivotUtilities.renderers["Simplified Line Chart C3"],
             rendererName: "Simplified Line Chart C3",
+            flagTooltip: false,
             filter : function(filter) {
                 return true;
             }
