@@ -252,6 +252,11 @@
             save: {
                 method: 'POST',
                 isArray: false
+            },
+            edit: { method: 'PUT', isArray: false },
+            delete: { 
+                method: 'DELETE', 
+                isArray: false 
             }
         });
     };
