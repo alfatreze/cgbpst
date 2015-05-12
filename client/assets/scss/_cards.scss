@@ -1,5 +1,7 @@
 // FO CARDS
 
+$card-height: 350px;
+
 // This is a card container
 .card-fo {
     @include card-container( 
@@ -12,6 +14,16 @@
         $margin: 1rem // Margin bottom
     );
     
+    height: $card-height;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    display: flex;
+    backface-visibility: hidden;
+    flex: 1 1 auto;
+    justify-content: flex-start;
+    order: 0;
+    
+    
     &:hover .card-fo-actions {
         opacity: 1
     }
@@ -20,6 +32,32 @@
     .grid-content .grid-block { margin: 0; }
     
     .grid-block { margin: 0; }
+    
+    .card-fo-title, 
+    .card-fo-subtitle, 
+    .card-fo-section, 
+    .card-fo-footer {
+        display: flex;
+        position: relative;
+        backface-visibility: hidden;
+        flex: 1 1 auto;
+        flex-flow: row nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
+        order: 0;
+        height: auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        //overflow-x: hidden;
+        //overflow-y: auto;
+    }
+    
+    .card-fo-title, 
+    .card-fo-subtitle, 
+    .card-fo-footer {
+        flex: 0 0 auto;
+    }
+    
 }
 
 // This is a card divider

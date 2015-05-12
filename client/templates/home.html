@@ -1,17 +1,17 @@
 ---
 name: home
 url: /home
-animationIn: fadeIn
-animationOut: fadeOut
 ---
 
-<div ng-controller="ConteudoController"
+<div ng-controller="ConteudoController" 
      class="grid-content">
-
+    
+    <route-loading-indicator></route-loading-indicator>
+    
     <!--<h1>PORTAL DAS ESTATÍSTICAS</h1>-->
     <div class="grid-block"
          style="margin: 1.5rem 0"
-         animation-in="zoomIn"
+         animation-in="zoomIn" 
          animation-out="zoomOut">
 
         <span ng-repeat="link in showLinks | orderBy:'order'"
@@ -22,8 +22,8 @@ animationOut: fadeOut
         </span>
 
     </div>
-
-
+    
+    
     <div class="grid-block small-up-1 medium-up-4" ng-init="getTextos();getGraficos();">
 
         <div ng-repeat="conteudoTexto in textos.texto | orderBy:'order'"

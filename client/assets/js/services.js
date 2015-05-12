@@ -3,26 +3,25 @@
 
     /* Services */
     /*
-     var statServices = angular.module('statServices', ['ngResource']);
-     statServices.factory('Dominios',Dominios);
-     Dominios.$inject = ['$resources'];
-     function Dominios($resources) {
-     return $resource('api/:file.json', {}, {
-     query: {method:'GET', params:{file:'dominios',series:$scope.selection.serie}, isArray:false}
-     });
-     };
-     */
-
+    var statServices = angular.module('statServices', ['ngResource']);
+    statServices.factory('Dominios',Dominios);
+    Dominios.$inject = ['$resources'];
+    function Dominios($resources) {
+        return $resource('api/:file.json', {}, {
+          query: {method:'GET', params:{file:'dominios',series:$scope.selection.serie}, isArray:false}
+        });
+      };
+    */
+    
     // AZURE SERVER
     //const serverServices = 'http://cgptazrbdp01.cloudapp.net:5000';
-
+    
     // VMWARE SERVER
-   // const serverServices = 'http://10.0.22.138:5000';
-    const serverServices = 'http://cgptazrbdp01.cloudapp.net:5000';
-
+    const serverServices = 'http://10.0.22.138:5000'; 
+    
     // LOCALHOST
     //const serverServices = 'http://localhost:5000'; 
-
+    
     var statServices = angular.module('statServices', ['ngResource']);
     statServices.factory('Dominios', Dominios);
     statServices.factory('Dimensoes', Dimensoes);

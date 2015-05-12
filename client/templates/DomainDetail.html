@@ -5,50 +5,119 @@ parent: DomainEstatistica
 controller: DomainsController
 ---
 
+<!-- CONFIG PANEL -->       
+<div zf-panel="" 
+     id="selection-panel" 
+     class=""
+     style="border-right: 1px solid lightgray; background: #fcfcfc;">
+    
+    <div class="vertical grid-block" style="height: 100%">
 
-<div class="grid-content">
+        <div class="vertical grid-block shrink">
 
-
-    <div class="nav-bar right">
-        <ul class="button-group">
-            <li><a href="#" ng-click="selectLink(1,'Table')">Indicador 1</a>
-            </li>
-            <li><a href="#" ng-click="selectLink(2,'Graph')">Indicador 2</a>
-            </li>
-        </ul>
-    </div>
-
-    <div ng-show="dominiosModel.link">
-        <label>
-            Membros:
-            <input id="membros" type="text" ng-model="dominiosModel.sel.membros">
-        </label>
-        
-        <label>Dimensões:</label>        
-        <select ng-model="choice.dimensao" ng-change="showMembros()">
-            <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.id}}">{{obj.nome}}</option>
-        </select>
-        
-        <div>
-            <label>Membros seleccionados:</label>
-            <p>{{dominiosModel.sel.membros}}</p>
-            <hr/>
-            <ul>
-                <li ng-repeat="obj in choice.membros.membros">
-                    <input type="checkbox" checkbox-group cb-id="obj.id" cb-model="dominiosModel.sel.membros">{{obj.nome}}</input>
-                </li>
-            </ul>
-
+            <div class="grid-content" style="margin-top: 1em" ng-hide="true">
+                <ul class="button-group expand">
+                    <li><a href="#" ng-click="selectLink(1,'Tab')">Indicador 1</a></li>
+                    <li><a href="#" ng-click="selectLink(2,'Gra')">Indicador 2</a></li>
+                </ul>
+            </div>
         </div>
 
+        <div class="vertical grid-block" ng-show="dominiosModel.link">
 
-        <div>
-            <button class="button" ng-click="getTable()">Tabela</button>
+            <div class="grid-content shrink" style="padding-top: 1em">
+                <a zf-close="selection-panel" class="close-button">×</a>
+                <label ng-hide="true">
+                    Membros:
+                    <input id="membros" type="text" ng-model="dominiosModel.sel.membros">
+                </label>
 
-            <button class="secondary button" ng-click="getGraph()">Gráfico</button>
+                <label>Dimensões:</label>        
+                <select ng-model="choice.dimensao" ng-change="showMembros()">
+                    <option ng-repeat="obj in dimensoes.dimensao" value="{{obj.id}}">{{obj.nome}}</option>
+                </select>
+            </div>
+            <div class="grid-content shrink">
+                <input type="text" ng-model="filterMembros" placeholder="filtro"/>
+            </div>
+            <div class="grid-content">
+                <section class="block-list">
+                    <header>Membros</header>
+                    <ul>
+                        <li ng-repeat="obj in choice.membros.membros | filter:filterMembros">
+                            <input type="checkbox" checkbox-group id="{{obj.id}}" cb-id="obj.id" cb-model="dominiosModel.sel.membros"></input>
+                            <label for="{{obj.id}}">{{obj.nome}}</label>
+                        </li>
+                    </ul>
+                </section>
 
-            <button class="info button" ng-click="getTable2()">Gráfico</button>
+            </div>
+    
+            <zf-accordion auto-open="false"
+                          class="grid-content shrink" 
+                          style="border: none; border-top: 1px solid lightgray;">
+                <zf-accordion-item title="Membros seleccionados:">
+                    <span ng-repeat="membro in dominiosModel.sel.membros" 
+                          class="label"
+                          style="margin: 0 0.3em 1em 0; border-radius: 10em;">
+                        {{membro}}
+                    </span>
+                </zf-accordion-item>
+            </zf-accordion>
+
+            <div class="grid-content shrink" style="border-top: 1px solid lightgray; padding-top: 1em;">
+                <ul class="button-group expand">
+                    <li>
+                        <a ng-click="getNewData('Tab')">Tabela</a>
+                    </li>
+                    <li class="secondary">
+                        <a ng-click="getNewData('Gra')">Gráfico</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
+</div>
 
+<!-- GRAPH AREA -->
+<div class="vertical grid-block">
+    
+    <!-- RENDER GRAPH -->
+    <div id="output" cg-busy="Promise" class="pivot-ovr grid-content" style="padding: 1em;">
+        <div id="panelHide" ng-hide="true">panelHide</div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="grid-content shrink" style="border-top: 1px solid #D3D3D3; padding: 1em;">
+        <a  class="secondary button float-right" style="margin-bottom: 0">Exportar XLS</a>
+        <a  class="secondary button float-right" style="margin-bottom: 0">Exportar PDF</a>
+        <a  ng-click="switchTo('Line Chart C3')" class="secondary button float-right" style="margin-bottom: 0">Ver Gráfico</a>
+        <a  ng-click="switchTo('Table')" class="secondary button float-right" style="margin-bottom: 0">Ver Tabela</a>    
+        <a href="#" zf-toggle="panel-metadata" class="secondary button float-right" style="margin-bottom: 0">Ver Metadata</a>
+        <a href="#" zf-toggle="selection-panel" class="secondary button float-right" style="margin-bottom: 0">
+            <img zf-iconic="" icon="cog" size="small">
+            Dimensões/Membros
+        </a>
+    </div>
+    
+    <!-- METADATA -->
+    <div id="panel-metadata" zf-panel="" position="right" style="padding: 1em; background: #fcfcfc; border-left: 1px solid lightgray">
+        <a zf-close="" class="close-button">×</a>
+        <h5 style="">METADATA</h5>
+        <hr />
+        <dl>
+            <dt class="float-left" style="margin-right: 1em">Data de criação</dt>
+            <dd>22 Janeiro 2015</dd>
+            <dt class="float-left" style="margin-right: 1em">Data de atualização</dt>
+            <dd>22 Janeiro 2015</dd>
+            <dt class="float-left" style="margin-right: 1em">Periodicidade</dt>
+            <dd>Mensal</dd>
+            <dt class="float-left" style="margin-right: 1em">Unidade</dt>
+            <dd>Euro (€)</dd>
+            <dt>Descrição</dt>
+            <dd>Lorem ipsum dolor est amet.</dd>
+        </dl>
+    </div>
+    
+    
 </div>
