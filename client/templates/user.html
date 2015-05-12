@@ -5,15 +5,16 @@ animationIn: fadeIn
 animationOut: fadeOut
 ---
 
-<div class="grid-content">
+<div class="grid-content" ng-controller="ConteudoController" >
 
     <h1>ÁREA PESSOAL</h1>
     
 
-    <div class="grid-block small-up-1 medium-up-4">
+    <div class="grid-block small-up-1 medium-up-4"  ng-init="getGraficos(false,true);">
 
-        <div class="grid-content" 
-             animation-in="zoomIn" 
+        <div ng-repeat="conteudoGrafico in conteudosGraficos | orderBy:'order'"
+             class="grid-content"
+             animation-in="zoomIn"
              animation-out="zoomOut">
             <div class="card-fo">
                 <div class="card-fo-title">
@@ -22,18 +23,18 @@ animationOut: fadeOut
                 <div class="card-fo-section">
                     <div id="{{conteudoGrafico.graficoId}}"></div>
                     <div class="card-fo-actions grid-block">
-                        <span class="grid-block"><img zf-iconic="magnifying-glass" icon="thumb" size="small" class="iconic-color-secondary"> LER MAIS</span>
-                        <span class="grid-block"><img zf-iconic="share-boxed" icon="thumb" size="small" class="iconic-color-secondary"> PARTILHAR</span>
+                        <span class="grid-block"><img zf-iconic="" icon="magnifying-glass" size="small" class="iconic-color-secondary">&nbsp;LER MAIS</span>
+                        <span class="grid-block"><img zf-iconic="" icon="share-boxed" size="small" class="iconic-color-secondary">&nbsp;PARTILHAR</span>
                     </div>
                 </div>
                 <div class="card-fo-footer">
                     <span>
-                        <img zf-iconic="person" icon="thumb" size="small">
-                        {{conteudoTexto.person}}
+                        <img zf-iconic="" icon="person" size="small">
+                        &nbsp;{{conteudoGrafico.person}}
                     </span>
-                    <span>{{conteudoTexto.getDataPublicacao()}}</span>
+                    <span>{{conteudoGrafico.textDate}}</span>
                 </div>
-                {{conteudo.gerarGrafico(conteudoGrafico.graficoId)}}
+                {{gerarGrafico(conteudoGrafico.graficoId)}}
             </div>
         </div>
     </div>
