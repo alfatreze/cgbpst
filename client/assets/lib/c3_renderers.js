@@ -13,7 +13,6 @@
 
   callWithJQuery(function($) {
     var makeC3Chart;
-    var makeSimplifiedC3Chart;
     makeC3Chart = function(chartType) {
       return function(pivotData, opts) {
         var agg, colKey, colKeys, columns, defaults, h, headers, params, result, row, rowHeader, rowKey, rowKeys, _i, _j, _len, _len1;
@@ -58,63 +57,35 @@
           columns.push(row);
         }
         result = $("<div>");
-        if (chartType != 'simplified') {
-          params = {
-            bindto: result[0],
-            size: {
-              height: $(window).height() / 1.4,
-              width: $(window).width() / 1.4
-            },
-            axis: {
-              x: {
-                type: 'category',
-                categories: headers
-              }
-            },
-            data: {
-              columns: columns
+        params = {
+          bindto: result[0],
+          size: {
+            height: $(window).height() / 1.4,
+            width: $(window).width()
+          },
+          axis: {
+            x: {
+              type: 'category',
+              categories: headers
             }
-          };
-        } else {
-          params = {
-            bindto: result[0],
-            size: {
-           //   height: $(window).height() / 1.4,
-              width: 450
-            },
-            axis: {
-              x: {
-             //   type: 'category',
-             //   categories: headers
-                show: true//$scope.graficosShowXaxis
-              },
-              y: {
-                show: false//$scope.graficosShowYaxis
-              }
-            },
-            legend: {
-              show: false//$scope.graficosShowLabels
-            },
-            tooltip: {
-              show: false//$scope.graficosShowTooltip
-            },
-            data: {
-              columns: columns
-            }
-          };
-        }
+          },
+          data: {
+            columns: columns
+          },
+          legend: {
+            hide:true
+          }
+        };
         if (chartType != null) {
           params.data.type = chartType;
         }
         c3.generate(params);
-        console.log('GENERATED GRAFIC');
         return result;
       };
     };
     return $.pivotUtilities.c3_renderers = {
       "Line Chart C3": makeC3Chart(),
-      "Bar Chart C3": makeC3Chart("bar"),
-      "Simplified Line Chart C3": makeC3Chart("simplified")
+      "Bar Chart C3": makeC3Chart("bar")
     };
   });
 
