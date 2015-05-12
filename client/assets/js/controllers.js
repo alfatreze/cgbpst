@@ -958,13 +958,13 @@ function HeaderController($scope) {
 
     var menuSections = [
         {
-            name: 'Backoffice',
+            name: 'Back office',
             order: 1,
             section: 'BO',
             uiSref: 'backoffice',
         },
         {
-            name: 'Frontoffice',
+            name: 'Front office',
             order: 2,
             section: 'FO',
             uiSref: 'home',
