@@ -433,6 +433,18 @@ function DragDropController($scope) {
 
 }
 
+var graficoSimplificadoShowTooltip = false;
+var graficoSimplificadoShowLegend = false;
+var graficoSimplificadoShowX = false;
+var graficoSimplificadoShowY = false;
+
+function gravarOpcoesGrafSimpl() {
+    graficoSimplificadoShowTooltip = document.getElementById("showTooltip").checked;
+    graficoSimplificadoShowLegend = document.getElementById("showLegend").checked;
+    graficoSimplificadoShowX = document.getElementById("showX").checked;
+    graficoSimplificadoShowY = document.getElementById("showY").checked;
+}
+
 function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll, Generico, Indicador, DashboardUtilizador) {
 
     function getData(cols,rows,members,observacao,obj) {

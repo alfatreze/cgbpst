@@ -6,20 +6,40 @@ parent: GestaoPaginaInicial
 
 <div class="grid-content" ng-controller="ConteudoController as conteudo" ng-init="getGraficos()">
 
-<!--     <div class="grid-block"
+     <div class="grid-block"
          style="margin: 1.5rem 0"
          animation-in="zoomIn"
          animation-out="zoomOut">
 
-        <span class="label"
-              style="margin-right: 10px">
-            ORDEM
-        </span>
-        <span class="label"
-              style="margin-right: 10px">
-            DATA DE PUBLICAÇÃO
-        </span>
-    </div> -->
+        <a zf-open="basicModal" class="info button">DEFINIÇÕES GRÁFICO SIMPLIFICADO</a>
+    </div>
+
+
+    <div zf-modal="" id="basicModal">
+        <a zf-close="" class="close-button">×</a>
+        <section class="block-list">
+            <header>DEFINIÇÕES GRÁFICO SIMPLIFICADO</header>
+            <ul>
+                <li>
+                    <input type="checkbox" id="showLegend" value="graficoSimplificadoShowLegend" ng-checked="{{graficoSimplificadoShowLegend}}">
+                    <label for="showLegend">Mostrar Legenda</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="showX" value="graficoSimplificadoShowX" ng-checked="{{graficoSimplificadoShowX}}">
+                    <label for="showX">Mostrar Eixo X</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="showY" value="graficoSimplificadoShowY" ng-checked="{{graficoSimplificadoShowY}}">
+                    <label for="showY">Mostrar Eixo Y</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="showTooltip" value="graficoSimplificadoShowTooltip" ng-checked="{{graficoSimplificadoShowTooltip}}">
+                    <label for="showTooltip">Mostrar Tooltip</label>
+                </li>
+            </ul>
+        </section>
+        <a zf-close="" class="alert button" onclick="gravarOpcoesGrafSimpl()">Gravar</a>
+    </div>
 
     <div class="card" ng-repeat="conteudoGrafico in conteudosGraficos | orderBy:'order'">
         <form ng-submit="saveConteudoGrafico(conteudoGrafico)">
