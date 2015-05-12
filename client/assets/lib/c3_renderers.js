@@ -61,10 +61,11 @@
         if (chartType != null && chartType == "simplified") {
           // Simplified Line Chart
           //console.log('SIMPLIFIED - xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+          //console.log(graficoSimplificadoShowY);
           params = {
             bindto: result[0],
             size: {
-              height: 260,
+              height: 180,
               width: 288
             },
             axis: {
