@@ -57,6 +57,7 @@
           columns.push(row);
         }
         result = $("<div>");
+        console.log(chartType);
         if (chartType != null && chartType == "simplified") {
           // Simplified Line Chart
           console.log('SIMPLIFIED - xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
