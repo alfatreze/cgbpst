@@ -71,17 +71,17 @@
               x: {
                 type: 'category',
                 categories: headers,
-                show: false
+                show: graficoSimplificadoShowX
               },
               y: {
-                show: false
+                show: graficoSimplificadoShowY
               }
             },
             legend: {
-              show: false
+              show: graficoSimplificadoShowLegend
             },
             tooltip: {
-              show: graficosShowTooltip//true
+              show: graficoSimplificadoShowTooltip//true
             },
             data: {
               columns: columns

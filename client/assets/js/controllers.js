@@ -415,7 +415,10 @@ function DragDropController($scope) {
 
 }
 
-var graficosShowTooltip = false;
+var graficoSimplificadoShowTooltip = false;
+var graficoSimplificadoShowLegend = false;
+var graficoSimplificadoShowX = false;
+var graficoSimplificadoShowY = false;
 
 function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll, Generico, Indicador, DashboardUtilizador) {
 
