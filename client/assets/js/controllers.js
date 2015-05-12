@@ -724,7 +724,7 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll, 
         var monthNames = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEC"];
 
         var dataFormatada = new Date(parseInt(data.substr(6)));
-        return dataFormatada.getDate()+' '+monthNames[dataFormatada.getMonth()-1]+' '+dataFormatada.getFullYear();
+        return dataFormatada.getDate()+' '+monthNames[dataFormatada.getMonth()]+' '+dataFormatada.getFullYear();
     }
 	
 	function loadGraficoIndicadores(data)
