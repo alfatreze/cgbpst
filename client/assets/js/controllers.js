@@ -1159,11 +1159,27 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
     
     function getData(action) {
 
+            //LEITURA DE OBSERVACOES EM LOCALSTORAGE
+            //------------------------------------
+            //Se existir uma variável no localStorage com o identificador "link"+link+"obs"
+            //por exemplo "link15obs", ele devolve o conteudo armazenado em localStorage
+            //caso contrário faz a chamada ao WS
+            //sendo que o link é o identificador do dominiosModel
+            //------------------------------------
+        if(localStorage['link'+$scope.dominiosModel.link+'obs']){         
+                var obj = localStorage['link'+$scope.dominiosModel.link+'obs'];
+                obj=JSON.parse(obj);
+
+                $scope.indicador = obj;
+        }
+
+
         if (jQuery.isEmptyObject($scope.indicador)) { 
- 
-            $scope.indicador = Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) { 
-			$scope.indicador = res.toJSON();
-    
+
+                Indicador.save({"id_membros":$scope.dominiosModel.sel.membros},function(res) {
+
+                $scope.indicador = res.toJSON();
+
                 if (jQuery.isEmptyObject($scope.indicador)) { 
                     notificationWarn("Observações","Sem resultados...");
                     delete $scope.indicador;
@@ -1193,20 +1209,77 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
                 $scope.dominiosModel.sel.membros1 = b;
                 $scope.dominiosModel.sel.membros2 = b.slice(0);
                 $scope.indicador._value = _value;
-                      
+
+                //Se o cliente efectuar 5 pedidos é dado início ao armazenamento de dados em LocalStorage
+                if(!localStorage['countRequests'])localStorage['countRequests']=0;
+                if(localStorage['countRequests']<6){
+                    $scope.indicador.timestamp = new Date().getTime().toString();
+                    try {                    
+                        localStorage['link'+$scope.dominiosModel.link+'obs'] = JSON.stringify($scope.indicador);
+                        localStorage['countRequests']++;
+                    }catch (e) {
+                        cleanLocalStorage();   
+                        localStorage['link'+$scope.dominiosModel.link+'obs'] = JSON.stringify($scope.indicador);
+                        localStorage['countRequests']=1;
+                    }
+                }else {
+                    deleteOldestEntry(localStorage);
+                    $scope.indicador.timestamp = new Date().getTime().toString();
+                    try {                    
+                        localStorage['link'+$scope.dominiosModel.link+'obs'] = JSON.stringify($scope.indicador);
+                        localStorage['countRequests']++;
+                    }catch (e) {
+                        cleanLocalStorage();   
+                        localStorage['link'+$scope.dominiosModel.link+'obs'] = JSON.stringify($scope.indicador);
+                        localStorage['countRequests']=1;
+                    }
+                }
                 /* hack table */
                 draw(action);
-                
-            /* error getting indicador */   
-            }, function (error) {
-                    notificationError("Observações",JSON.stringify(error));
-                    delete $scope.indicador;               
-            });
+                }, function (error) {
+                        notificationError("Observações",JSON.stringify(error));
+                        delete $scope.indicador;               
+                });
+
         } else {
             draw(action);
         }
     } /*** End getData() ***/
     
+    function cleanLocalStorage (){
+        //var oldest = null;
+        for (var key in localStorage){
+           if (key.match(/link.*obs/)) {
+               localStorage.removeItem(key);
+           }
+        }
+    }
+
+
+    function deleteOldestEntry (array){
+        //var oldest = null;
+        var oldestKey = null;
+        var oldestDate = new Date().getTime();
+        var arrayObj
+        for (var key in array){
+           console.log(key)
+           if(key.match(/link.*obs/)){
+                arrayObj = JSON.parse(array[key])
+                console.log(true);
+                console.log(arrayObj);
+                console.log(arrayObj.timestamp);
+                console.log(oldestDate);
+                if(parseInt(arrayObj.timestamp)<oldestDate){
+                    oldestDate=arrayObj.timestamp
+                    //oldest=array[key];
+                    oldestKey=key;
+                }
+           }else console.log(false);
+        }
+        console.log(oldestKey);
+        localStorage.removeItem(oldestKey);
+    }
+
     /******************
      *  init()
      */ 
@@ -1218,47 +1291,14 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         $scope.choice.dimensao = {};
         $scope.choice.membros =[];
         $scope.indicador = {};
-        //$scope.dominiosModel.sel = {};
-        //$scope.dominiosModel.sel.membros = [];
-        
-		//------------------------------------
-		//COMENTÁRIOS DE DEBUG
-		//------------------------------------
-		console.log('link:'+$scope.dominiosModel.link);
-		console.log('dominiosModel:');
-		console.log($scope.dominiosModel);
 		
-		
-        if ($scope.dominiosModel.link){
-			//------------------------------------
-			//Se existir uma variável no localStorage com o identificador "link"+link
-			//por exemplo "link15", ele devolve o conteudo armazenado em localStorage
-			//caso contrário faz a chamada ao WS
-			//sendo que o link é o identificador do dominiosModel
-			//------------------------------------
-			if(localStorage['link'+$scope.dominiosModel.link]){			
-				console.log('iflinktrue');
-				console.log(localStorage['link'+$scope.dominiosModel.link]);
-				$scope.dimensoes = localStorage['link'+$scope.dominiosModel.link];
-				getData($scope.dominiosModel.action);
-			}else {
-				console.log('iflinkfalse');
 
-				Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
-                console.log(res);
-				$scope.dimensoes = res.toJSON();
-				localStorage['link'+$scope.dominiosModel.link] = $scope.dimensoes;
-				getData($scope.dominiosModel.action);
-			  });
-			}
-		  
-		}
 		
-        // if ($scope.dominiosModel.link)
-        //   Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
-        //     $scope.dimensoes = res.toJSON();
-        //     getData($scope.dominiosModel.action);
-        //   });
+         if ($scope.dominiosModel.link)
+           Dimensoes.query({"link":$scope.dominiosModel.link},function(res) {
+           $scope.dimensoes = res.toJSON();
+             getData($scope.dominiosModel.action);
+           });
         
     }
     
