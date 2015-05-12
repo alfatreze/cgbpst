@@ -57,26 +57,58 @@
           columns.push(row);
         }
         result = $("<div>");
-        params = {
-          bindto: result[0],
-          size: {
-            height: $(window).height() / 1.4,
-            width: $(window).width()
-          },
-          axis: {
-            x: {
-              type: 'category',
-              categories: headers
+        if (chartType != null && chartType == "simplified") {
+          // Simplified Line Chart
+          console.log('SIMPLIFIED - xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+          params = {
+            bindto: result[0],
+            size: {
+              height: 260,
+              width: 288
+            },
+            axis: {
+              x: {
+                type: 'category',
+                categories: headers,
+                show: false
+              },
+              y: {
+                show: false
+              }
+            },
+            legend: {
+              show: false
+            },
+            tooltip: {
+              show: true
+            },
+            data: {
+              columns: columns
             }
-          },
-          data: {
-            columns: columns
-          },
-          legend: {
-            hide:true
-          }
-        };
-        if (chartType != null) {
+          };
+        } else {
+          // Normal Charts
+          params = {
+            bindto: result[0],
+            size: {
+              height: $(window).height() / 1.4,
+              width: $(window).width()
+            },
+            axis: {
+              x: {
+                type: 'category',
+                categories: headers
+              }
+            },
+            data: {
+              columns: columns
+            },
+            legend: {
+              hide:true
+            }
+          };
+        }
+        if (chartType != null && chartType != "simplified") {
           params.data.type = chartType;
         }
         c3.generate(params);
@@ -85,7 +117,8 @@
     };
     return $.pivotUtilities.c3_renderers = {
       "Line Chart C3": makeC3Chart(),
-      "Bar Chart C3": makeC3Chart("bar")
+      "Bar Chart C3": makeC3Chart("bar"),
+      "Simplified Line Chart C3": makeC3Chart("simplified")
     };
   });
 
