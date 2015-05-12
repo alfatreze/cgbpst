@@ -9,7 +9,7 @@ statControllers.controller('ConteudoController', ConteudoController);
 statControllers.controller('DragDropController', DragDropController);
 statControllers.controller('EstatisticasTreeController', EstatisticasTreeController);
 
-DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','NotificationFactory','filterFilter','dominiosModel'];
+DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','NotificationFactory','filterFilter','dominiosModel','DashboardUtilizador'];
 //DomainsController.$inject = ['$scope','$state', '$window', 'Dominios','Dimensoes','Indicador','NotificationFactory','filterFilter','dominiosModel','Observacao'];
 HeaderController.$inject = ['$scope'];
 ConteudoController.$inject = ['$scope','$state', '$window','Texto','Dominios','TextoAll','Generico','Indicador','DashboardUtilizador'];
@@ -748,35 +748,74 @@ function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll, 
 		});			
 	}
 
-    $scope.getGraficos = function () {
+    $scope.getGraficos = function (getGenerico, getDashboardUtilizador) {
         if (!$scope.graficosLoaded) {
             if (localStorage.getItem("BDP_ConteudoGraficosTeste")) {
                 conteudoGraficos = JSON.parse(localStorage.getItem("BDP_ConteudoGraficosTeste"));
             }
 
             $scope.conteudosGraficos = new Array();
-
-            $scope.genericoQueryResult = Generico.query(function (data) {
-				loadGraficoIndicadores(data);
-            }, function (error) {
-                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
-                alert('Erro:' + JSON.stringify(error));
-                $scope.textos = {};
-            });
 			
-            $scope.dashboardQueryResult = DashboardUtilizador.query(function (data) {
-				for (var i = 0; i < data.dashboard.length; i++) {
-					loadGraficoIndicadores(data.dashboard[i]);
-				}
-            }, function (error) {
-                //definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
-                alert('Erro:' + JSON.stringify(error));
-                $scope.textos = {};
-            });			
+			if (typeof(getGenerico)=='undefined')
+			{
+				getGenerico = true;
+			}
+
+			if (typeof(getDashboardUtilizador)=='undefined')
+			{
+				getDashboardUtilizador = true;
+			}		
+			
+			if (getGenerico)
+			{			
+				$scope.genericoQueryResult = Generico.query(function (data) {
+					loadGraficoIndicadores(data);
+				}, function (error) {
+					//definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+					alert('Erro:' + JSON.stringify(error));
+					$scope.textos = {};
+				});
+			}
+
+			if (getDashboardUtilizador)
+			{
+				$scope.dashboardQueryResult = DashboardUtilizador.query(function (data) {
+					var graficosToLoad = new Array();
+					var maxId = -1;
+					
+					for (var i = 0; i < data.dashboard.length; i++) {
+						if (data.dashboard[i].id>maxId)
+						{
+							maxId = data.dashboard[i].id;
+						}
+						
+						graficosToLoad[data.dashboard[i].id] = data.dashboard[i];
+					}
+					
+					var graficosCount = 0;
+					
+					for (var i = maxId; i >= 0; i--) {
+						if (typeof(graficosToLoad[i])!='undefined')
+						{
+							loadGraficoIndicadores(graficosToLoad[i]);
+							graficosCount++;
+							if (graficosCount==2)
+							{
+								break;
+							}
+						}
+					}					
+				}, function (error) {
+					//definir uma funcao geral para devolver o erro (Notification )com chamada a callback;
+					alert('Erro:' + JSON.stringify(error));
+					$scope.textos = {};
+				});	
+			}			
 			
             $scope.graficosLoaded = true;
         }
     }
+
 
     $scope.gerarGrafico = function (graficoId) {
         conteudo_gerarGrafico(graficoId);
@@ -1076,7 +1115,7 @@ function HeaderController($scope) {
 }
 
 //function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,NotificationFactory,filterFilter,dominiosModel, Observacao){
-function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,NotificationFactory,filterFilter,dominiosModel){
+function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,NotificationFactory,filterFilter,dominiosModel,DashboardUtilizador){
     
     $scope.dominios = Dominios.query();
     $scope.dominiosModel = dominiosModel;
@@ -1419,6 +1458,38 @@ function DomainsController($scope, $state, $window,Dominios,Dimensoes,Indicador,
         delete $scope.indicador;
         getData(action);
     }
+	
+    /*******************
+    * saveGraficoToDashoard()
+    */
+    $scope.saveGraficoToDashoard = function(){
+		var tipoDeFormato = '';
+	
+		if ($scope.dominiosModel.action =="Tab")
+		{
+			tipoDeFormato = "Quadro";
+		}
+		else
+		{
+			tipoDeFormato = "Grafico";	
+		}
+		
+		DashboardUtilizador.save({
+			"id_dados_fonte":$scope.dominiosModel.link,
+			"formatacao":{
+				"tipo_formato": tipoDeFormato,
+				"linhas":$scope.dominiosModel.rows,
+				"colunas":$scope.dominiosModel.cols,
+				"filtros":$scope.dominiosModel.sel.membros
+			}
+		}, function (data) {
+			alert('Gravado para o dashboard');
+		}, function (error) {
+			alert('Erro ' + JSON.stringify(error));
+		});		
+
+    }	
+	
 }
 
 /**************************************************************
