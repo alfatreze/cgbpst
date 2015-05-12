@@ -17,7 +17,7 @@
     //const serverServices = 'http://cgptazrbdp01.cloudapp.net:5000';
     
     // VMWARE SERVER
-    const serverServices = 'http://10.0.22.138:5000'; 
+    const serverServices = 'http://10.0.22.165:5000'; 
     
     // LOCALHOST
     //const serverServices = 'http://localhost:5000'; 
