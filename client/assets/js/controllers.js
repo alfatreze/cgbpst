@@ -447,6 +447,11 @@ function gravarOpcoesGrafSimpl() {
 
 function ConteudoController($scope, $state, $window, Texto, Dominios, TextoAll, Generico, Indicador, DashboardUtilizador) {
 
+    $scope.graficoSimplificadoShowTooltip = graficoSimplificadoShowTooltip;
+    $scope.graficoSimplificadoShowLegend = graficoSimplificadoShowLegend;
+    $scope.graficoSimplificadoShowX = graficoSimplificadoShowX;
+    $scope.graficoSimplificadoShowY = graficoSimplificadoShowY;
+
     function getData(cols,rows,members,observacao,obj) {
                 /* hack table */
                 var sum = $.pivotUtilities.aggregatorTemplates.sum;
