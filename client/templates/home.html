@@ -24,7 +24,7 @@ url: /home
     </div>
     
     
-    <div class="grid-block small-up-1 medium-up-4" ng-init="getTextos();getGraficos();">
+    <div class="grid-block small-up-1 medium-up-4" ng-init="getTextos();getGraficos(true, false);">
 
         <div ng-repeat="conteudoTexto in textos.texto | orderBy:'order'"
              ng-show="textosVisible"
