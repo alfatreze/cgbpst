@@ -89,7 +89,8 @@ controller: DomainsController
 
     <!-- TOOLBAR -->
     <div class="grid-content shrink" style="border-top: 1px solid #D3D3D3; padding: 1em;">
-        <a  class="secondary button float-right" style="margin-bottom: 0">Exportar XLS</a>
+        <a  ng-click="saveGraficoToDashoard()" class="secondary button float-right" style="margin-bottom: 0">Gravar para dashboard</a>
+		<a  class="secondary button float-right" style="margin-bottom: 0">Exportar XLS</a>
         <a  class="secondary button float-right" style="margin-bottom: 0">Exportar PDF</a>
         <a  ng-click="switchTo('Line Chart C3')" class="secondary button float-right" style="margin-bottom: 0">Ver Gráfico</a>
         <a  ng-click="switchTo('Table')" class="secondary button float-right" style="margin-bottom: 0">Ver Tabela</a>    
